@@ -1,13 +1,13 @@
 import {
-    Yp as onAuthStateChanged,
-    jp as signInWithGoogle,
-    zp as showToast,
-    Kp as signOut,
-    Qp as getProducts,
-    Vp as CATEGORIES,
-    $p as formatPrice,
-    Gp as formatInstallments,
-    Hp as isAdmin
+    onAuthStateChanged,
+    signInWithGoogle,
+    showToast,
+    signOut,
+    getProducts,
+    CATEGORIES,
+    formatPrice,
+    formatInstallments,
+    isAdmin
 } from "./firebase-lib.js";
 
 import { addToCart } from "./cart.js";

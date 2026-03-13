@@ -1,5 +1,5 @@
 import { getCart, getCartTotal } from './cart.js';
-import { h as saveOrder, zp as showToast } from "./firebase-lib.js";
+import { saveOrder, showToast } from "./firebase-lib.js";
 
 const summaryItems = document.getElementById('checkout-summary-items');
 const totalDisplay = document.getElementById('checkout-total');

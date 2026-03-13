@@ -2658,7 +2658,16 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const e of t
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */function Up(n){wu(nt),qe(new Ae("database",(e,{instanceIdentifier:t})=>{const i=e.getProvider("app").getImmediate(),s=e.getProvider("auth-internal"),r=e.getProvider("app-check-internal");return Op(i,s,r,t)},"PUBLIC").setMultipleInstances(!0)),ge(js,Ks,n),ge(js,Ks,"esm2020")}se.prototype.simpleListen=function(n,e){this.sendRequest("q",{p:n},e)};se.prototype.echo=function(n,e){this.sendRequest("echo",{d:n},e)};Up();const KAZZI_API_CONFIG={apiKey:"AIzaSyCWfFdav3JLU7nvkYk2FAl6aXbvQ2F9jhU",authDomain:"streamhub-alpha.firebaseapp.com",databaseURL:"https://streamhub-alpha-default-rtdb.firebaseio.com",projectId:"streamhub-alpha",storageBucket:"streamhub-alpha.firebasestorage.app",messagingSenderId:"818791017216",appId:"1:818791017216:web:4815e114c1c58f0c20a1e5",measurementId:"G-FLYS3NCT6K"},kazzi_app=Wr(KAZZI_API_CONFIG),kazzi_auth=Iu(kazzi_app),kazzi_db=xp(kazzi_app),kazzi_provider=new ee,KAZZI_ADMIN_EMAIL="moisesvanti@gmail.com";function Hp(n){return n&&n.email===KAZZI_ADMIN_EMAIL}async function qp(){try{const n=await Io(kazzi_auth,kazzi_provider);if(!Hp(n.user))throw await co(kazzi_auth),{code:"auth/not-admin",message:"Acesso negado. Apenas administradores autorizados podem acessar este painel."};return n.user}catch(n){throw gs(n)}}async function jp(){try{return(await Io(kazzi_auth,kazzi_provider)).user}catch(n){throw gs(n)}}async function Kp(){try{await co(kazzi_auth)}catch(n){throw gs(n)}}function Yp(n){return hh(kazzi_auth,n)}const K_PRODS="kazzi_products";async function Qp(){try{const n=await Np(Dn(kazzi_db,K_PRODS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}async function Jp(n){try{const e=Sp(Dn(kazzi_db,K_PRODS)),t=e.key,i={...n};return delete i._key,await Ma(e,i),{...i,_key:t}}catch(e){throw xn(e)}}async function Xp(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_PRODS}/${n}`),t)}catch(t){throw xn(t)}}async function Zp(n){try{await bp(Dn(kazzi_db,`${K_PRODS}/${n}`))}catch(e){throw xn(e)}}function gs(n){if(n.code==="auth/not-admin")return n;const t={
+ */function Up(n){wu(nt),qe(new Ae("database",(e,{instanceIdentifier:t})=>{const i=e.getProvider("app").getImmediate(),s=e.getProvider("auth-internal"),r=e.getProvider("app-check-internal");return Op(i,s,r,t)},"PUBLIC").setMultipleInstances(!0)),ge(js,Ks,n),ge(js,Ks,"esm2020")}se.prototype.simpleListen=function(n,e){this.sendRequest("q",{p:n},e)};se.prototype.echo=function(n,e){this.sendRequest("echo",{d:n},e)};Up();const KAZZI_API_CONFIG = {
+  apiKey: "AIzaSyCWfFdav3JLU7nvkYk2FAl6aXbvQ2F9jhU",
+  authDomain: "streamhub-alpha.firebaseapp.com",
+  databaseURL: "https://streamhub-alpha-default-rtdb.firebaseio.com",
+  projectId: "streamhub-alpha",
+  storageBucket: "streamhub-alpha.firebasestorage.app",
+  messagingSenderId: "818791017216",
+  appId: "1:818791017216:web:4815e114c1c58f0c20a1e5",
+  measurementId: "G-FLYS3NCT6K"
+};const kazzi_app=Wr(KAZZI_API_CONFIG),kazzi_auth=Iu(kazzi_app),kazzi_db=xp(kazzi_app),kazzi_provider=new ee,KAZZI_ADMIN_EMAIL="moisesvanti@gmail.com";function Hp(n){return n&&n.email===KAZZI_ADMIN_EMAIL}async function qp(){try{const n=await Io(kazzi_auth,kazzi_provider);if(!Hp(n.user))throw await co(kazzi_auth),{code:"auth/not-admin",message:"Acesso negado. Apenas administradores autorizados podem acessar este painel."};return n.user}catch(n){throw gs(n)}}async function jp(){try{return(await Io(kazzi_auth,kazzi_provider)).user}catch(n){throw gs(n)}}async function Kp(){try{await co(kazzi_auth)}catch(n){throw gs(n)}}function Yp(n){return hh(kazzi_auth,n)}const K_PRODS="kazzi_products";async function Qp(){try{const n=await Np(Dn(kazzi_db,K_PRODS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}async function Jp(n){try{const e=Sp(Dn(kazzi_db,K_PRODS)),t=e.key,i={...n};return delete i._key,await Ma(e,i),{...i,_key:t}}catch(e){throw xn(e)}}async function Xp(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_PRODS}/${n}`),t)}catch(t){throw xn(t)}}async function Zp(n){try{await bp(Dn(kazzi_db,`${K_PRODS}/${n}`))}catch(e){throw xn(e)}}function gs(n){if(n.code==="auth/not-admin")return n;const t={
     "auth/popup-closed-by-user":{icon:"🔐",message:"A janela de login foi fechada antes da conclusão."},
     "auth/popup-blocked":{icon:"🔐",message:"O navegador bloqueou a janela de login. Permita popups."},
     "auth/network-request-failed":{icon:"🌐",message:"Sem conexão com a internet. Verifique sua rede."},
@@ -2680,4 +2689,22 @@ async function saveOrder(n){try{const e=Sp(Dn(kazzi_db,K_ORDERS)),t=e.key,i={...
 async function getOrders(){try{const n=await Np(Dn(kazzi_db,K_ORDERS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}
 async function updateOrder(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_ORDERS}/${n}`),t)}catch(t){throw xn(t)}}
 function onNewOrder(n){try{const e=new Tp(t=>{const i=t.val();if(i)n(Object.entries(i).map(([s,r])=>({...r,_key:s})))},()=>{}),t=new _s(e);return up(kazzi_db._repo,Dn(kazzi_db,K_ORDERS),t)}catch(e){console.error(e)}}
-export{Vp as C,Kp as a,$p as b,Gp as c,qp as d,Jp as e,Qp as f,Zp as g,Hp as i,jp as l,Yp as o,zp as s,Xp as u,saveOrder as h,getOrders as j,updateOrder as k,onNewOrder as m};
+export { 
+    Vp as CATEGORIES, 
+    Kp as signOut, 
+    $p as formatPrice, 
+    Gp as formatInstallments, 
+    qp as loginAsAdmin, 
+    Jp as addProduct, 
+    Qp as getProducts, 
+    Zp as deleteProduct, 
+    Hp as isAdmin, 
+    jp as signInWithGoogle, 
+    Yp as onAuthStateChanged, 
+    zp as showToast, 
+    Xp as updateProduct, 
+    saveOrder, 
+    getOrders, 
+    updateOrder, 
+    onNewOrder 
+};

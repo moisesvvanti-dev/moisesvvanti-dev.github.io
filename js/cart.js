@@ -1,5 +1,5 @@
 const CART_STORAGE_KEY = 'kazzi_cart';
-import { zp as showToast } from "./firebase-lib.js";
+import { showToast } from "./firebase-lib.js";
 
 export function getCart() {
     try {

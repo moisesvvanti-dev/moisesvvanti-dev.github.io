@@ -1,20 +1,20 @@
 import {
-    Yp as onAuthStateChanged,
-    qp as signInWithGoogle,
-    zp as showToast,
-    Hp as isAdmin,
-    Qp as getProducts,
-    Vp as CATEGORIES,
-    $p as formatPrice,
-    Xp as updateProduct,
-    Jp as addProduct,
-    Zp as deleteProduct,
-    Kp as signOut,
-    Gp as formatInstallments,
-    jp as getCurrentUser,
-    j as getOrders,
-    k as updateOrder,
-    m as onNewOrder
+    onAuthStateChanged,
+    loginAsAdmin,
+    showToast,
+    isAdmin,
+    getProducts,
+    CATEGORIES,
+    formatPrice,
+    updateProduct,
+    addProduct,
+    deleteProduct,
+    signOut,
+    formatInstallments,
+    signInWithGoogle as getCurrentUser,
+    getOrders,
+    updateOrder,
+    onNewOrder
 } from "./firebase-lib.js";
 
 let products = [];
