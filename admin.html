@@ -212,8 +212,10 @@
                     <div class="form-group full" style="grid-column: 1/-1">
                         <label class="form-label">Imagens / Ângulos (URL)</label>
                         <div style="display:flex; gap:0.5rem; margin-bottom: 0.5rem;">
-                            <input type="text" id="edit-image-url-input" class="form-input" placeholder="Nova URL de imagem..." />
-                            <button class="btn btn-outline btn-sm" id="btn-edit-image-add">Add</button>
+                            <input type="text" id="edit-image-url-input" class="form-input" placeholder="Nova URL de imagem..." style="flex:1;" />
+                            <input type="file" id="edit-image-file-input" style="display:none;" accept="image/*,video/*" />
+                            <button class="btn btn-outline btn-sm" id="btn-edit-image-upload" title="Upload de Arquivo">📁</button>
+                            <button class="btn btn-outline btn-sm" id="btn-edit-image-add">Add URL</button>
                         </div>
                         <div id="edit-images-list" class="edit-images-list" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top: 0.5rem;"></div>
                         <p class="form-hint">Dica: A primeira imagem será a capa. Você pode clicar nas imagens para removê-las.</p>

@@ -16,6 +16,7 @@ import {
 } from "./kazzi-lib.js";
 
 import { signInWithGoogle, onAuthStateChanged } from "./firebase-lib.js";
+import { uploadFile } from "./firebase-storage-lib.js";
 
 let products = [];
 let orders = [];
@@ -518,6 +519,40 @@ function setupEventListeners() {
             currentEditProduct.images.push(url);
             input.value = "";
             renderEditImages();
+        }
+    });
+
+    // File Upload for edit
+    const editFileInput = document.getElementById("edit-image-file-input");
+    const editUploadBtn = document.getElementById("btn-edit-image-upload");
+
+    editUploadBtn?.addEventListener("click", () => editFileInput.click());
+
+    editFileInput?.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file || !currentEditProduct) return;
+
+        try {
+            editUploadBtn.textContent = "⏳";
+            editUploadBtn.disabled = true;
+            
+            const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+            const path = `products/${currentEditProduct._key || 'new'}/${fileName}`;
+            
+            const url = await uploadFile(file, path, (progress) => {
+                console.log(`Upload progress: ${progress}%`);
+            });
+
+            if (!currentEditProduct.images) currentEditProduct.images = [];
+            currentEditProduct.images.push(url);
+            renderEditImages();
+            showToast("Upload concluído!", "success", 3000, "📸");
+        } catch (error) {
+            console.error("Upload failed:", error);
+        } finally {
+            editUploadBtn.textContent = "📁";
+            editUploadBtn.disabled = false;
+            editFileInput.value = ""; // Reset input
         }
     });
 

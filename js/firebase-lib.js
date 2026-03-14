@@ -2676,7 +2676,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const e of t
   messagingSenderId: "818791017216",
   appId: "1:818791017216:web:4815e114c1c58f0c20a1e5",
   measurementId: "G-FLYS3NCT6K"
-};const kazzi_app=Wr(KAZZI_API_CONFIG),kazzi_auth=Iu(kazzi_app),kazzi_db=xp(kazzi_app),kazzi_provider=new ee,KAZZI_ADMIN_EMAILS=["moisesvvanti@gmail.com","kazzicompany@gmail.com"];const Vp=[{id:"all",name:"Todos"},{id:"camisas",name:"Camisetas"},{id:"moletons",name:"Moletons"},{id:"calcas-shorts",name:"Calças & Shorts"},{id:"acessorios",name:"Acessórios"}];function Hp(n){const isAdmin = n && KAZZI_ADMIN_EMAILS.includes(n.email); if(n) console.log(`[Admin Check] E-mail: ${n.email} | Autorizado: ${isAdmin}`); return isAdmin;}
+};const kazzi_app=Wr(KAZZI_API_CONFIG),kazzi_auth=Iu(kazzi_app),kazzi_db=xp(kazzi_app),kazzi_provider=new ee,KAZZI_ADMIN_EMAILS=["moisesvvanti@gmail.com","kazzicompany@gmail.com"];const Vp=[{id:"all",name:"Todos"},{id:"camisas",name:"Camisetas"},{id:"moletons",name:"Moletons"},{id:"calcas-shorts",name:"Calças & Shorts"},{id:"acessorios",name:"Acessórios"}];function Hp(n){const email = (n && n.email) ? n.email.toLowerCase() : ""; const isAdmin = KAZZI_ADMIN_EMAILS.includes(email); if(n) console.log(`[Admin Check] E-mail: ${email} | Autorizado: ${isAdmin}`); return isAdmin;}
 async function qp(){try{const n=await Io(kazzi_auth,kazzi_provider);if(!Hp(n.user))throw await co(kazzi_auth),{code:"auth/not-admin",message:"Acesso negado. Apenas administradores autorizados podem acessar este painel."};return n.user}catch(n){throw gs(n)}}async function jp(){try{return(await Io(kazzi_auth,kazzi_provider)).user}catch(n){throw gs(n)}}async function Kp(){try{await co(kazzi_auth)}catch(n){throw gs(n)}}function Yp(n){return hh(kazzi_auth,n)}const K_PRODS="kazzi_products";async function Qp(){try{const n=await Np(Dn(kazzi_db,K_PRODS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}async function Jp(n){try{const e=Sp(Dn(kazzi_db,K_PRODS)),t=e.key,i={...n};return delete i._key,await Ma(e,i),{...i,_key:t}}catch(e){throw xn(e)}}async function Xp(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_PRODS}/${n}`),t)}catch(t){throw xn(t)}}async function Zp(n){try{await bp(Dn(kazzi_db,`${K_PRODS}/${n}`))}catch(e){throw xn(e)}}function gs(n) {
     console.error("Firebase Auth Error Details:", n);
     if(n.code === "auth/not-admin") return n;
@@ -2750,5 +2750,6 @@ export {
     getOrders, 
     updateOrder, 
     onNewOrder,
-    kazzi_auth as auth
+    kazzi_auth as auth,
+    kazzi_app as app
 };
