@@ -3,52 +3,38 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/img/logo_kazzi_official_1772658596931.png" />
+  <link rel="icon" type="image/png" href="img/logo_kazzi_official_1772658596931.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kazzi Company | Estilo de Rua & Cultura Baggy</title>
   <meta name="description"
     content="Muita rua para ser street. A marca de streetwear focada no estilo baggy e na essência urbana de Blumenau para o Brasil." />
-  <script type="module" crossorigin src="/js/home-logic.js"></script>
-  <link rel="stylesheet" crossorigin href="/css/firebase.css">
-  <link rel="stylesheet" crossorigin href="/css/main.css">
+  <script type="module" src="js/home-logic.js"></script>
+  <link rel="stylesheet" href="css/firebase.css">
+  <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
   <!-- ═══ HEADER ═══ -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="/" class="header-logo" aria-label="Kazzi Company - Início">
-        <img src="/img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" />
+      <a href="./" class="header-logo" aria-label="Kazzi Company - Início">
+        <img src="img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" />
       </a>
       <div class="header-search">
         <input type="text" id="header-search-input" placeholder="O que deseja procurar?" aria-label="Buscar produtos" />
         <button type="button" aria-label="Buscar">🔍</button>
       </div>
       <div class="header-actions">
-        <!-- Logged out state -->
-        <button class="btn btn-sm header-login-btn" id="btn-header-login">👤 Entrar</button>
-        
-        <!-- Logged in state -->
-        <div class="header-user" id="header-user" style="display: none;">
-          <button class="header-user-toggle" id="header-user-toggle" aria-label="Menu do usuário">
-            <img id="header-user-avatar" class="header-user-avatar" src="" alt="" />
-            <span id="header-user-name" class="header-user-name"></span>
-            <span class="header-user-arrow">▾</span>
-          </button>
-          <div class="header-user-dropdown" id="header-user-dropdown">
-            <a href="/admin.html" id="admin-link" style="display: none;">🛠 Painel Admin</a>
-            <a href="https://api.whatsapp.com/send?phone=5547989164910" target="_blank">💬 WhatsApp</a>
-            <button id="btn-header-logout" class="header-dropdown-logout">🚪 Sair</button>
-          </div>
-        </div>
-
         <!-- Cart Button -->
-        <a href="/cart.html" class="header-cart-btn" id="header-cart-btn" style="text-decoration: none; font-size: 1.5rem; position: relative; margin: 0 10px;">
+        <a href="cart.html" class="header-cart-btn" id="header-cart-btn" style="text-decoration: none; font-size: 1.5rem; position: relative; margin: 0 10px;">
           🛒
           <span id="cart-count-badge" style="position: absolute; top: -5px; right: -5px; background: #E11D48; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #0A0A0A;">0</span>
         </a>
 
-        <!-- WhatsApp (always visible) -->
+        <!-- Login Button -->
+        <button id="btn-user-login" type="button" class="header-login-btn" aria-label="Entrar ou Registrar">Entrar</button>
+
+        <!-- WhatsApp -->
         <a href="https://api.whatsapp.com/send?phone=5547989164910" target="_blank" id="header-wa-link">💬 WhatsApp</a>
       </div>
     </div>
@@ -65,7 +51,7 @@
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="container">
-      <img src="/img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company Logo" class="hero-logo" />
+      <img src="img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company Logo" class="hero-logo" />
       <h1 class="sr-only">KAZZI COMPANY</h1>
       <p class="hero-tagline pichacao">MUITA RUA PARA SER STREET.</p>
       <p class="hero-subtitle">Elevando o streetwear com o autêntico estilo baggy e a alma da pichação brasileira. De
@@ -103,8 +89,8 @@
   <!-- ═══ FOOTER ═══ -->
   <footer class="site-footer">
     <div class="container footer-inner">
-      <a href="/" class="footer-logo">
-        <img src="/img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" />
+      <a href="./" class="footer-logo">
+        <img src="img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" />
       </a>
       <p class="footer-copyright">&copy; 2025 Kazzi Company. Todos os direitos reservados. Muita rua para ser street.
       </p>

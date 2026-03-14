@@ -1,7 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
@@ -9,98 +8,47 @@ if (!$data) {
     exit;
 }
 
-$method = $data['method'];
-$total = $data['total'];
-$customer = $data['customer'];
+$method = $data['method'] ?? 'unknown';
+$total = $data['total'] ?? 0;
+$customer = $data['customer'] ?? [];
+$items = $data['items'] ?? [];
 
-// --- API KEYS CONFIGURATION ---
-// In a real scenario, these should be in a separate config file or environment variables
-$keys = [
-    'stripe' => 'sk_test_...',
-    'pagbank' => 'TOKEN_HERE',
-    'mercadopago' => 'TEST-339...',
-    'rede' => '...',
-    'infinitepay' => '...',
-    'cielo' => '...'
+// Log the order
+$logEntry = date('Y-m-d H:i:s') . " | Pedido: $method | R$ $total | Cliente: " . ($customer['name'] ?? 'N/A') . "\n";
+file_put_contents(__DIR__ . '/payment_logs.txt', $logEntry, FILE_APPEND);
+
+// Save order to orders.json
+$orderId = strtoupper(substr($method, 0, 2)) . '_' . uniqid();
+
+$ordersFile = __DIR__ . '/orders.json';
+$orders = file_exists($ordersFile) ? json_decode(file_get_contents($ordersFile), true) : [];
+if (!is_array($orders)) $orders = [];
+
+$order = [
+    '_key' => 'order_' . uniqid(),
+    'name' => $customer['name'] ?? '',
+    'email' => $customer['email'] ?? '',
+    'cpf' => $customer['cpf'] ?? '',
+    'cep' => $customer['cep'] ?? '',
+    'address' => $customer['address'] ?? '',
+    'number' => $customer['number'] ?? '',
+    'neighborhood' => $customer['neighborhood'] ?? '',
+    'city' => $customer['city'] ?? '',
+    'state' => $customer['state'] ?? '',
+    'paymentMethod' => $method,
+    'total' => floatval($total),
+    'items' => $items,
+    'orderId' => $orderId,
+    'status' => 'pending',
+    'trackingCode' => '',
+    'createdAt' => date('c')
 ];
 
-// --- ACTUAL INTEGRATION MODE ---
-// Setting simulation to false to ensure requests go to real gateway logic.
-$simulate = false;
+$orders[] = $order;
+file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-if ($simulate) {
-    // Keep this as an internal fallback for debugging if needed, but the main flow should be real.
-    $logEntry = date('Y-m-d H:i:s') . " Order Created:
-    Method: $method
-    Total: R$ $total
-    Customer: " . ($customer['name'] ?? 'N/A') . PHP_EOL;
-    file_put_contents('payment_logs.txt', $logEntry, FILE_APPEND);
-
-    echo json_encode([
-        'success' => true,
-        'message' => 'Pagamento processado com sucesso via ' . ucfirst($method),
-        'order_id' => uniqid('KAZZI_')
-    ]);
-    exit;
-}
-else {
-    // LOG REAL ATTEMPT
-    $logEntry = date('Y-m-d H:i:s') . " [REAL ATTEMPT] - Order Initialization:
-    Method: $method
-    Total: R$ $total
-    Customer: " . ($customer['name'] ?? 'N/A') . " (" . ($customer['email'] ?? 'N/A') . ")
-    Address: " . ($customer['address'] ?? '') . ", " . ($customer['number'] ?? '') . " - " . ($customer['neighborhood'] ?? '') . ", " . ($customer['city'] ?? '') . "/" . ($customer['state'] ?? '') . " - CEP: " . ($customer['cep'] ?? '') . "
-    Items: " . (isset($data['items']) ? count($data['items']) : 0) . " items
-    " . str_repeat("-", 30) . PHP_EOL;
-
-    file_put_contents('payment_logs.txt', $logEntry, FILE_APPEND);
-}
-
-// --- ACTUAL INTEGRATION LOGIC (Skeleton) ---
-
-switch ($method) {
-    case 'pagbank':
-        // Mock PagBank success
-        echo json_encode([
-            'success' => true,
-            'message' => 'Pagamento aprovado via PagBank.',
-            'order_id' => 'PB_' . uniqid()
-        ]);
-        exit;
-        
-    case 'stripe':
-        // Mock Stripe success
-        echo json_encode([
-            'success' => true,
-            'message' => 'Pagamento processado com sucesso via Stripe.',
-            'order_id' => 'ST_' . uniqid()
-        ]);
-        exit;
-        
-    case 'mercadopago':
-        // Mock Mercado Pago success
-        echo json_encode([
-            'success' => true,
-            'message' => 'Pagamento aprovado via Mercado Pago.',
-            'order_id' => 'MP_' . uniqid()
-        ]);
-        exit;
-        
-    case 'rede':
-    case 'infinitepay':
-    case 'cielo':
-        // Mock Rede/Others success
-        echo json_encode([
-            'success' => true,
-            'message' => 'Pagamento processado via ' . ucfirst($method) . '.',
-            'order_id' => 'RD_' . uniqid()
-        ]);
-        exit;
-}
-
-// Para tornar "real", se não houver lógica de sucesso acima, retornamos erro de configuração.
-// O usuário deve inserir as credenciais e habilitar a lógica de produção.
-echo json_encode(['success' => false, 'error' => 'A integração com ' . ucfirst($method) . ' requer chaves de API válidas. Entre em contato com o suporte.']);
-exit;
-
-?>
+echo json_encode([
+    'success' => true,
+    'message' => 'Pedido registrado com sucesso via ' . ucfirst($method) . '.',
+    'order_id' => $orderId
+]);

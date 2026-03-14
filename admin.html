@@ -3,13 +3,13 @@
 
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/img/logo_kazzi_official_1772658596931.png" />
+    <link rel="icon" type="image/png" href="img/logo_kazzi_official_1772658596931.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kazzi Company | Painel Admin</title>
     <meta name="description" content="Painel administrativo da Kazzi Company — Gestão de produtos e inventário." />
-    <script type="module" crossorigin src="/js/admin-logic.js"></script>
-    <link rel="stylesheet" crossorigin href="/css/firebase.css">
-    <link rel="stylesheet" crossorigin href="/css/admin.css">
+    <script type="module" src="js/admin-logic.js"></script>
+    <link rel="stylesheet" href="css/firebase.css">
+    <link rel="stylesheet" href="css/admin.css">
     <style>
         .edit-images-list img { transition: transform 0.2s; }
         .edit-images-item:hover img { transform: scale(1.05); }
@@ -30,31 +30,24 @@
     <!-- ═══ LOGIN SCREEN ═══ -->
     <div id="admin-login-screen" class="admin-login-screen" style="display: flex;">
         <div class="login-card">
-            <img src="/img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" class="login-logo" />
+            <img src="img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" class="login-logo" />
             <h2>Painel Administrativo</h2>
             <p class="login-subtitle">Acesso restrito a administradores autorizados.</p>
-            <button class="btn btn-accent btn-lg btn-block" id="btn-google-login">
-                <svg width="20" height="20" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: middle;">
-                    <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
-                    <path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Entrar com Google
-            </button>
-            <p id="login-error" class="login-error" style="display: none; padding: 1rem; background: rgba(255, 0, 0, 0.1); border-radius: 8px; border: 1px solid var(--error); color: var(--error);"></p>
-            <div id="login-loading" class="login-loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Autenticando...</p>
+            <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                <button class="btn btn-outline btn-lg btn-block" id="btn-admin-google" style="background: #fff; color: #333; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid #ddd; height: 54px; font-weight: 600;">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20">
+                    Entrar com conta Google Admin
+                </button>
             </div>
+            <p id="login-error" class="login-error" style="display: none; padding: 1rem; background: rgba(255, 0, 0, 0.1); border-radius: 8px; border: 1px solid var(--error); color: var(--error); margin-top: 1rem;"></p>
         </div>
     </div>
 
     <!-- ═══ ADMIN SIDEBAR ═══ -->
     <aside class="admin-sidebar" id="admin-sidebar" style="display: none;">
         <div class="sidebar-header">
-            <a href="/" class="sidebar-logo">
-                <img src="/img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" />
+            <a href="./" class="sidebar-logo">
+                <img src="img/logo_kazzi_official_1772658596931.png" alt="Kazzi Company" />
             </a>
         </div>
         <nav class="sidebar-nav">
@@ -76,7 +69,7 @@
             </a>
         </nav>
         <div class="sidebar-footer">
-            <p class="sidebar-version">Kazzi Admin v2.1</p>
+            <p class="sidebar-version">Kazzi Admin v3.0</p>
         </div>
     </aside>
 
@@ -284,6 +277,6 @@
         </div>
     </div>
 
-    <audio id="order-bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <div id="toast-container" class="toast-container"></div>
 </body>
 </html>

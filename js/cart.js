@@ -1,5 +1,5 @@
 const CART_STORAGE_KEY = 'kazzi_cart';
-import { showToast } from "./firebase-lib.js";
+import { showToast } from "./kazzi-lib.js";
 
 export function getCart() {
     try {
@@ -33,7 +33,7 @@ export function addToCart(product, size) {
     }
 
     saveCart(cart);
-    window.location.href = '/cart.html';
+    window.location.href = 'cart.html';
 }
 
 export function removeFromCart(key, size) {
@@ -49,8 +49,8 @@ export function updateQuantity(key, size, delta) {
     const item = cart.find(i => i._key === key && i.size === size);
     if (item) {
         item.quantity = Math.max(1, item.quantity + delta);
-        if (delta > 0) showToast('Quantidade aumentada!', 'info', 2000, '➕');
-        else showToast('Quantidade reduzida!', 'info', 2000, '➖');
+        if (delta > 0) showToast('Quantidade aumentada! ➕', 'info', 2000);
+        else showToast('Quantidade reduzida! ➖', 'info', 2000);
         saveCart(cart);
         renderCart();
     }
@@ -78,7 +78,7 @@ function renderCart() {
                 <span class="empty-cart-icon">🛒</span>
                 <h2>Seu carrinho está vazio.</h2>
                 <p style="color: var(--text-muted); margin-bottom: 2rem;">Que tal levar um drop da Kazzi hoje?</p>
-                <a href="/" class="checkout-btn" style="max-width: 200px; margin: 0 auto; display: inline-block;">VER PRODUTOS</a>
+                <a href="./" class="checkout-btn" style="max-width: 200px; margin: 0 auto; display: inline-block;">VER PRODUTOS</a>
             </div>
         `;
         return;
@@ -121,7 +121,7 @@ function renderCart() {
                 <span>Total</span>
                 <span>R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             </div>
-            <a href="/checkout.html" class="checkout-btn">FINALIZAR COMPRA</a>
+            <a href="checkout.html" class="checkout-btn">FINALIZAR COMPRA</a>
         </div>
     `;
 }

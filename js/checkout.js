@@ -1,5 +1,5 @@
 import { getCart, getCartTotal } from './cart.js';
-import { saveOrder, showToast } from "./firebase-lib.js";
+import { showToast, handleError, saveOrder } from "./kazzi-lib.js";
 
 const summaryItems = document.getElementById('checkout-summary-items');
 const totalDisplay = document.getElementById('checkout-total');
@@ -8,7 +8,7 @@ const payBtn = document.getElementById('btn-pay');
 function initCheckout() {
     const cart = getCart();
     if (cart.length === 0) {
-        window.location.href = '/cart.html';
+        window.location.href = 'cart.html';
         return;
     }
 
@@ -56,8 +56,7 @@ function setupViaCEP() {
                 document.getElementById('cust-number').focus();
             }
         } catch (e) {
-            console.error('ViaCEP error:', e);
-            showToast('Não conseguimos localizar seu CEP automaticamente.', 'warning', 4000, '📮');
+            handleError(e);
         } finally {
             loading.style.display = 'none';
         }
@@ -111,49 +110,27 @@ async function handlePayment() {
     payBtn.disabled = true;
     payBtn.textContent = 'Processando...';
 
-    console.log(`Processing ${method} payment for R$ ${total}...`);
+    console.log(`Processando pagamento via ${method} no valor de R$ ${total}...`);
     
     try {
-        const response = await fetch('/api/payments.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                method,
-                total,
-                customer,
-                items: getCart()
-            })
-        });
+        const orderData = {
+            method,
+            total,
+            customer,
+            items: getCart()
+        };
 
-        const result = await response.json();
+        const result = await saveOrder(orderData);
         
-        if (result.success) {
-            // Save order to Firebase for Admin tracking
-            try {
-                await saveOrder({
-                    ...customer,
-                    paymentMethod: method,
-                    total,
-                    items: getCart(),
-                    orderId: result.order_id
-                });
-            } catch (fbErr) {
-                console.error("Error saving order to Firebase:", fbErr);
-                // We don't block the user if Firebase fails but payment succeeded
-            }
-
+        if (result) {
             showToast('Sua compra foi processada com sucesso! 🎉', 'success', 5000, '✅');
             localStorage.removeItem('kazzi_cart');
             setTimeout(() => {
-                window.location.href = '/success.html';
+                window.location.href = 'success.html';
             }, 1000);
-        } else {
-            showToast('Houve um problema com o pagamento: ' + (result.error || 'Tente novamente.'), 'error', 5000, '❌');
-            payBtn.disabled = false;
-            payBtn.textContent = 'PAGAR AGORA';
         }
     } catch (e) {
-        showToast('Erro de conexão com o servidor de pagamentos.', 'error', 5000, '🌐');
+        handleError(e, "payment");
         payBtn.disabled = false;
         payBtn.textContent = 'PAGAR AGORA';
     }

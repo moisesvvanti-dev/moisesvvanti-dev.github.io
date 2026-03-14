@@ -1,7 +1,16 @@
-(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const r of s)if(r.type==="childList")for(const o of r.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&i(o)}).observe(document,{childList:!0,subtree:!0});function t(s){const r={};return s.integrity&&(r.integrity=s.integrity),s.referrerPolicy&&(r.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?r.credentials="include":s.crossOrigin==="anonymous"?r.credentials="omit":r.credentials="same-origin",r}function i(s){if(s.ep)return;s.ep=!0;const r=t(s);fetch(s.href,r)}})();const Vp=[{id:"all",name:"Todos"},{id:"outfits",name:"Outfits"},{id:"camisetas",name:"Camisetas"},{id:"calcas",name:"Calças"},{id:"calcados",name:"Calçados"},{id:"acessorios",name:"Acessórios"}];function $p(n){return!n||n===0?"Chama na ADM":`R$ ${Number(n).toLocaleString("pt-BR",{minimumFractionDigits:2})}`}function Gp(n){return!n||n===0?"":`ou <strong>12x</strong> de <strong>R$ ${(n/12).toFixed(2).replace(".",",")}</strong> com juros`}function Fa(){let e=document.getElementById("toast-container");return e||(e=document.createElement("div"),e.className="toast-container",e.id="toast-container",document.body.appendChild(e)),e}const ms={success:"✨",error:"💥",info:"🔹",warning:"🔸"};function zp(n,e="info",t=4e3,i=null){const s=Fa(),r=document.createElement("div");r.className=`toast toast-${e}`;const o=i||ms[e]||ms.info;r.innerHTML=`
-    <div class="toast-icon">${o}</div>
-    <div class="toast-msg">${n}</div>
-`;s.appendChild(r);setTimeout(()=>r.classList.add("visible"),10);const a=setTimeout(()=>{r.classList.remove("visible"),setTimeout(()=>r.remove(),600)},t);r.onclick=()=>{clearTimeout(a),r.classList.remove("visible"),setTimeout(()=>r.remove(),600)}}const Ua=()=>{};var ys={};/**
+(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const r of s)if(r.type==="childList")for(const o of r.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&i(o)}).observe(document,{childList:!0,subtree:!0});function t(s){const r={};return s.integrity&&(r.integrity=s.integrity),s.referrerPolicy&&(r.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?r.credentials="include":s.crossOrigin==="anonymous"?r.credentials="omit":r.credentials="same-origin",r}function i(s){if(s.ep)return;s.ep=!0;const r=t(s);fetch(s.href,r)}})();
+const Fa=()=>document.getElementById("toast-container")||(()=>{const e=document.createElement("div");return e.className="toast-container",e.id="toast-container",document.body.appendChild(e),e})();
+const ms={success:"✨",error:"💥",info:"🔹",warning:"🔸"};
+function zp(n,e="info",t=4e3,i=null){
+    const s=Fa(),r=document.createElement("div");r.className=`toast toast-${e}`;const o=i||ms[e]||ms.info;
+    r.innerHTML=`<div class="toast-icon">${o}</div><div class="toast-msg">${n}</div>`;
+    s.appendChild(r);setTimeout(()=>r.classList.add("visible"),10);
+    const a=setTimeout(()=>{r.classList.remove("visible"),setTimeout(()=>r.remove(),600)},t);
+    r.onclick=()=>{clearTimeout(a),r.classList.remove("visible"),setTimeout(()=>r.remove(),600)}
+}
+function $p(n){return Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+function Gp(n){return n?`ou 10x de ${$p(n/10)} sem juros`:""}
+const Ua=()=>{};var ys={};/**
  * @license
  * Copyright 2017 Google LLC
  *
@@ -2667,24 +2676,58 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const e of t
   messagingSenderId: "818791017216",
   appId: "1:818791017216:web:4815e114c1c58f0c20a1e5",
   measurementId: "G-FLYS3NCT6K"
-};const kazzi_app=Wr(KAZZI_API_CONFIG),kazzi_auth=Iu(kazzi_app),kazzi_db=xp(kazzi_app),kazzi_provider=new ee,KAZZI_ADMIN_EMAIL="moisesvanti@gmail.com";function Hp(n){return n&&n.email===KAZZI_ADMIN_EMAIL}async function qp(){try{const n=await Io(kazzi_auth,kazzi_provider);if(!Hp(n.user))throw await co(kazzi_auth),{code:"auth/not-admin",message:"Acesso negado. Apenas administradores autorizados podem acessar este painel."};return n.user}catch(n){throw gs(n)}}async function jp(){try{return(await Io(kazzi_auth,kazzi_provider)).user}catch(n){throw gs(n)}}async function Kp(){try{await co(kazzi_auth)}catch(n){throw gs(n)}}function Yp(n){return hh(kazzi_auth,n)}const K_PRODS="kazzi_products";async function Qp(){try{const n=await Np(Dn(kazzi_db,K_PRODS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}async function Jp(n){try{const e=Sp(Dn(kazzi_db,K_PRODS)),t=e.key,i={...n};return delete i._key,await Ma(e,i),{...i,_key:t}}catch(e){throw xn(e)}}async function Xp(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_PRODS}/${n}`),t)}catch(t){throw xn(t)}}async function Zp(n){try{await bp(Dn(kazzi_db,`${K_PRODS}/${n}`))}catch(e){throw xn(e)}}function gs(n){if(n.code==="auth/not-admin")return n;const t={
-    "auth/popup-closed-by-user":{icon:"🔐",message:"A janela de login foi fechada antes da conclusão."},
-    "auth/popup-blocked":{icon:"🔐",message:"O navegador bloqueou a janela de login. Permita popups."},
-    "auth/network-request-failed":{icon:"🌐",message:"Sem conexão com a internet. Verifique sua rede."},
-    "auth/too-many-requests":{icon:"🔐",message:"Muitas tentativas. Aguarde alguns minutos e tente novamente."},
-    "auth/user-disabled":{icon:"🔐",message:"Esta conta foi desativada pelo administrador."},
-    "auth/user-not-found":{icon:"🔐",message:"Usuário não encontrado."},
-    "auth/wrong-password":{icon:"🔐",message:"Senha incorreta."},
-    "auth/invalid-email":{icon:"📧",message:"O endereço de e-mail é inválido."},
-    "auth/operation-not-allowed":{icon:"🚫",message:"Este método de login não está habilitado."},
-    "auth/weak-password":{icon:"🔑",message:"A senha fornecida é muito fraca."},
-    "auth/email-already-in-use":{icon:"📧",message:"Este e-mail já está sendo utilizado por outra conta."}
-};return t[n.code]?{code:n.code,...t[n.code]}:{code:n.code||"auth/unknown",icon:"🔐",message:"Não foi possível realizar a autenticação. Tente novamente mais tarde."}}function xn(n){const e=(n==null?void 0:n.message)||"";
-if(e.includes("PERMISSION_DENIED")||e.includes("permission_denied"))return{code:"db/permission-denied",icon:"🚫",message:"Acesso negado. Você não tem permissão para realizar esta ação."};
-if(e.includes("network")||e.includes("Network")||e.includes("ERR_INTERNET_DISCONNECTED"))return{code:"db/network",icon:"🌐",message:"Problema de conexão. Verifique sua internet."};
-if(e.includes("DATASIZEXCEEDED")||e.includes("too large"))return{code:"db/data-too-large",icon:"📸",message:"O arquivo é muito grande. Tente usar uma imagem menor."};
-if(e.includes("quota exceeded"))return{code:"db/quota",icon:"⚠️",message:"Limite de armazenamento atingido. Contrate mais espaço."};
-return{code:"db/unknown",icon:"📦",message:"Ocorreu um erro ao processar os dados. Tente novamente mais tarde."}}const K_ORDERS="kazzi_orders";
+};const kazzi_app=Wr(KAZZI_API_CONFIG),kazzi_auth=Iu(kazzi_app),kazzi_db=xp(kazzi_app),kazzi_provider=new ee,KAZZI_ADMIN_EMAILS=["moisesvvanti@gmail.com","kazzicompany@gmail.com"];const Vp=[{id:"all",name:"Todos"},{id:"camisas",name:"Camisetas"},{id:"moletons",name:"Moletons"},{id:"calcas-shorts",name:"Calças & Shorts"},{id:"acessorios",name:"Acessórios"}];function Hp(n){const isAdmin = n && KAZZI_ADMIN_EMAILS.includes(n.email); if(n) console.log(`[Admin Check] E-mail: ${n.email} | Autorizado: ${isAdmin}`); return isAdmin;}
+async function qp(){try{const n=await Io(kazzi_auth,kazzi_provider);if(!Hp(n.user))throw await co(kazzi_auth),{code:"auth/not-admin",message:"Acesso negado. Apenas administradores autorizados podem acessar este painel."};return n.user}catch(n){throw gs(n)}}async function jp(){try{return(await Io(kazzi_auth,kazzi_provider)).user}catch(n){throw gs(n)}}async function Kp(){try{await co(kazzi_auth)}catch(n){throw gs(n)}}function Yp(n){return hh(kazzi_auth,n)}const K_PRODS="kazzi_products";async function Qp(){try{const n=await Np(Dn(kazzi_db,K_PRODS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}async function Jp(n){try{const e=Sp(Dn(kazzi_db,K_PRODS)),t=e.key,i={...n};return delete i._key,await Ma(e,i),{...i,_key:t}}catch(e){throw xn(e)}}async function Xp(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_PRODS}/${n}`),t)}catch(t){throw xn(t)}}async function Zp(n){try{await bp(Dn(kazzi_db,`${K_PRODS}/${n}`))}catch(e){throw xn(e)}}function gs(n) {
+    console.error("Firebase Auth Error Details:", n);
+    if(n.code === "auth/not-admin") return n;
+    
+    const errors = {
+        "auth/popup-closed-by-user": { icon: "🔐", message: "A janela de login foi fechada antes de terminar. Tente novamente." },
+        "auth/popup-blocked": { icon: "🚫", message: "O seu navegador bloqueou a janela de login. Por favor, permita pop-ups para este site." },
+        "auth/network-request-failed": { icon: "🌐", message: "Problema de conexão. Verifique se você está conectado à internet." },
+        "auth/too-many-requests": { icon: "⏳", message: "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente." },
+        "auth/user-disabled": { icon: "🚫", message: "Esta conta foi desativada. Entre em contato com o suporte." },
+        "auth/user-not-found": { icon: "🔍", message: "Conta não encontrada. Verifique os dados digitados." },
+        "auth/wrong-password": { icon: "🔑", message: "Senha incorreta. Se esqueceu sua senha, você pode redefini-la no Firebase." },
+        "auth/invalid-email": { icon: "📧", message: "O e-mail digitado não parece ser válido." },
+        "auth/operation-not-allowed": { icon: "🚫", message: "O login via Google não está disponível no momento." },
+        "auth/weak-password": { icon: "🛡️", message: "A senha escolhida é muito fraca. Tente algo mais seguro." },
+        "auth/email-already-in-use": { icon: "📧", message: "Este e-mail já está cadastrado em outra conta." },
+        "auth/unauthorized-domain": { icon: "🌐", message: "Este site ainda não está autorizado a realizar login. Fale com o desenvolvedor." },
+        "auth/invalid-api-key": { icon: "⚠️", message: "Erro de configuração no sistema (Chave de API inválida)." },
+        "auth/app-not-authorized": { icon: "🚫", message: "Aplicativo não autorizado a usar o serviço de autenticação." },
+        "auth/internal-error": { icon: "⚠️", message: "Ocorreu um erro interno. Por favor, tente novamente em instantes." }
+    };
+
+    const found = errors[n.code];
+    if (found) return found;
+
+    return {
+        code: n.code || "auth/unknown",
+        icon: "🔐",
+        message: "Ocorreu um erro inesperado ao tentar autenticar. Tente novamente mais tarde."
+    };
+}function xn(n) {
+    const errorMsg = (n?.message || "").toLowerCase();
+    
+    if (errorMsg.includes("permission_denied") || errorMsg.includes("access_denied")) {
+        return { code: "db/permission-denied", icon: "🚫", message: "Você não tem permissão para realizar esta ação." };
+    }
+    
+    if (errorMsg.includes("network") || errorMsg.includes("internet") || errorMsg.includes("disconnected")) {
+        return { code: "db/network", icon: "🌐", message: "Problema de conexão. Verifique sua internet." };
+    }
+    
+    if (errorMsg.includes("datasizexceeded") || errorMsg.includes("too large") || errorMsg.includes("limit")) {
+        return { code: "db/data-too-large", icon: "📸", message: "O arquivo ou imagem enviado é muito grande." };
+    }
+    
+    if (errorMsg.includes("quota exceeded") || errorMsg.includes("usage limit")) {
+        return { code: "db/quota", icon: "⚠️", message: "O limite de processamento foi atingido. Tente novamente em instantes." };
+    }
+    
+    return { code: "db/unknown", icon: "📦", message: "Ocorreu um erro ao processar os dados. Tente novamente mais tarde." };
+}const K_ORDERS="kazzi_orders";
 async function saveOrder(n){try{const e=Sp(Dn(kazzi_db,K_ORDERS)),t=e.key,i={...n,createdAt:new Date().toISOString(),status:"pending"};return await Ma(e,i),{...i,_key:t}}catch(e){throw xn(e)}}
 async function getOrders(){try{const n=await Np(Dn(kazzi_db,K_ORDERS));if(!n.exists())return[];const e=n.val();return Object.entries(e).map(([t,i])=>({...i,_key:t}))}catch(n){throw xn(n)}}
 async function updateOrder(n,e){try{const t={...e};delete t._key,await Rp(Dn(kazzi_db,`${K_ORDERS}/${n}`),t)}catch(t){throw xn(t)}}
@@ -2706,5 +2749,6 @@ export {
     saveOrder, 
     getOrders, 
     updateOrder, 
-    onNewOrder 
+    onNewOrder,
+    kazzi_auth as auth
 };

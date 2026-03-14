@@ -1,21 +1,21 @@
 import {
-    onAuthStateChanged,
-    loginAsAdmin,
     showToast,
-    isAdmin,
     getProducts,
     CATEGORIES,
     formatPrice,
     updateProduct,
     addProduct,
     deleteProduct,
-    signOut,
-    formatInstallments,
-    signInWithGoogle as getCurrentUser,
+    adminLogin,
+    adminLogout,
+    isAdminLoggedIn,
     getOrders,
     updateOrder,
-    onNewOrder
-} from "./firebase-lib.js";
+    handleError,
+    adminGoogleLogin
+} from "./kazzi-lib.js";
+
+import { signInWithGoogle, onAuthStateChanged } from "./firebase-lib.js";
 
 let products = [];
 let orders = [];
@@ -26,97 +26,63 @@ let importList = [];
 let currentSection = "products";
 let deleteTargetKey = null;
 
-const WHATSAPP_NUMBER = "5547989164910";
-const WHATSAPP_BASE_URL = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}`;
-
 // DOM Elements
 let tableBody, categoryFilter, statusFilter, searchInput, statsDisplay;
 let importModal, editModal, deleteModal, orderDetailsModal;
 let sidebarToggle, sidebar;
 let dropzone, fileInput, importListView, importCount, saveImportBtn;
-let ordersTableBody, orderBell;
+let ordersTableBody;
 
 function init() {
-    onAuthStateChanged(async (user) => {
-        if (user) {
-            console.log("Logged in as:", user.email);
-            if (isAdmin(user)) {
-                showAdminUI();
-                await loadProducts();
-                initOrders();
-            } else {
-                handleLoginError({
-                    code: "auth/not-admin",
-                    message: `Acesso negado para ${user.email}. Apenas administradores autorizados podem acessar este painel.`
-                });
-                await signOut();
-            }
+    // Wait for auth state to be confirmed before deciding which UI to show
+    onAuthStateChanged((user) => {
+        if (user && isAdminLoggedIn()) {
+            showAdminUI();
+            loadProducts();
+            loadOrders();
         } else {
             showLoginScreen();
         }
     });
 
-    const loginBtn = document.getElementById("btn-google-login");
-    if (loginBtn) loginBtn.addEventListener("click", handleLogin);
+    const googleBtn = document.getElementById("btn-admin-google");
+    if (googleBtn) googleBtn.addEventListener("click", handleGoogleLogin);
 }
 
-function initOrders() {
-    orderBell = document.getElementById("order-bell");
-    onNewOrder((newOrders) => {
-        if (orders.length > 0 && newOrders.length > orders.length) {
-            playBell();
-            showToast("Novo pedido recebido! 🎉", "success", 7000, "🔔");
-        }
-        orders = newOrders;
-        if (currentSection === "orders") renderOrders();
-    });
-}
-
-function playBell() {
-    if (orderBell) {
-        orderBell.currentTime = 0;
-        orderBell.play().catch(e => console.log("Audio play failed:", e));
-    }
-}
-
-async function handleLogin() {
+async function handleGoogleLogin() {
     const errorEl = document.getElementById("login-error");
-    const loadingEl = document.getElementById("login-loading");
-    const loginBtn = document.getElementById("btn-google-login");
+    const googleBtn = document.getElementById("btn-admin-google");
 
     if (errorEl) errorEl.style.display = "none";
-    if (loadingEl) loadingEl.style.display = "flex";
-    if (loginBtn) loginBtn.disabled = true;
+    if (googleBtn) { 
+        googleBtn.disabled = true; 
+        googleBtn.innerHTML = "Autenticando..."; 
+    }
 
     try {
-        await signInWithGoogle();
+        const user = await signInWithGoogle();
+        if (!user) throw new Error("A janela de login foi fechada.");
+
+        // Exchange Google User for PHP Admin Session
+        await adminGoogleLogin(user.email);
+        
+        showToast("Bem-vindo de volta! 🔥", "success", 3000, "🛠");
+        
+        // Reload page to ensure clean state and show admin UI via init()
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
     } catch (error) {
-        if (loadingEl) loadingEl.style.display = "none";
-        if (loginBtn) loginBtn.disabled = false;
-        
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") return;
-        
-        if (errorEl) {
-            errorEl.textContent = error.message;
-            errorEl.style.display = "block";
+        handleError(error, "auth");
+    } finally {
+        if (googleBtn) { 
+            googleBtn.disabled = false; 
+            googleBtn.innerHTML = `
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20">
+                Entrar com conta Google Admin
+            `; 
         }
-        showToast(error.message, "error", 5000, error.icon || "🔐");
     }
-}
-
-function handleLoginError(error) {
-    const errorEl = document.getElementById("login-error");
-    const loadingEl = document.getElementById("login-loading");
-    const loginBtn = document.getElementById("btn-google-login");
-
-    if (loadingEl) loadingEl.style.display = "none";
-    if (loginBtn) loginBtn.disabled = false;
-    
-    if (errorEl) {
-        errorEl.textContent = error.message;
-        errorEl.style.display = "block";
-    }
-    showToast(error.message, "error", 5000, error.icon || "🔐");
 }
 
 function showLoginScreen() {
@@ -169,16 +135,13 @@ function showSection(sectionId) {
     });
     
     if (sectionId === "products") renderProducts();
-    else renderOrders();
+    else loadOrders();
 }
 
 async function handleLogout() {
-    try {
-        await signOut();
-        showLoginScreen();
-    } catch (error) {
-        showToast(error.message || "Erro ao tentar sair.", "error", 4000, "🚫");
-    }
+    adminLogout();
+    showLoginScreen();
+    showToast("Você saiu do painel admin.", "info", 3000, "🚪");
 }
 
 async function loadProducts() {
@@ -186,9 +149,20 @@ async function loadProducts() {
         products = await getProducts();
         renderProducts();
     } catch (error) {
-        showToast("Não foi possível carregar os produtos.", "error", 5000, "📦");
+        handleError(error, "products");
         products = [];
         renderProducts();
+    }
+}
+
+async function loadOrders() {
+    try {
+        orders = await getOrders();
+        renderOrders();
+    } catch (error) {
+        handleError(error, "orders");
+        orders = [];
+        renderOrders();
     }
 }
 
@@ -257,7 +231,7 @@ function renderProducts() {
     tableBody.querySelectorAll(".delete-btn").forEach(btn => btn.addEventListener("click", () => confirmDelete(btn.dataset.key)));
 }
 
-async function renderOrders() {
+function renderOrders() {
     if (!ordersTableBody || currentSection !== "orders") return;
 
     if (orders.length === 0) {
@@ -327,7 +301,7 @@ function openOrderDetails(key) {
 function openEditModal(key) {
     const product = products.find(p => p._key === key);
     if (!product) return;
-    currentEditProduct = product;
+    currentEditProduct = { ...product, images: [...(product.images || [])] };
 
     document.getElementById("edit-product-name").value = product.name;
     document.getElementById("edit-product-price").value = product.price;
@@ -346,19 +320,21 @@ function renderEditImages() {
 
     const imgs = currentEditProduct.images || [];
     list.innerHTML = imgs.map((img, idx) => `
-        <div class="edit-images-item" style="position:relative; cursor:pointer;" onclick="removeEditImage(${idx})">
+        <div class="edit-images-item" style="position:relative; cursor:pointer;" data-idx="${idx}">
             <img src="${img}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid rgba(255,255,255,0.1);" />
             ${idx === 0 ? '<span style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.7); font-size:8px; text-align:center;">CAPA</span>' : ''}
             <div class="remove-overlay" style="position:absolute; inset:0; background:rgba(220,38,38,0.4); display:none; align-items:center; justify-content:center; border-radius:4px;">✖</div>
         </div>
     `).join('');
-}
 
-window.removeEditImage = (idx) => {
-    if (!currentEditProduct) return;
-    currentEditProduct.images.splice(idx, 1);
-    renderEditImages();
-};
+    list.querySelectorAll('.edit-images-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const idx = parseInt(item.dataset.idx);
+            currentEditProduct.images.splice(idx, 1);
+            renderEditImages();
+        });
+    });
+}
 
 async function handleSaveEdit() {
     if (!currentEditProduct) return;
@@ -379,7 +355,7 @@ async function handleSaveEdit() {
         editModal.classList.remove("active");
         await loadProducts();
     } catch (e) {
-        showToast("Não foi possível salvar as alterações.", "error", 5000, "💾");
+        handleError(e, "products");
     }
 }
 
@@ -396,7 +372,7 @@ async function handleDelete() {
         deleteModal.classList.remove("active");
         await loadProducts();
     } catch (e) {
-        showToast("Ocorreu um erro ao excluir o produto.", "error", 5000, "🗑️");
+        handleError(e, "products");
     }
 }
 
@@ -428,10 +404,9 @@ function formatProductName(filename) {
 
 function autoCategory(name) {
     const l = name.toLowerCase();
-    if (l.includes("camisa") || l.includes("jersey") || l.includes("shirt")) return "camisas";
-    if (l.includes("moletom") || l.includes("hoodie")) return "moletons";
-    if (l.includes("calca") || l.includes("pants") || l.includes("short")) return "calcas-shorts";
-    if (l.includes("bone") || l.includes("cap") || l.includes("meia")) return "acessorios";
+    if (l.includes("camis") || l.includes("jersey") || l.includes("shirt")) return "camisetas";
+    if (l.includes("calca") || l.includes("pants") || l.includes("short")) return "calcas";
+    if (l.includes("bone") || l.includes("cap") || l.includes("meia") || l.includes("tenis") || l.includes("sapato")) return "acessorios";
     return "";
 }
 
@@ -448,29 +423,35 @@ function renderImportList() {
             <div style="display:flex; gap:1rem; align-items:center;">
                 <img src="${thumb}" style="width:60px; height:60px; object-fit:cover; border-radius:4px;" />
                 <div style="flex:1;">
-                    <input type="text" value="${item.name}" onchange="importList[${idx}].name=this.value" class="form-input" style="margin-bottom:0.5rem;" />
+                    <input type="text" value="${item.name}" class="form-input import-name-input" data-idx="${idx}" style="margin-bottom:0.5rem;" />
                     <div style="display:flex; gap:0.5rem;">
-                        <input type="number" value="${item.price}" onchange="importList[${idx}].price=parseFloat(this.value)" placeholder="Preço" class="form-input" style="width:80px;" />
-                        <select onchange="importList[${idx}].category=this.value" class="form-select" style="flex:1;">
+                        <input type="number" value="${item.price}" class="form-input import-price-input" data-idx="${idx}" placeholder="Preço" style="width:80px;" />
+                        <select class="form-select import-cat-select" data-idx="${idx}" style="flex:1;">
                             <option value="">Categoria...</option>
                             ${CATEGORIES.filter(c => c.id !== "all").map(c => `<option value="${c.id}" ${item.category === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
                         </select>
                     </div>
                 </div>
-                <button onclick="importList.splice(${idx},1); renderImportList();" class="btn btn-sm btn-ghost">✖</button>
-            </div>
-            <div class="import-item-images" style="display:flex; gap:0.25rem; flex-wrap:wrap;">
-                ${(item.images || []).map((img, iIdx) => `
-                    <div style="position:relative; cursor:pointer;" onclick="importList[${idx}].images.splice(${iIdx},1); renderImportList();">
-                        <img src="${img}" style="width:30px; height:30px; object-fit:cover; border-radius:2px;" />
-                    </div>
-                `).join('')}
+                <button class="btn btn-sm btn-ghost import-remove-btn" data-idx="${idx}">✖</button>
             </div>
         </div>
         `;
     }).join('');
     
-    if (importCount) importCount.textContent = `${importList.length} itens`;
+    // Attach event listeners
+    importListView.querySelectorAll('.import-name-input').forEach(input => {
+        input.addEventListener('change', (e) => { importList[parseInt(e.target.dataset.idx)].name = e.target.value; });
+    });
+    importListView.querySelectorAll('.import-price-input').forEach(input => {
+        input.addEventListener('change', (e) => { importList[parseInt(e.target.dataset.idx)].price = parseFloat(e.target.value); });
+    });
+    importListView.querySelectorAll('.import-cat-select').forEach(select => {
+        select.addEventListener('change', (e) => { importList[parseInt(e.target.dataset.idx)].category = e.target.value; });
+    });
+    importListView.querySelectorAll('.import-remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => { importList.splice(parseInt(btn.dataset.idx), 1); renderImportList(); });
+    });
+
     if (saveImportBtn) saveImportBtn.disabled = importList.length === 0;
 }
 
@@ -486,14 +467,13 @@ async function saveImportedProducts() {
                 stock: item.stock,
                 category: item.category,
                 description: item.description,
-                images: item.images || [item.preview], // In real app, we'd upload file to Storage first
-                active: true,
-                createdAt: new Date().toISOString()
+                images: item.images || [item.preview],
+                active: true
             });
-        } catch (e) { console.error("Error saving", item.name, e); }
+        } catch (e) { handleError(e, "products"); }
     }
     
-    showToast("A importação foi concluída com sucesso! 🚀", "success", 6000, "📸");
+    showToast("A importação foi concluída com sucesso! 🚀", "success", 6000, "✨");
     importModal.classList.remove("active");
     importList = [];
     saveImportBtn.textContent = "Salvar Todos";
@@ -529,7 +509,7 @@ function setupEventListeners() {
     document.getElementById("btn-delete-cancel").addEventListener("click", () => deleteModal.classList.remove("active"));
     document.getElementById("btn-delete-confirm").addEventListener("click", handleDelete);
 
-    // New Multi-Image listeners
+    // Image URL add for edit
     document.getElementById("btn-edit-image-add")?.addEventListener("click", () => {
         const input = document.getElementById("edit-image-url-input");
         const url = input.value.trim();
@@ -541,6 +521,7 @@ function setupEventListeners() {
         }
     });
 
+    // Image URL add for import
     document.getElementById("btn-import-url-add")?.addEventListener("click", () => {
         const input = document.getElementById("import-url-input");
         const url = input.value.trim();
@@ -569,7 +550,10 @@ function setupEventListeners() {
             await updateOrder(currentViewOrder._key, { trackingCode: code, status: code ? "shipped" : "pending" });
             showToast("Código de rastreio atualizado!", "success", 4000, "📦");
             orderDetailsModal.classList.remove("active");
-        } catch (e) { showToast("Erro ao atualizar.", "error"); }
+            await loadOrders();
+        } catch (e) { 
+            handleError(e, "orders"); 
+        }
     });
 
     document.getElementById("btn-mark-delivered").addEventListener("click", async () => {
@@ -578,7 +562,10 @@ function setupEventListeners() {
             await updateOrder(currentViewOrder._key, { status: "delivered" });
             showToast("Status alterado para Entregue! ✅", "success", 4000, "🏁");
             orderDetailsModal.classList.remove("active");
-        } catch (e) { showToast("Erro ao atualizar.", "error"); }
+            await loadOrders();
+        } catch (e) { 
+            handleError(e, "orders"); 
+        }
     });
 
     dropzone.addEventListener("click", () => fileInput.click());
@@ -594,10 +581,6 @@ function setupEventListeners() {
     categoryFilter.addEventListener("change", renderProducts);
     statusFilter.addEventListener("change", renderProducts);
     searchInput.addEventListener("input", renderProducts);
-
-    // Global helper for rendered list buttons (workaround for onclick in template strings)
-    window.renderImportList = renderImportList;
-    window.importList = importList;
 }
 
 document.addEventListener("DOMContentLoaded", init);
