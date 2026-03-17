@@ -71,7 +71,7 @@ const ChangelogManager = (() => {
             setupRealtimeListener();
 
         } catch (err) {
-            console.error('[Changelog] Error:', err);
+            showKordAlert("Servidor de Novidades em Manutenção", "O histórico de atualizações não pôde ser carregado.", "update_disabled", "#f59e0b");
             container.innerHTML = `
                 <div style="text-align:center;padding:40px;color:#ef4444">
                     <span class="material-icons-round" style="font-size:3rem">cloud_off</span>
@@ -144,7 +144,7 @@ const ChangelogManager = (() => {
         try {
             // Firebase should already be initialized globally
             if (typeof firebase === 'undefined' || !firebase.apps.length) {
-                console.warn('[Changelog] Firebase app not initialized globally.');
+                /* Silent init fail */
                 return;
             }
 
@@ -170,7 +170,7 @@ const ChangelogManager = (() => {
                 render();
             });
         } catch (e) {
-            console.warn('[Changelog] Real-time listener failed:', e);
+            /* Silent listener fail */
         }
     };
 

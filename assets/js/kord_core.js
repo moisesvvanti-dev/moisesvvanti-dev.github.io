@@ -292,7 +292,7 @@ function copyToClipboard(text) {
             document.execCommand('copy');
             showKordAlert("Copiado!", "Link copiado para a área de transferência.", "content_copy", "#10b981");
         } catch (err) {
-            console.error('Fallback copy failed', err);
+            showKordAlert("Falha ao Copiar", "Não foi possível copiar o texto para sua área de transferência.", "content_copy", "#f59e0b");
         }
         document.body.removeChild(textArea);
     }
@@ -1507,7 +1507,7 @@ function saveGroqKeyDirectly(isManual = false) {
             });
             showKordAlert("Nuvem Sincronizada", "Sua chave agora está salva na sua conta online e liberada para uso.", "cloud_done", "#10b981");
         }).catch(e => {
-            console.error("Firebase Key Sync Error:", e);
+            /* Silent */
             showKordAlert("Erro de Internet", "Desculpe, houve uma falha de rede. A sua credencial foi salva apenas neste dispositivo local.", "cloud_off", "#f59e0b");
         });
     } else {
@@ -1556,7 +1556,7 @@ function getSystemGroqKey() {
 async function removeInvalidKey(key) {
     const keyHash = btoa(key).substring(0, 16);
     await firebase.database().ref(`system/groq_pool/${keyHash}`).remove();
-    console.warn("Key Exaurida/Invalida removida do Pool:", keyHash);
+    /* Silent pool management */
 }
 
 async function checkSecurityMessageAI(text) {
@@ -1590,7 +1590,7 @@ async function checkSecurityMessageAI(text) {
         return analysis.includes('TRUE');
 
     } catch (e) {
-        console.error("AI Moderation Error:", e);
+        /* Silent */
         return false;
     }
 }
@@ -1989,7 +1989,7 @@ async function generateAIProfileTheme() {
         showKordAlert("Vibe Finalizada", `Layout pronto! Confira o estilo "${res.alert || 'Especial'}" em sua tela.`, "draw", res.primary || "#3b82f6");
 
     } catch (e) {
-        console.error("[Groq Designer Error]:", e);
+        showKordAlert("Falha na IA", "O Designer Kord está temporariamente indisponível.", "auto_awesome", "#f59e0b");
 
         let errorMsg = e.message;
         if (errorMsg.includes("Unexpected token")) errorMsg = "A IA respondeu em um formato de dados inválido (Não é JSON). Tente outro prompt.";
@@ -2159,7 +2159,7 @@ async function loadCategoryPreview(query) {
                 bgEl.style.background = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)), url('${imgUrl}') center/cover no-repeat`;
             }
         }
-    } catch (e) { console.error("Tenor preview error:", e); }
+    } catch (e) { /* Silent */ }
 }
 
 function showKordStickers() {
@@ -2265,7 +2265,7 @@ async function fetchKordTenorGifs(query) {
         }
         resultsContainer.innerHTML = html;
     } catch (err) {
-        console.error("[Tenor API Error]:", err);
+        showKordAlert("Falha nos GIFs", "Serviço de busca de GIFs indisponível.", "gif", "#f59e0b");
         resultsContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:#ef4444;">Erro ao carregar GIFs.</div>`;
     }
 }
@@ -2326,15 +2326,15 @@ function uploadKordSticker(input) {
                 });
                 showKordAlert("Concluído", "Figurinha salva com sucesso e pronta para uso!", "check_circle", "#10b981");
             } catch (dlErr) {
-                console.error("[Sticker URL Error]:", dlErr);
+                /* Silent */
                 showKordAlert("Falha no Banco", "Houve um problema ao vincular a figurinha à sua conta. Tente novamente.", "error", "#ef4444");
             }
         }).catch(uploadErr => {
-            console.error("[Sticker Upload Error]:", uploadErr);
+            showKordAlert("Erro no Sticker", "Não foi possível enviar a imagem.", "cloud_off", "#ef4444");
             showKordAlert("Falha no Envio", "Não foi possível carregar o arquivo na nuvem. Verifique sua conexão.", "cloud_off", "#ef4444");
         });
     } catch (e) {
-        console.error("[Sticker Fatal Error]:", e);
+        showKordAlert("Falha Crítica", "Ocorreu um erro ao processar seu Sticker.", "error", "#ef4444");
         showKordAlert("Erro Misto", "Um erro inesperado interrompeu o processo do upload.", "error", "#ef4444");
     }
     input.value = '';
@@ -2453,7 +2453,7 @@ function downloadKordP2PFile(magnetURI, originalName) {
 
             torrent.files.forEach(file => {
                 file.getBlobURL((err, url) => {
-                    if (err) return console.error("[P2P Blob assembler error]:", err);
+                    if (err) return showKordAlert("Erro P2P", "Falha ao montar o arquivo recebido.", "broken_image", "#ef4444");
 
                     // Create hidden <a> to force download the assembled Blob
                     const a = document.createElement('a');
@@ -2797,7 +2797,7 @@ async function saveKordProfileCustomization() {
             showKordAlert("Campos Vazios", "Mude pelo menos o Nome, adicione uma Foto ou use a IA para que possamos salvar as alterações.", "info", "#3b82f6");
         }
     } catch (err) {
-        console.error("Profile Save Error:", err);
+        showKordAlert("Erro ao Salvar", "Suas alterações não puderam ser salvas agora.", "person_off", "#ef4444");
         showKordAlert("Falha ao Salvar", err.message || "Ocorreu um problema ao conectar com o banco de usuários. Tente de novo.", "error", "#ef4444");
     } finally {
         if (btn) {
@@ -3063,7 +3063,7 @@ function acceptFriendRequest(senderUid) {
             checkEmptyFriendRequests();
         }
     }).catch(err => {
-        console.error(err);
+        /* Handled */
         _kordProcessingFriendIds.delete(senderUid); // Allow retry on fail
         showKordAlert("Falha na Rede", "Um problema impediu de aceitar o pedido no momento.", "error", "#ef4444");
     });
@@ -3709,7 +3709,7 @@ async function executeKordTranslation() {
         document.getElementById('kordTransActions').style.display = 'flex';
 
     } catch (e) {
-        console.error('[Translator Error]:', e);
+        showKordAlert("Tradução Falhou", "O serviço de tradução encontrou um erro.", "translate", "#ef4444");
         let msg = e.message;
         if (msg.includes('rate limit')) msg = 'Limite de requisições excedido. Aguarde.';
         if (msg.includes('Invalid')) msg = 'Sua API Key é inválida ou expirou.';
@@ -3906,7 +3906,7 @@ function sendKordPayment(targetUid, targetName, targetPaypalEmail) {
                 });
             },
             onError: function (err) {
-                console.error("PayPal Flow Error:", err);
+                showKordAlert("Erro no PayPal", "A conexão com o servidor de pagamentos falhou.", "payments", "#ef4444");
                 showKordAlert("Aviso de Checkout", "A janela segura foi fechada ou houve um erro no gateway. Tente novamente.", "report", "#ef4444");
                 closeKordModal();
             },

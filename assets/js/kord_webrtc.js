@@ -68,11 +68,11 @@ async function startKordVoiceCall() {
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     } catch (e) {
-        console.warn("Sem câmera detectada ou recusada. Tentando apenas Microfone...");
+        showKordAlert("Câmera Indisponível", "Não encontramos uma câmera ou permissão negada. Entrando com voz...", "videocam_off", "#f59e0b");
         try {
             localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
         } catch (e2) {
-            console.warn("Sem Microfone também. Entrando apenas como Ouvinte/Espectador.");
+            showKordAlert("Microfone Indisponível", "Não há microfone. Entrando apenas como ouvinte.", "mic_off", "#ef4444");
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             const ctx = new AudioCtx();
             const dest = ctx.createMediaStreamDestination();
@@ -434,7 +434,7 @@ function setupLocalSpeakingDetector(stream) {
             }
         }, 100);
     } catch (e) {
-        console.warn("Speaking detector setup failed:", e);
+        /* Silent fail user should not see internal UI failures */
     }
 }
 
@@ -644,7 +644,7 @@ function toggleKordFullscreen(element) {
         if (element.requestFullscreen) {
             element.requestFullscreen().then(() => {
                 element.style.backgroundColor = '#0f172a';
-            }).catch(err => console.error(err));
+            }).catch(err => {/* Silent */});
         } else if (element.webkitRequestFullscreen) {
             element.webkitRequestFullscreen();
             element.style.backgroundColor = '#0f172a';
@@ -850,6 +850,12 @@ function toggleKordDeafen() {
         const audioEl = document.getElementById(`remote_audio_${uid}`);
         if(audioEl) audioEl.muted = isDeafened;
     });
+    
+    // Mute/Unmute all remote peer connections
+    Object.keys(peerConnections).forEach(uid => {
+        const audioEl = document.getElementById(`remote_audio_${uid}`);
+        if(audioEl) audioEl.muted = isDeafened;
+    });
 
     if (presenceRef) {
         presenceRef.update({ deafened: isDeafened, muted: !isAudioEnabled });
@@ -956,8 +962,7 @@ async function toggleKordScreenShare() {
         }
 
     } catch (err) {
-        console.warn("Screen share cancelled or failed:", err);
-        showKordAlert("Falha na Captura", "Não foi possível compartilhar a sua tela.", "cancel_presentation", "#ef4444");
+        showKordAlert("Compartilhamento Interrompido", "Não foi possível compartilhar a tela.", "cancel_presentation", "#f59e0b");
     }
 }
 
@@ -1052,7 +1057,7 @@ function startAIObservationStream() {
     };
 
     speechRecognition.onerror = (e) => {
-        console.warn("SpeechRec Error:", e.error);
+        if (e.error !== "no-speech" && e.error !== "aborted") { showKordAlert("Tradução Interrompida", "O reconhecimento de voz falhou na sua rede.", "translate", "#ef4444"); }
         if (e.error === 'network') {
             speechRecognition.stop();
         }
@@ -1209,7 +1214,7 @@ async function whisperTranscribe(audioBlob) {
         const data = await response.json();
         return data.text ? data.text.trim() : null;
     } catch (e) {
-        console.warn("Whisper transcription error:", e);
+        showKordAlert("Tradutor Offline", "Não foi possível contatar o servidor.", "cloud_off", "#ef4444");
         return null;
     }
 }

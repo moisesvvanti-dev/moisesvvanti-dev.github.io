@@ -64,7 +64,7 @@ const ClickTracker = (() => {
             }
 
             if (typeof firebase === 'undefined' || !firebase.apps.length) {
-                console.warn("[ClickTracker] Firebase not initialized for tracking");
+                /* Silent */
                 return;
             }
 
@@ -77,7 +77,7 @@ const ClickTracker = (() => {
             });
             console.log(`[ClickTracker] Success: ${toolName} (${toolId})`);
         } catch (e) {
-            console.error("[ClickTracker] Track failed:", e);
+            /* Silent tracking fail */
         }
     };
 
@@ -89,7 +89,7 @@ const ClickTracker = (() => {
             }
 
             if (typeof firebase === 'undefined' || !firebase.apps.length) {
-                console.warn("[ClickTracker] Firebase not initialized for fetching");
+                /* Silent */
                 return [];
             }
 
@@ -108,7 +108,7 @@ const ClickTracker = (() => {
             console.log(`[ClickTracker] Found ${items.length} popular items in Firebase`);
             return items;
         } catch (e) {
-            console.error("[ClickTracker] getPopular failed:", e);
+            /* Silent tracking fetch fail */
             return [];
         }
     };
@@ -298,7 +298,7 @@ async function renderPopularView() {
 
             const fullTool = allItems.find(t => ClickTracker.getToolId(t.url) === stat.id);
             if (!fullTool) {
-                console.warn(`[PopularView] Sem correspondência no banco de dados para o ID: ${stat.id}`);
+                /* Silent mismatch */
                 continue;
             }
 
@@ -341,7 +341,7 @@ async function renderPopularView() {
             </div>
         `;
     } catch (err) {
-        console.error("[PopularView] Erro crítico na renderização:", err);
+        showKordAlert("Falha de Renderização", "Alguns itens populares não puderam ser exibidos.", "local_fire_department", "#f59e0b");
         grid.innerHTML = '<div style="text-align:center;padding:40px;color:#f44;">⚠️ Erro ao carregar ranking global. Verifique o console (F12).</div>';
     }
 }
@@ -542,7 +542,7 @@ function initApp() {
             });
             console.log("[AccessLogger] Log de acesso registrado.");
         } catch (e) {
-            console.error("[AccessLogger] Falha ao registrar log:", e);
+            /* Silent log fail */
         }
     }
 
@@ -579,7 +579,7 @@ function initApp() {
                 }
             });
         } catch (err) {
-            console.error("[Database] Erro fatal:", err);
+            showKordAlert("Desconectado", "O sistema perdeu a conexão primária.", "wifi_off", "#ef4444");
             grid.innerHTML = '<div style="color:#ffaa00; text-align:center; padding:40px;">⚠️ Erro de conexão com o Banco Firebase.</div>';
         }
     };
@@ -1543,13 +1543,13 @@ window.submitBugReport = async function (e) {
             throw new Error('Firebase não disponível');
         }
     } catch (error) {
-        console.error('❌ [BugReport] Erro detalhado:', error);
+        showKordAlert("Falha no Envio", "Seu relatório de bug sofreu uma instabilidade de rede.", "bug_report", "#ef4444");
         btn.innerHTML = originalText;
         btn.disabled = false;
 
         if (error.code === 'PERMISSION_DENIED') {
             showToast('❌ Erro de permissão no Firebase. Verifique as regras.', 'error');
-            console.warn('⚠️ DICA: Verifique se você aplicou as regras do firebase_rules.json no console do Firebase!');
+            /* Silent prod rules */
         } else {
             showToast('❌ Erro ao enviar. Verifique o console (F12).', 'error');
         }

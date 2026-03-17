@@ -226,7 +226,7 @@ const RankingManager = (() => {
             renderRanking(data.ranking);
 
         } catch (error) {
-            console.error('Ranking error:', error);
+            showKordAlert("Ranking Inacessível", "Não foi possível atualizar o Hall da Fama no momento.", "emoji_events", "#f59e0b");
             grid.innerHTML = `
                 <div class="ranking-empty">
                     <span class="material-icons-round">cloud_off</span>

@@ -174,7 +174,7 @@ function loadUserProfile(uid) {
 
             // Sync database photoURL to Firebase Auth object for legacy users
             if (data.photoURL && currentUser.photoURL !== data.photoURL) {
-                currentUser.updateProfile({ photoURL: data.photoURL }).catch(e => console.error(e));
+                currentUser.updateProfile({ photoURL: data.photoURL }).catch(e => { /* Silent Profile Sync Error */ });
             }
 
             // For immediate local use, we attach it to a custom property _photoURL as a fallback
