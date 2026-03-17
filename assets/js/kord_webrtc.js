@@ -58,6 +58,16 @@ async function startKordVoiceCall() {
     // Hide "Entrar" button, show RTC controls
     if (callActions) callActions.style.display = 'none';
     if (rtcControls) rtcControls.style.display = 'flex';
+    
+    // PWA Offline Dynamic Buttons
+    const btnOfflineSync = document.getElementById('kord-btn-offline-sync');
+    if (!navigator.onLine && btnOfflineSync) {
+        btnOfflineSync.style.display = 'inline-flex';
+        showKordAlert("Rede Local Necessária", "Sem internet extena. O Kord tentará criar uma ponte na placa de rede local.", "wifi_tethering", "#f59e0b");
+    } else if (btnOfflineSync) {
+        btnOfflineSync.style.display = 'none';
+    }
+    
     const anonBadge = document.getElementById('kord-anon-badge');
     if (anonBadge) anonBadge.style.display = 'inline-flex';
     isCallActive = true;
@@ -85,7 +95,6 @@ async function startKordVoiceCall() {
     const roomId = `${currentKordServer}_${currentKordChannel}`;
     roomRef = firebase.database().ref(`webrtc_rooms/${roomId}`);
     presenceRef = roomRef.child(`participants/${currentUser.uid}`);
-    audioChunksRef = roomRef.child(`audio_chunks/${currentUser.uid}`);
 
     // Mark self present with profile data + heartbeat timestamp
     const displayName = currentUser.displayName || currentUser.email.split('@')[0];
@@ -99,7 +108,6 @@ async function startKordVoiceCall() {
         lastSeen: firebase.database.ServerValue.TIMESTAMP
     });
     presenceRef.onDisconnect().remove();
-    audioChunksRef.onDisconnect().remove();
 
     // Start heartbeat to prevent ghost entries
     startPresenceHeartbeat();
@@ -189,7 +197,10 @@ const kordIceConfig = {
 function getPeerConnection(peerUid) {
     if (peerConnections[peerUid]) return peerConnections[peerUid];
 
-    const pc = new RTCPeerConnection(kordIceConfig);
+    // If offline, bypass the TURN relay restriction to allow Local Network P2P (mDNS fallback)
+    const activeConfig = (!navigator.onLine) ? getOfflineConfig() : kordIceConfig;
+
+    const pc = new RTCPeerConnection(activeConfig);
     peerConnections[peerUid] = pc;
 
     if (localStream) {
@@ -495,7 +506,6 @@ function disconnectKordCall() {
 
     // Clean Firebase
     if (presenceRef) presenceRef.remove();
-    if (audioChunksRef) audioChunksRef.remove();
     if (roomRef) {
         roomRef.child('participants').off();
         roomRef.child('signals').off(); // WebRTC signals
@@ -844,12 +854,6 @@ function toggleKordDeafen() {
             micBtn.classList.add('kord-rtc-btn--active');
         }
     }
-    
-    // Mute/Unmute all remote peer connections
-    Object.keys(peerConnections).forEach(uid => {
-        const audioEl = document.getElementById(`remote_audio_${uid}`);
-        if(audioEl) audioEl.muted = isDeafened;
-    });
     
     // Mute/Unmute all remote peer connections
     Object.keys(peerConnections).forEach(uid => {

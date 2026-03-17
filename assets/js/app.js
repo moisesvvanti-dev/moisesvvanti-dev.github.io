@@ -495,6 +495,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Add popular styles
     addPopularStyles();
+
+    // 5. PWA Offline Handlers
+    window.addEventListener('offline', () => {
+        showKordAlert("Conexão Perdida", "Você está offline. O Kord operará via cache seguro (PWA) e Sincronização LAN (Air-Gapped).", "wifi_off", "#ef4444");
+        const banner = document.getElementById('kord-offline-banner');
+        if (banner) banner.style.display = 'block';
+        
+        // Exibe botão P2P manual no Kord se a call estiver aberta
+        const btnOfflineSync = document.getElementById('kord-btn-offline-sync');
+        if (btnOfflineSync) btnOfflineSync.style.display = 'inline-flex';
+    });
+
+    window.addEventListener('online', () => {
+        showKordAlert("Conexão Restaurada", "Internet detectada. Sincronizando com redes Kord.", "wifi", "#10b981");
+        const banner = document.getElementById('kord-offline-banner');
+        if (banner) banner.style.display = 'none';
+        
+        // Esconde botão P2P manual do Kord
+        const btnOfflineSync = document.getElementById('kord-btn-offline-sync');
+        if (btnOfflineSync) btnOfflineSync.style.display = 'none';
+        
+        // Tenta reavivar firebase auto
+        if (typeof firebase !== 'undefined' && firebase.apps.length) {
+            firebase.database().goOnline();
+        }
+    });
+
 });
 
 function initApp() {

@@ -1,0 +1,23 @@
+{
+  "name": "Kord",
+  "short_name": "Kord",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Kord Offline Secure Chat & Voice Voice",
+  "icons": [
+    {
+      "src": "assets/img/kord_logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/kord_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

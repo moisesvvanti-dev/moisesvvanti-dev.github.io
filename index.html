@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:;">
+        content="default-src 'self' https: wss: stun: turn: data: blob: 'unsafe-eval' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https: wss: stun: turn:;">
+    <link rel="manifest" href="manifest.json">
     <title>Kord | Premium Chat Experience</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,6 +77,7 @@
 </head>
 
 <body>
+    <div id="kord-offline-banner">Conexão Offline ou Air-Gapped - PWA Acionado</div>
     <main class="app-shell">
         <!-- DESKTOP SIDEBAR -->
         <aside class="sidebar">
@@ -831,6 +833,10 @@
                                     <span class="material-icons-round">translate</span>
                                     <span id="kord-ai-translate-label">IA Tradutor</span>
                                 </button>
+                                <button onclick="openOfflineSyncModal()" id="kord-btn-offline-sync"
+                                    class="kord-rtc-btn" style="display:none; color: #f59e0b;" title="Sincronização Offline (Air-Gapped)">
+                                    <span class="material-icons-round">wifi_tethering</span>
+                                </button>
                                 <button onclick="disconnectKordCall()" class="kord-rtc-btn kord-rtc-btn--hangup">
                                     <span class="material-icons-round">call_end</span> Sair
                                 </button>
@@ -1494,6 +1500,60 @@
                     style="width:100%; margin-top:30px; padding:12px; border-radius:12px;">Fechar Apps</button>
             </div>
         </div>
+    <!-- OFFLINE P2P SYNC MODAL (AIR-GAPPED WEBRTC) -->
+    <div id="kord-offline-sync-modal" class="kord-modal-overlay">
+        <div class="kord-modal" style="max-width: 600px;">
+            <div class="kord-modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <div class="kord-modal-title">
+                    <span class="material-icons-round" style="color: #f59e0b;">wifi_tethering_off</span>
+                    Pareamento Offline (Rede Local)
+                </div>
+                <button class="kord-modal-close" onclick="closeOfflineSyncModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="kord-modal-body" style="display:flex; flex-direction:column; gap:20px;">
+                <p style="color:#94a3b8; font-size:14px; margin:0;">
+                    Sua internet externa caiu, mas você e seu contato ainda estão na mesma rede ou Wi-Fi. 
+                    Gere seu convite, passe para ele (pendrive, sms) e cole o dele aqui para falarem.
+                </p>
+
+                <!-- Passo 1: O Que Eu Envio -->
+                <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; color:#e2e8f0;">1. Meu Convite (Envie isso)</span>
+                        <button onclick="generateOfflineOffer()" class="kord-btn-primary" style="padding:6px 14px; border-radius:6px; font-size:12px;">Gerar Novo Convite</button>
+                    </div>
+                    <textarea id="kord-offline-my-token" readonly style="width:100%; height:80px; margin-top:10px; background:#0f172a; border:1px solid rgba(255,255,255,0.2); color:#a8b2d1; font-family:monospace; font-size:11px; padding:10px; border-radius:6px; resize:none;" placeholder="Aguardando geração..."></textarea>
+                    <button onclick="copyOfflineToken('kord-offline-my-token')" style="width:100%; margin-top:10px; background:rgba(255,255,255,0.1); border:none; color:#fff; padding:8px; border-radius:6px; cursor:pointer;" class="hover-opacity">
+                        <span class="material-icons-round" style="font-size:14px; vertical-align:middle;">content_copy</span> Copiar Convite
+                    </button>
+                </div>
+
+                <!-- Passo 2: O Que Eu Recebo -->
+                <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; color:#e2e8f0;">2. Convite do Parceiro (Cole aqui)</span>
+                    </div>
+                    <textarea id="kord-offline-partner-token" style="width:100%; height:80px; margin-top:10px; background:#0f172a; border:1px solid rgba(255,255,255,0.2); color:#fff; font-family:monospace; font-size:11px; padding:10px; border-radius:6px; resize:none;" placeholder="Cole o token gigante do seu parceiro aqui..."></textarea>
+                    <button onclick="applyOfflineToken()" class="kord-btn-primary" style="width:100%; margin-top:10px; padding:12px; border-radius:6px; margin-top:10px;">
+                        <span class="material-icons-round" style="font-size:16px; vertical-align:middle; margin-right:5px;">link</span> Conectar Agora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Worker Registration for Offline Support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Kord ServiceWorker registrado:', reg.scope))
+                    .catch(e => console.error('ServiceWorker erro:', e));
+            });
+        }
+    </script>
 </body>
 
 </html>
