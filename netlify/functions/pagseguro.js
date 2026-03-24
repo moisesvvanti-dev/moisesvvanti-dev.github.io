@@ -54,8 +54,8 @@ exports.handler = async (event) => {
           'senderEmail': params.customerEmail || 'cliente@email.com',
           'shippingAddressRequired': 'false',
           'currency': 'BRL',
-          'redirectURL': params.redirectURL || 'https://kazzi.com.br/',
-          'notificationURL': params.notificationURL || 'https://kazzi.com.br/.netlify/functions/pagseguro?action=notification',
+          'redirectURL': params.redirectURL || 'https://moisesvvanti-dev.github.io/',
+          'notificationURL': params.notificationURL || 'https://moisesvvanti-dev.github.io/.netlify/functions/pagseguro?action=notification',
           'extraAmount': '0.00',
           'reference': params.orderId,
         };
