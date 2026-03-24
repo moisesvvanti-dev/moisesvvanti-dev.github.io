@@ -1,26 +1,57 @@
 [build]
   functions = "netlify/functions"
 
+[functions]
+  node_bundler = "esbuild"
+
+# ── Cabeçalhos de segurança globais ──────────────────────────
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
+    X-Frame-Options             = "DENY"
+    X-Content-Type-Options      = "nosniff"
+    Referrer-Policy             = "strict-origin-when-cross-origin"
+    Permissions-Policy          = "geolocation=(), microphone=(), camera=(), payment=()"
+    # CSP: adapte 'connect-src' para seus domínios reais
+    Content-Security-Policy     = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://huqbfmyjnqlrkvwqabec.supabase.co; connect-src 'self' https://huqbfmyjnqlrkvwqabec.supabase.co https://api.pagseguro.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Strict-Transport-Security   = "max-age=31536000; includeSubDomains; preload"
 
+# ── Cache para assets estáticos ───────────────────────────────
 [[headers]]
   for = "/js/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=3600"
+    Cache-Control = "public, max-age=3600, immutable"
 
 [[headers]]
   for = "/css/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=3600"
+    Cache-Control = "public, max-age=3600, immutable"
 
 [[headers]]
   for = "/img/*"
   [headers.values]
-    Cache-Control = "public, max-age=2592000"
+    Cache-Control = "public, max-age=2592000, immutable"
 
-[functions]
-  node_bundler = "esbuild"
+[[headers]]
+  for = "/produtos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# ── Bloqueia acesso direto a arquivos sensíveis ───────────────
+[[redirects]]
+  from   = "/.env"
+  to     = "/404"
+  status = 404
+  force  = true
+
+[[redirects]]
+  from   = "/supabase_setup.sql"
+  to     = "/404"
+  status = 404
+  force  = true
+
+[[redirects]]
+  from   = "/netlify.toml"
+  to     = "/404"
+  status = 404
+  force  = true
