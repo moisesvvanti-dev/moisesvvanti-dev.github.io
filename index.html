@@ -284,8 +284,13 @@ supabase.auth.onAuthStateChange((event, session) => {
   } else {
     btn.textContent = 'Entrar';
     btn.onclick = async () => {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-      if (error) toast('Erro: ' + error.message, 'erro');
+      const email = prompt('✉️ Digite seu e-mail de acesso:');
+      if (!email) return;
+      const pwd = prompt('🔑 Digite sua senha (cuidado com olhares!):');
+      if (!pwd) return;
+      
+      const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
+      if (error) toast('Erro ao entrar: ' + error.message, 'erro');
     };
     if (btnOrders) btnOrders.style.display = 'none';
   }
