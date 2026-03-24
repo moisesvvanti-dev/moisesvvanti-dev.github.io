@@ -153,10 +153,8 @@
 </style>
 
 <script type="module">
-import { auth, listarProdutos, buscarProduto } from '/js/firebase.js?v=2';
+import { supabase, listarProdutos, buscarProduto } from '/js/supabase.js?v=3';
 import { toast, Cart, fmtPreco, fmtInst, getSizes } from '/js/utils.js';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
 
 Cart.badge();
 
@@ -275,18 +273,20 @@ window.addEventListener('scroll', () => {
 })();
 
 // ── Auth (botão Entrar) ───────────────────────────────────
-onAuthStateChanged(auth, u => {
+supabase.auth.onAuthStateChange((event, session) => {
+  const u = session?.user;
   const btn = document.getElementById('btnLogin');
   const btnOrders = document.getElementById('btnMyOrders');
   if (u) {
-    btn.textContent = 'Sair (' + (u.displayName || 'Usuário').split(' ')[0] + ')';
-    btn.onclick = () => signOut(auth).then(() => toast('Você saiu.', 'info'));
+    btn.textContent = 'Sair (' + (u.user_metadata?.full_name || 'Usuário').split(' ')[0] + ')';
+    btn.onclick = () => supabase.auth.signOut().then(() => toast('Você saiu.', 'info'));
     if (btnOrders) btnOrders.style.display = 'inline-block';
   } else {
     btn.textContent = 'Entrar';
-    btn.onclick = () => signInWithPopup(auth, new GoogleAuthProvider())
-      .then(r => toast('Bem-vindo, ' + r.user.displayName + '!', 'ok'))
-      .catch(e => toast('Erro: ' + e.message, 'erro'));
+    btn.onclick = async () => {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      if (error) toast('Erro: ' + error.message, 'erro');
+    };
     if (btnOrders) btnOrders.style.display = 'none';
   }
 });

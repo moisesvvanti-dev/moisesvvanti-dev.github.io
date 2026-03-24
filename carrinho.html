@@ -142,9 +142,9 @@
 .tracking-map{width:100%;height:200px;border-radius:8px;border:1px solid var(--bor);margin-top:10px;overflow:hidden}
 </style>
 
+<script type="module">
 import { toast, Cart, STORE_ADDRESS } from '/js/utils.js';
-import { db } from '/js/firebase.js';
-import { doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+import { supabase } from '/js/supabase.js?v=3';
 
 let STEP = 'cart';
 let PAY_METHOD = 'pagseguro';
@@ -319,38 +319,34 @@ window.processPayment = async () => {
   btn.textContent = 'Processando...';
 
   try {
-    const pedidoId = 'kz_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const orderData = {
+    const pedidoId = crypto.randomUUID ? crypto.randomUUID() : 'kz_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const orderDataDB = {
       id: pedidoId,
-      criado: new Date().toISOString(),
       itens: cart,
-      subtotal: sub,
-      frete: frete,
       total: total,
       endereco: addr,
-      clienteNome: addr.name,
-      clienteTelefone: addr.phone,
-      clienteEmail: addr.email,
-      metodoPagamento: PAY_METHOD,
+      cliente_nome: addr.name,
+      cliente_telefone: addr.phone,
+      cliente_email: addr.email,
+      metodo_pagamento: PAY_METHOD,
       status: 'aguardando_pagamento'
     };
 
-    // Firebase DB Registry
+    // Supabase DB Registry
     try {
-      await setDoc(doc(db, 'kazzi_orders', pedidoId), {
-        ...orderData,
-        criado: serverTimestamp(),
-        atualizado: serverTimestamp()
-      });
-    } catch(e) { console.error('Aviso: Falha ao salvar no Firestore. Prosseguindo localmente.', e); }
+      const { error: err } = await supabase.from('kazzi_orders').insert([orderDataDB]);
+      if (err) throw err;
+    } catch(e) { console.error('Aviso: Falha ao salvar no Supabase. Prosseguindo localmente.', e); }
     
-    saveOrderLocal(orderData);
+    // Convertendo para padrão camelCase antigo para salvar histórico local e não quebrar "Meus Pedidos" antigo
+    const orderLocal = { ...orderDataDB, clienteNome: addr.name, clienteTelefone: addr.phone, clienteEmail: addr.email, metodoPagamento: PAY_METHOD };
+    saveOrderLocal(orderLocal);
 
     if (PAY_METHOD === 'pagseguro') {
       let psEmail = 'suporte@kazzi.com.br';
       try {
-        const snap = await getDoc(doc(db, 'kazzi_settings', 'delivery'));
-        if (snap.exists() && snap.data().pagseguroEmail) psEmail = snap.data().pagseguroEmail;
+        const { data: snap } = await supabase.from('kazzi_settings').select('pagseguro_email').eq('id', 'delivery').single();
+        if (snap && snap.pagseguro_email) psEmail = snap.pagseguro_email;
       } catch(e) {}
       
       const form = document.createElement('form');

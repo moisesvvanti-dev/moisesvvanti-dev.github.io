@@ -353,15 +353,8 @@
   </div>
 
   <script type="module">
-    import {
-      auth, db, storage,
-      listarTodos, criarProduto, criarProdutoLocal, editarProduto, excluirProduto
-    } from '/js/firebase.js?v=2';
-    import { detectarCat, formatarNome, descAuto, fmtBytes, ADMIN_EMAILS, toast }
-      from '/js/utils.js';
-    import {
-      GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-    } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js?v=2';
+    import { toast, detectarCat, formatarNome, descAuto, fmtBytes, ADMIN_EMAILS } from '/js/utils.js';
+    import { supabase, listarTodos, criarProduto, editarProduto, excluirProduto, uploadMidia } from '/js/supabase.js?v=3';
 
     const CAT_N = {
       camisetas: 'Camiseta', polos: 'Polo', moletons: 'Moletom',
@@ -392,13 +385,13 @@
       if (f) f.style.width = Math.min(pct * 100, 100) + '%';
     }
 
-    // ── Traduz erros Firebase ─────────────────────────────────
+    // ── Traduz erros ─────────────────────────────────
     function traduzErro(e) {
       const code = e.code || '';
-      if (code.includes('permission-denied') || code.includes('unauthorized'))
-        return '❌ Sem permissão. Configure as regras do Firestore/Storage no Firebase Console.';
+      if (code.includes('permission-denied') || code.includes('unauthorized') || e.message?.includes('violates row-level security'))
+        return '❌ Sem permissão. Verifique as políticas RLS no Supabase.';
       if (code.includes('storage/unauthorized'))
-        return '❌ Storage sem permissão. Cole as regras do Storage no Firebase Console.';
+        return '❌ Storage sem permissão. Verifique as políticas RLS do bucket kazzi-media no Supabase.';
       if (code.includes('storage/object-not-found'))
         return '❌ Arquivo não encontrado no Storage.';
       if (code.includes('storage/canceled'))
@@ -411,18 +404,19 @@
     }
 
     // ── AUTH ──────────────────────────────────────────────────
-    onAuthStateChanged(auth, u => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      const u = session?.user;
       if (u && ADMIN_EMAILS.includes(u.email)) {
         $('loginScreen').style.display = 'none';
         $('appAdmin').style.display = 'block';
         const av = $('adminAv');
-        if (u.photoURL)
-          av.innerHTML = `<img src="${u.photoURL}" style="width:100%;height:100%;object-fit:cover;">`;
+        if (u.user_metadata?.avatar_url)
+          av.innerHTML = `<img src="${u.user_metadata.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
         else
-          av.textContent = (u.displayName || u.email || 'U')[0].toUpperCase();
+          av.textContent = (u.user_metadata?.full_name || u.email || 'U')[0].toUpperCase();
         loadEstoque();
       } else if (u) {
-        signOut(auth);
+        supabase.auth.signOut();
         $('loginErr').textContent = 'Acesso negado: ' + u.email;
       } else {
         $('loginScreen').style.display = 'flex';
@@ -430,23 +424,19 @@
       }
     });
 
-    $('btnLoginAdmin').onclick = () => {
+    $('btnLoginAdmin').onclick = async () => {
       $('loginErr').textContent = '';
       $('btnLoginAdmin').innerHTML = '<span class="spin">↻</span> Entrando...';
       $('btnLoginAdmin').disabled = true;
-      const provider = new GoogleAuthProvider();
-
-      signInWithPopup(auth, provider).then((result) => {
-        // Redirecionamento feito pelo observer
-      }).catch(e => {
-        $('loginErr').textContent =
-          e.code === 'auth/popup-closed-by-user' ? 'Cancelado.' : e.message;
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      if (error) {
+        $('loginErr').textContent = error.message;
         $('btnLoginAdmin').disabled = false;
         $('btnLoginAdmin').innerHTML = 'ENTRAR COM GOOGLE';
-      });
+      }
     };
 
-    window.adminSignOut = () => { if (confirm('Sair do painel?')) { signOut(auth); } };
+    window.adminSignOut = () => { if (confirm('Sair do painel?')) supabase.auth.signOut(); };
 
     // ── TABS ──────────────────────────────────────────────────
     window.goTab = t => {
@@ -581,8 +571,8 @@
           const nomeLimpo = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
           const cat = detectarCat(nomeLimpo);
 
-          await criarProdutoLocal({
-            imagemLocal: directUrl,
+          await criarProduto({
+            imagem: directUrl,
             nome: nomeLimpo,
             categoria: cat,
             preco: 0,
@@ -672,22 +662,22 @@
       btn.textContent = 'Enviando (1/2)...';
 
       try {
-        const prod = await criarProduto({
-          file: _selectedFile,
+        const urlObj = await uploadMidia(_selectedFile, (pct) => {
+          btn.textContent = `Enviando Arquivo (${Math.round(pct)}%)...`;
+        });
+
+        await criarProduto({
           nome,
           categoria: cat,
           preco,
           estoque: est,
-          descricao: desc || descAuto(nome, cat)
-        }, (pct, label) => {
-          btn.textContent = label + ` (${Math.round(pct * 100)}%)`;
+          descricao: desc || descAuto(nome, cat),
+          imagem: urlObj.url,
+          storage_path: urlObj.path,
+          ativo: _cadAtivo
         });
 
-        if (!_cadAtivo && prod.id) {
-          await editarProduto(prod.id, { ativo: false }, null, () => { });
-        }
-
-        showFb(fb, `✅ "${nome}" cadastrado com sucesso e enviado p/ Firebase!`, 'ok');
+        showFb(fb, `✅ "${nome}" cadastrado com sucesso e enviado p/ o Supabase!`, 'ok');
         limparSelecao();
         btn.disabled = false;
         btn.textContent = '⚡ CADASTRAR PRODUTO';
@@ -777,12 +767,15 @@
       const p = CACHE.find(x => x.id === _editId);
 
       try {
-        await editarProduto(
-          _editId,
-          { nome, preco, estoque: est, descricao: desc, ativo: _editAtivo, storagePath: p?.storagePath },
-          _editFile,
-          (pct, label) => { }
-        );
+        let updateData = { nome, preco, estoque: est, descricao: desc, ativo: _editAtivo };
+        
+        if (_editFile) {
+          const urlObj = await uploadMidia(_editFile, (pct) => { btn.textContent = `Enviando Arquivo (${Math.round(pct)}%)...`; });
+          updateData.imagem = urlObj.url;
+          updateData.storage_path = urlObj.path;
+        }
+
+        await editarProduto(_editId, updateData);
         showFb(fb, '✅ Produto salvo com sucesso!', 'ok');
         await loadEstoque();
         setTimeout(window.closeDrawer, 1200);
@@ -808,25 +801,28 @@
     // ═══════════════════════════════════════════
     // ENTREGAS — Uber Direct
     // ═══════════════════════════════════════════
-    import {
-      collection as fCollection, doc as fDoc, getDocs as fGetDocs,
-      getDoc as fGetDoc, query as fQuery, where as fWhere, orderBy as fOrderBy,
-      updateDoc as fUpdateDoc, setDoc as fSetDoc, addDoc as fAddDoc, serverTimestamp as fServerTimestamp, onSnapshot
-    } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
-
+    
     let ORDERS_CACHE = [];
     let DELIVERIES_CACHE = [];
 
     async function loadEntregas() {
       $('ordersList').innerHTML = '<p class="a-empty">Carregando pedidos...</p>';
       try {
-        const ordersSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_orders'), fOrderBy('criado', 'desc')));
-        ORDERS_CACHE = [];
-        ordersSnap.forEach(d => ORDERS_CACHE.push({ id: d.id, ...d.data() }));
+        const { data: orders, error: errO } = await supabase.from('kazzi_orders').select('*').order('criado_em', { ascending: false });
+        if (errO) throw errO;
+        ORDERS_CACHE = (orders || []).map(o => ({
+          ...o,
+          clienteNome: o.cliente_nome,
+          clienteTelefone: o.cliente_telefone,
+          clienteEmail: o.cliente_email,
+          criado: { toDate: () => new Date(o.criado_em) }
+        }));
 
-        const delSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_deliveries'), fOrderBy('criado', 'desc')));
-        DELIVERIES_CACHE = [];
-        delSnap.forEach(d => DELIVERIES_CACHE.push({ id: d.id, ...d.data() }));
+        const { data: dels, error: errD } = await supabase.from('kazzi_deliveries').select('*').order('atualizado_em', { ascending: false });
+        if (errD) throw errD;
+        DELIVERIES_CACHE = (dels || []).map(d => ({
+          ...d, pedidoId: d.pedido_id, uberDeliveryId: d.uber_delivery_id, trackingUrl: d.tracking_url
+        }));
 
         renderEntregas();
       } catch (e) {
@@ -1007,10 +1003,10 @@
       if (!confirm(`Confirmar pedido de ${order.clienteNome}?`)) return;
 
       try {
-        await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
-          status: 'confirmado',
-          atualizado: fServerTimestamp()
-        });
+        const { error } = await supabase.from('kazzi_orders').update({
+          status: 'confirmado', atualizado_em: new Date().toISOString()
+        }).eq('id', orderId);
+        if (error) throw error;
         toast('Pedido confirmado! Agora solicite o Uber.', 'ok');
         closeDelDrawer();
         await loadEntregas();
@@ -1053,15 +1049,10 @@
           });
           const data = await result.json();
           if (data.success && data.delivery) {
-            const delRef = await fAddDoc(fCollection(db, 'kazzi_deliveries'), {
-              pedidoId: orderId, deliveryId, clienteNome: order.clienteNome,
-              clienteTelefone: order.clienteTelefone, endereco: order.endereco,
-              itens: order.itens || [], frete: order.frete || 0,
-              status: 'ativo', uberDeliveryId: data.delivery.id || deliveryId,
-              trackingUrl: data.delivery.tracking_url || null,
-              criado: fServerTimestamp(), atualizado: fServerTimestamp()
-            });
-            await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), { status: 'uber_criado', atualizado: fServerTimestamp() });
+            await supabase.from('kazzi_deliveries').insert([{
+              pedido_id: orderId, status: 'ativo', uber_delivery_id: data.delivery.id || deliveryId, tracking_url: data.delivery.tracking_url || null
+            }]);
+            await supabase.from('kazzi_orders').update({ status: 'uber_criado', atualizado_em: new Date().toISOString() }).eq('id', orderId);
             toast('Uber criado automaticamente!', 'ok');
             closeDelDrawer();
             await loadEntregas();
@@ -1150,24 +1141,15 @@
       if (!order) return;
 
       try {
-        const delRef = await fAddDoc(fCollection(db, 'kazzi_deliveries'), {
-          pedidoId: orderId,
-          deliveryId: deliveryId,
-          clienteNome: order.clienteNome,
-          clienteTelefone: order.clienteTelefone,
-          endereco: order.endereco,
-          itens: order.itens || [],
-          frete: order.frete || 0,
-          status: 'ativo',
-          trackingUrl: trackingUrl,
-          criado: fServerTimestamp(),
-          atualizado: fServerTimestamp()
-        });
+        const { error: e1 } = await supabase.from('kazzi_deliveries').insert([{
+          pedido_id: orderId, status: 'ativo', uber_delivery_id: deliveryId, tracking_url: trackingUrl
+        }]);
+        if (e1) throw e1;
 
-        await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
-          status: 'uber_criado',
-          atualizado: fServerTimestamp()
-        });
+        const { error: e2 } = await supabase.from('kazzi_orders').update({
+          status: 'uber_criado', atualizado_em: new Date().toISOString()
+        }).eq('id', orderId);
+        if (e2) throw e2;
 
         toast('Entrega registrada com rastreamento!', 'ok');
         closeDelDrawer();
@@ -1183,10 +1165,10 @@
       if (!url) { toast('Cole o link de rastreamento', 'erro'); return; }
 
       try {
-        await fUpdateDoc(fDoc(db, 'kazzi_deliveries', deliveryDocId), {
-          trackingUrl: url,
-          atualizado: fServerTimestamp()
-        });
+        const { error } = await supabase.from('kazzi_deliveries').update({
+          tracking_url: url, atualizado_em: new Date().toISOString()
+        }).eq('id', deliveryDocId);
+        if (error) throw error;
         toast('Rastreamento salvo!', 'ok');
         closeDelDrawer();
         await loadEntregas();
@@ -1209,16 +1191,9 @@
           });
         }
 
-        await fUpdateDoc(fDoc(db, 'kazzi_deliveries', deliveryDocId), {
-          status: 'cancelado',
-          atualizado: fServerTimestamp()
-        });
-
+        await supabase.from('kazzi_deliveries').update({ status: 'cancelado', atualizado_em: new Date().toISOString() }).eq('id', deliveryDocId);
         if (orderId) {
-          await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
-            status: 'cancelado',
-            atualizado: fServerTimestamp()
-          });
+          await supabase.from('kazzi_orders').update({ status: 'cancelado', atualizado_em: new Date().toISOString() }).eq('id', orderId);
         }
 
         toast('Entrega cancelada', 'info');
@@ -1236,37 +1211,26 @@
     let CAIXA_EXPENSES = [];
 
     async function loadCaixa() {
-      if (ORDERS_CACHE.length === 0) {
-         const ordersSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_orders'), fOrderBy('criado', 'desc')));
-         ORDERS_CACHE = [];
-         ordersSnap.forEach(d => ORDERS_CACHE.push({ id: d.id, ...d.data() }));
-      }
+      if (ORDERS_CACHE.length === 0) await loadEntregas();
       
       try {
-        const expSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_expenses'), fOrderBy('data', 'desc')));
-        CAIXA_EXPENSES = [];
-        expSnap.forEach(d => CAIXA_EXPENSES.push({ id: d.id, ...d.data() }));
-      } catch(e) {} // Falha se a collection não existe ou regras
+        const { data: exps, error } = await supabase.from('kazzi_expenses').select('*').order('data', { ascending: false });
+        if (error) throw error;
+        CAIXA_EXPENSES = (exps || []).map(e => ({ ...e, data: { toDate: () => new Date(e.data) } }));
+      } catch(e) {}
 
       calcularCaixa();
     }
 
-    function isSameDay(d1, d2) {
-      return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
-    }
+    function isSameDay(d1, d2) { return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate(); }
     function getWeek(d) {
-      const date = new Date(d.getTime());
-      date.setHours(0, 0, 0, 0);
+      const date = new Date(d.getTime()); date.setHours(0, 0, 0, 0);
       date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
       const week1 = new Date(date.getFullYear(), 0, 4);
       return Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
     }
-    function isSameWeek(d1, d2) {
-      return d1.getFullYear() === d2.getFullYear() && getWeek(d1) === getWeek(d2);
-    }
-    function isSameMonth(d1, d2) {
-      return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
-    }
+    function isSameWeek(d1, d2) { return d1.getFullYear() === d2.getFullYear() && getWeek(d1) === getWeek(d2); }
+    function isSameMonth(d1, d2) { return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth(); }
 
     function calcularCaixa() {
        const now = new Date();
@@ -1292,7 +1256,7 @@
          if (!e.data || !e.data.toDate) return;
          const d = e.data.toDate();
          const val = Number(e.valor || 0);
-         movimentos.push({ data: d, tipo: 'saida', valor: val, desc: e.desc || 'Despesa' });
+         movimentos.push({ data: d, tipo: 'saida', valor: val, desc: e.descricao || e.desc || 'Despesa' });
 
          if (d.getFullYear() === now.getFullYear()) outAno += val;
          if (isSameMonth(d, now)) outMes += val;
@@ -1341,9 +1305,8 @@
        if (isNaN(valor) || valor <= 0) { toast('Valor inválido', 'erro'); return; }
 
        try {
-         await fAddDoc(fCollection(db, 'kazzi_expenses'), {
-           desc, valor, data: fServerTimestamp()
-         });
+         const { error } = await supabase.from('kazzi_expenses').insert([{ descricao: desc, valor: valor }]);
+         if (error) throw error;
          toast('Despesa registrada no caixa!', 'ok');
          await loadCaixa();
        } catch(e) { toast('Erro: ' + e.message, 'erro'); }
@@ -1356,17 +1319,20 @@
 
     async function loadConfigs() {
       try {
-        const snap = await fGetDoc(fDoc(db, 'kazzi_settings', 'delivery'));
-        if (snap.exists()) {
-          CONFIGS_DATA = snap.data();
+        const { data: snap } = await supabase.from('kazzi_settings').select('*').eq('id', 'delivery').single();
+        if (snap) {
+          CONFIGS_DATA = {
+            uberEmail: snap.uber_email || '',
+            uberSenha: snap.uber_senha || '',
+            pagseguroEmail: snap.pagseguro_email || '',
+            storeName: snap.store_name || '',
+            storePhone: snap.store_phone || '',
+            storeAddress: snap.store_address || ''
+          };
         } else {
           CONFIGS_DATA = {
-            uberEmail: '',
-            uberSenha: '',
-            pagseguroEmail: 'suporte@kazzi.com.br',
-            storeName: 'Kazzi Company',
-            storePhone: '(47) 98916-4910',
-            storeAddress: 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC'
+            uberEmail: '', uberSenha: '', pagseguroEmail: 'suporte@kazzi.com.br',
+            storeName: 'Kazzi Company', storePhone: '(47) 98916-4910', storeAddress: 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC'
           };
         }
 
@@ -1391,18 +1357,21 @@
 
       try {
         const dados = {
-          uberEmail: $('cfgUberEmail').value.trim(),
-          uberSenha: $('cfgUberSenha').value.trim(),
-          pagseguroEmail: $('cfgPagSeguro').value.trim() || 'suporte@kazzi.com.br',
-          storeName: $('cfgStoreName').value.trim() || 'Kazzi Company',
-          storePhone: $('cfgStorePhone').value.trim() || '(47) 98916-4910',
-          storeAddress: $('cfgStoreAddr').value.trim() || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC',
-          atualizado: fServerTimestamp()
+          id: 'delivery',
+          uber_email: $('cfgUberEmail').value.trim(),
+          uber_senha: $('cfgUberSenha').value.trim(),
+          pagseguro_email: $('cfgPagSeguro').value.trim() || 'suporte@kazzi.com.br',
+          store_name: $('cfgStoreName').value.trim() || 'Kazzi Company',
+          store_phone: $('cfgStorePhone').value.trim() || '(47) 98916-4910',
+          store_address: $('cfgStoreAddr').value.trim() || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC'
         };
 
-        await fSetDoc(fDoc(db, 'kazzi_settings', 'delivery'), dados, { merge: true });
+        const { error } = await supabase.from('kazzi_settings').upsert([dados]);
+        if (error) throw error;
 
-        CONFIGS_DATA = dados;
+        CONFIGS_DATA = {
+          uberEmail: dados.uber_email, uberSenha: dados.uber_senha, pagseguroEmail: dados.pagseguro_email, storeName: dados.store_name, storePhone: dados.store_phone, storeAddress: dados.store_address
+        };
         showFb(fb, '✅ Configurações salvas com sucesso!', 'ok');
         toast('Configurações salvas!', 'ok');
       } catch (e) {
