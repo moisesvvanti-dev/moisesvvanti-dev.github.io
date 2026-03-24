@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>Kazzi Company | Estilo de Rua & Cultura Baggy</title>
+  <meta name="description" content="Muita rua para ser street. Streetwear baggy de Blumenau para o Brasil.">
+  <link rel="icon" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- LOGO ANIMAÇÃO -->
+<div class="logo-splash" id="logoSplash">
+  <div class="logo-anim">
+    <!-- Spray particles no fundo -->
+    <canvas class="splash-spray" id="splashSpray"></canvas>
+    <!-- Triângulo -->
+    <svg class="splash-tri" viewBox="0 0 300 320">
+      <line class="tri-line tri-l1" x1="150" y1="20" x2="270" y2="280" />
+      <line class="tri-line tri-l2" x1="270" y1="280" x2="30" y2="280" />
+      <line class="tri-line tri-l3" x1="30" y1="280" x2="150" y2="20" />
+    </svg>
+    <!-- Texto KAZZI -->
+    <div class="splash-text">
+      <span class="st-k">K</span>
+      <span class="st-k">A</span>
+      <span class="st-k">Z</span>
+      <span class="st-k">Z</span>
+      <span class="st-k">I</span>
+    </div>
+    <!-- Gota de tinta escorrendo -->
+    <div class="graff-drip drip-1"></div>
+    <div class="graff-drip drip-2"></div>
+    <div class="graff-drip drip-3"></div>
+    <!-- COMPANY -->
+    <div class="splash-company">COMPANY</div>
+  </div>
+</div>
+
+<!-- SPRAY CURSOR -->
+<canvas id="sprayCanvas"></canvas>
+
+<header class="site-header">
+  <div class="h-inner container">
+    <a href="/" class="h-logo">
+      <img src="/img/logo.png" alt="Kazzi Company">
+      <span class="h-logo-text">KAZZI<em>.</em></span>
+    </a>
+    <div class="h-search">
+      <input type="text" id="searchInput" placeholder="Buscar produtos..." autocomplete="off">
+      <button aria-label="Buscar">🔍</button>
+    </div>
+    <div class="h-actions">
+      <button class="btn-cart" onclick="location.href='/carrinho.html'" aria-label="Carrinho">
+        🛒<span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <button class="btn-login" id="btnLogin">Entrar</button>
+      <button class="btn-login" id="btnMyOrders" style="display:none;border-color:#3b82f6;color:#3b82f6;" onclick="location.href='/pedidos.html'">Pedidos</button>
+      <a href="https://api.whatsapp.com/send?phone=5547989164910" target="_blank" class="btn-wa">💬 WhatsApp</a>
+    </div>
+  </div>
+</header>
+
+<nav class="cat-nav">
+  <ul id="catNav">
+    <li><a href="#" data-cat="all" class="active">Todos</a></li>
+    <li><a href="#" data-cat="camisetas">Camisetas</a></li>
+    <li><a href="#" data-cat="polos">Polos</a></li>
+    <li><a href="#" data-cat="moletons">Moletons</a></li>
+    <li><a href="#" data-cat="calcas">Calças</a></li>
+    <li><a href="#" data-cat="calcados">Calçados</a></li>
+    <li><a href="#" data-cat="cintos">Cintos</a></li>
+    <li><a href="#" data-cat="meias">Meias</a></li>
+    <li><a href="#" data-cat="oculos">Óculos</a></li>
+    <li><a href="#" data-cat="acessorios">Acessórios</a></li>
+    <li><a href="#" data-cat="outfits">Outfits</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-content">
+    <img src="/img/logo.png" alt="Kazzi" class="hero-logo">
+    <p class="hero-tag">MUITA RUA PARA<span class="hero-tag-line">SER STREET.</span></p>
+    <p class="hero-sub">Elevando o streetwear com o autêntico estilo baggy. De Blumenau para todo o Brasil.</p>
+    <a href="#produtos" class="btn-hero">VER PRODUTOS</a>
+  </div>
+</section>
+
+<section class="section" id="produtos">
+  <div class="container">
+    <h2 class="section-title">Mais Vendidos</h2>
+    <div class="product-grid" id="productGrid">
+      <div class="grid-msg">Carregando...</div>
+    </div>
+  </div>
+</section>
+
+<section class="map-section">
+  <div class="container">
+    <h2 class="section-title">Onde Estamos</h2>
+    <div class="map-wrap">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.3774690353202!2d-49.10279810000001!3d-26.859745900000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94df1f882c8069f3%3A0x70b09a0b430f9317!2sR.%20Frederico%20Jensen%2C%201720%20-%20Itoupavazinha%2C%20Blumenau%20-%20SC!5e0!3m2!1spt-BR!2sbr!4v1772660015215!5m2!1spt-BR!2sbr"
+        allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Localização Kazzi"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container f-inner">
+    <a href="/"><img src="/img/logo.png" alt="Kazzi" style="height:22px;border-radius:50%;opacity:.65;"></a>
+    <p class="f-copy" id="fCopy">© 2026 Kazzi Company. Muita rua para ser street.</p>
+    <div class="f-social">
+      <a href="https://www.instagram.com/kazzi.company" target="_blank" aria-label="Instagram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a href="https://api.whatsapp.com/send?phone=5547989164910" target="_blank" aria-label="WhatsApp">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">×</button>
+    <div class="modal-gallery">
+      <div class="modal-main">
+        <img id="modalImg" src="" alt="">
+        <video id="modalVideo" controls style="display:none;width:100%;height:100%;object-fit:cover;"></video>
+      </div>
+      <div class="modal-thumbs" id="modalThumbs"></div>
+    </div>
+    <div class="modal-info">
+      <p class="modal-crumb" id="modalCrumb"></p>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <p class="modal-price" id="modalPrice"></p>
+      <p class="modal-inst"  id="modalInst"></p>
+      <label class="modal-label">TAMANHO</label>
+      <div class="modal-sizes" id="modalSizes"></div>
+      <button class="btn-buy" id="modalBuy">COMPRAR AGORA</button>
+      <p class="modal-desc" id="modalDesc"></p>
+    </div>
+  </div>
+</div>
+
+<style>
+.grid-msg { grid-column:1/-1; text-align:center; padding:3rem; color:var(--mut); }
+</style>
+
+<script type="module">
+import { auth, listarProdutos, buscarProduto } from '/js/firebase.js?v=2';
+import { toast, Cart, fmtPreco, fmtInst, getSizes } from '/js/utils.js';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+
+Cart.badge();
+
+let CAT = 'all', BUSCA = '', PRODUTO = null, TAM = null, searchTimer;
+
+// ── Carrega produtos do Firestore ─────────────────────────
+async function loadProducts() {
+  const g = document.getElementById('productGrid');
+  g.innerHTML = '<div class="grid-msg">Carregando...</div>';
+  try {
+    const lista = await listarProdutos(CAT, BUSCA);
+    if (!lista.length) {
+      g.innerHTML = '<div class="grid-msg">Nenhum produto encontrado.</div>';
+      return;
+    }
+    g.innerHTML = lista.map(p => {
+      const img    = p.imagem || 'https://placehold.co/400x500/111/555?text=Kazzi';
+      const isVid  = /\.(mp4|webm|mov)$/i.test(img);
+      const est    = p.estoque || 0;
+      const media  = isVid
+        ? `<video src="${img}" muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
+        : `<img src="${img}" alt="${p.nome}" loading="lazy" onerror="this.src='https://placehold.co/400x500/111/555?text=Erro'">`;
+      const badges = est > 0 && est <= 3 ? '<span class="badge badge-warn">Últimas unidades</span>'
+                   : est === 0           ? '<span class="badge badge-out">Esgotado</span>'
+                   : '';
+      return `<article class="product-card" onclick="window._openModal('${p.id}')">
+        <div class="pc-img">${badges}${media}</div>
+        <div class="pc-info">
+          <h3 class="pc-name">${p.nome}</h3>
+          <p class="pc-price">${fmtPreco(p.preco)}</p>
+          ${p.preco > 0 ? `<p class="pc-inst">${fmtInst(p.preco)}</p>` : ''}
+        </div>
+      </article>`;
+    }).join('');
+  } catch(e) {
+    g.innerHTML = `<div class="grid-msg">Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+// ── Modal ─────────────────────────────────────────────────
+window._openModal = async (id) => {
+  try {
+    const p = await buscarProduto(id);
+    if (!p) return;
+    PRODUTO = p; TAM = null;
+
+    document.getElementById('modalTitle').textContent = p.nome;
+    document.getElementById('modalPrice').textContent = fmtPreco(p.preco);
+    document.getElementById('modalInst').innerHTML   = p.preco > 0 ? fmtInst(p.preco) : '';
+    document.getElementById('modalDesc').textContent  = p.descricao || '';
+    document.getElementById('modalCrumb').textContent = `Home / ${p.categoria || 'Produto'} / ${p.nome}`;
+
+    const img = document.getElementById('modalImg');
+    const vid = document.getElementById('modalVideo');
+    const isV = /\.(mp4|webm|mov)$/i.test(p.imagem || '');
+    if (isV) {
+      img.style.display = 'none'; vid.style.display = ''; vid.src = p.imagem; vid.load();
+    } else {
+      vid.pause(); vid.style.display = 'none'; img.style.display = ''; img.src = p.imagem || '';
+    }
+
+    const sizes = getSizes(p);
+    const sw = document.getElementById('modalSizes');
+    sw.innerHTML = sizes.map(s => `<button class="size-btn" data-s="${s}">${s}</button>`).join('');
+    sw.querySelectorAll('.size-btn').forEach(b => {
+      b.onclick = () => { sw.querySelectorAll('.size-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); TAM = b.dataset.s; };
+    });
+
+    document.getElementById('modalBuy').onclick = () => {
+      if (!TAM && sizes.length > 1) { toast('Escolha um tamanho', 'info'); return; }
+      Cart.add(p, TAM || sizes[0]);
+    };
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  } catch(e) { toast('Erro ao abrir produto', 'erro'); }
+};
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  const v = document.getElementById('modalVideo'); if (v) v.pause();
+}
+document.getElementById('modalClose').onclick = closeModal;
+document.getElementById('modalOverlay').onclick = e => { if (e.target === e.currentTarget) closeModal(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Categorias ────────────────────────────────────────────
+document.getElementById('catNav').addEventListener('click', e => {
+  e.preventDefault();
+  const a = e.target.closest('[data-cat]'); if (!a) return;
+  document.querySelectorAll('.cat-nav a').forEach(x => x.classList.remove('active'));
+  a.classList.add('active'); CAT = a.dataset.cat; loadProducts();
+});
+
+// ── Busca ─────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  const v = this.value;
+  searchTimer = setTimeout(() => { BUSCA = v.toLowerCase().trim(); loadProducts(); }, 350);
+});
+
+// ── Parallax ──────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('heroBg').style.transform = `translateY(${window.scrollY * .35}px)`;
+}, { passive: true });
+
+// ── Secret admin ──────────────────────────────────────────
+(function() {
+  const el = document.getElementById('fCopy'); let cc = 0, ct;
+  if (!el) return;
+  el.addEventListener('click', () => {
+    if (++cc >= 4) location.href = '/admin/';
+    clearTimeout(ct); ct = setTimeout(() => cc = 0, 1200);
+  });
+})();
+
+// ── Auth (botão Entrar) ───────────────────────────────────
+onAuthStateChanged(auth, u => {
+  const btn = document.getElementById('btnLogin');
+  const btnOrders = document.getElementById('btnMyOrders');
+  if (u) {
+    btn.textContent = 'Sair (' + (u.displayName || 'Usuário').split(' ')[0] + ')';
+    btn.onclick = () => signOut(auth).then(() => toast('Você saiu.', 'info'));
+    if (btnOrders) btnOrders.style.display = 'inline-block';
+  } else {
+    btn.textContent = 'Entrar';
+    btn.onclick = () => signInWithPopup(auth, new GoogleAuthProvider())
+      .then(r => toast('Bem-vindo, ' + r.user.displayName + '!', 'ok'))
+      .catch(e => toast('Erro: ' + e.message, 'erro'));
+    if (btnOrders) btnOrders.style.display = 'none';
+  }
+});
+
+// Inicia
+loadProducts();
+
+// ── Spray na Animação da Logo ──────────────────────────────
+(function() {
+  const c = document.getElementById('splashSpray');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  c.width = 320;
+  c.height = 340;
+  const cx = 160, cy = 170;
+  let frame = 0;
+
+  function burst(x, y, count, spread) {
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * spread;
+      const px = x + Math.cos(a) * d;
+      const py = y + Math.sin(a) * d;
+      const s = Math.random() * 2 + 0.5;
+      const al = Math.random() * 0.6 + 0.2;
+      ctx.beginPath();
+      ctx.arc(px, py, s, 0, Math.PI * 2);
+      ctx.fillStyle = Math.random() > 0.5
+        ? 'rgba(232,0,28,' + al + ')'
+        : 'rgba(255,255,255,' + (al * 0.7) + ')';
+      ctx.fill();
+    }
+  }
+
+  function tick() {
+    if (frame > 150) return;
+    frame++;
+
+    // Spray ao redor do triângulo nas linhas
+    if (frame > 20 && frame < 60) {
+      const t = (frame - 20) / 40;
+      burst(cx + (t - 0.5) * 200, cy - 60 + t * 200, 2, 12);
+    }
+    if (frame > 30 && frame < 50) {
+      burst(cx - 80 + Math.random() * 160, cy + 80, 1, 10);
+    }
+    if (frame > 40 && frame < 60) {
+      burst(cx + 70, cy - 40 + Math.random() * 120, 1, 10);
+    }
+
+    // Spray nas letras KAZZI
+    if (frame > 55 && frame < 90) {
+      burst(cx - 40 + Math.random() * 80, cy - 20, 2, 18);
+    }
+
+    // Spray nas letras COMPANY
+    if (frame > 80 && frame < 110) {
+      burst(cx - 30 + Math.random() * 60, cy + 20, 1, 14);
+    }
+
+    // Fade
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.04)';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.globalCompositeOperation = 'source-over';
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// ── Efeito Spray no Mouse ──────────────────────────────────
+(function() {
+  const canvas = document.getElementById('sprayCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let mouseX = -100, mouseY = -100;
+  let lastX = mouseX, lastY = mouseY;
+  let smoothX = mouseX, smoothY = mouseY;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }, { passive: true });
+
+  function spray() {
+    smoothX += (mouseX - smoothX) * 0.4;
+    smoothY += (mouseY - smoothY) * 0.4;
+
+    const dx = smoothX - lastX;
+    const dy = smoothY - lastY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > 1) {
+      const dots = Math.min(Math.floor(dist / 2), 20);
+      for (let i = 0; i < dots; i++) {
+        const t = i / dots;
+        const spread = 30 + Math.random() * 25;
+        const angle = Math.random() * Math.PI * 2;
+        const px = smoothX + dx * t + Math.cos(angle) * spread * Math.random();
+        const py = smoothY + dy * t + Math.sin(angle) * spread * Math.random();
+        const size = Math.random() * 3 + 0.5;
+        const alpha = Math.random() * 0.7 + 0.25;
+        const r = Math.random();
+
+        ctx.beginPath();
+        ctx.arc(px, py, size, 0, Math.PI * 2);
+        if (r > 0.35) {
+          ctx.fillStyle = 'rgba(232,0,28,' + alpha + ')';
+        } else {
+          ctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+        }
+        ctx.fill();
+      }
+      lastX = smoothX;
+      lastY = smoothY;
+    }
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.045)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'source-over';
+
+    requestAnimationFrame(spray);
+  }
+  spray();
+})();
+</script>
+</body>
+</html>

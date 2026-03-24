@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>Kazzi Company | Carrinho</title>
+  <link rel="icon" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="h-inner container">
+    <a href="/" class="h-logo"><img src="/img/logo.png" alt="Kazzi Company"><span class="h-logo-text">KAZZI<em>.</em></span></a>
+    <a href="/" style="color:var(--mut2);font-size:13px;font-weight:600;margin-left:auto;">← Voltar à loja</a>
+  </div>
+</header>
+
+<main class="cart-page container">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+    <h1 class="cart-heading" id="pageHeading">Seu Carrinho</h1>
+    <span id="cartCount" style="color:var(--mut);font-size:13px;"></span>
+  </div>
+
+  <!-- ETAPA 1: CARRINHO -->
+  <div id="step-cart">
+    <div id="cartRoot" class="cart-grid"></div>
+  </div>
+
+  <!-- ETAPA 2: ENDEREÇO -->
+  <div id="step-address" style="display:none;">
+    <div class="cart-grid">
+      <div class="cart-box">
+        <p class="sum-label">📍 Endereço de Entrega</p>
+        <div class="a-field">
+          <label class="a-label">Nome Completo *</label>
+          <input type="text" id="addrName" class="a-input" placeholder="Seu nome completo">
+        </div>
+        <div class="a-field">
+          <label class="a-label">Telefone *</label>
+          <input type="tel" id="addrPhone" class="a-input" placeholder="(47) 99999-9999">
+        </div>
+        <div class="a-field">
+          <label class="a-label">Email *</label>
+          <input type="email" id="addrEmail" class="a-input" placeholder="seu@email.com">
+        </div>
+        <div class="a-row2" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+          <div class="a-field">
+            <label class="a-label">CEP *</label>
+            <input type="text" id="addrZip" class="a-input" placeholder="89070-000">
+          </div>
+          <div class="a-field">
+            <label class="a-label">Rua *</label>
+            <input type="text" id="addrStreet" class="a-input" placeholder="Nome da rua">
+          </div>
+        </div>
+        <div class="a-row2" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+          <div class="a-field">
+            <label class="a-label">Número *</label>
+            <input type="text" id="addrNumber" class="a-input" placeholder="123">
+          </div>
+          <div class="a-field">
+            <label class="a-label">Bairro *</label>
+            <input type="text" id="addrDistrict" class="a-input" placeholder="Bairro">
+          </div>
+        </div>
+        <div class="a-field">
+          <label class="a-label">Complemento</label>
+          <input type="text" id="addrComplement" class="a-input" placeholder="Apto, bloco, etc.">
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button class="btn-checkout" style="background:transparent;border:1.5px solid var(--ac);color:var(--ac);flex:1;" onclick="goStep('cart')">← VOLTAR</button>
+          <button class="btn-checkout" style="flex:2;" onclick="goStep('payment')">CONTINUAR PARA PAGAMENTO →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ETAPA 3: PAGAMENTO -->
+  <div id="step-payment" style="display:none;">
+    <div class="cart-grid">
+      <div class="cart-box">
+        <p class="sum-label">💳 Pagamento</p>
+        <div class="pay-methods">
+          <button class="pay-method active" data-method="credit" onclick="selectPayMethod(this)">
+            <span>💳</span> Cartão de Crédito
+          </button>
+          <button class="pay-method" data-method="boleto" onclick="selectPayMethod(this)">
+            <span>📄</span> Boleto
+          </button>
+        </div>
+
+        <div id="creditForm">
+          <div class="a-field">
+            <label class="a-label">Número do Cartão *</label>
+            <input type="text" id="cardNumber" class="a-input" placeholder="0000 0000 0000 0000" maxlength="19">
+          </div>
+          <div class="a-row2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="a-field">
+              <label class="a-label">Validade *</label>
+              <input type="text" id="cardExpiry" class="a-input" placeholder="MM/AA" maxlength="5">
+            </div>
+            <div class="a-field">
+              <label class="a-label">CVV *</label>
+              <input type="text" id="cardCvv" class="a-input" placeholder="123" maxlength="4">
+            </div>
+          </div>
+          <div class="a-field">
+            <label class="a-label">Nome no Cartão *</label>
+            <input type="text" id="cardName" class="a-input" placeholder="Nome como está no cartão">
+          </div>
+          <div class="a-field">
+            <label class="a-label">CPF do Titular *</label>
+            <input type="text" id="cardCpf" class="a-input" placeholder="000.000.000-00">
+          </div>
+          <div class="a-field">
+            <label class="a-label">Parcelas</label>
+            <select id="cardInstallments" class="a-input">
+              <option value="1">1x sem juros</option>
+              <option value="2">2x sem juros</option>
+              <option value="3">3x sem juros</option>
+              <option value="4">4x sem juros</option>
+              <option value="5">5x sem juros</option>
+              <option value="6">6x sem juros</option>
+              <option value="7">7x com juros</option>
+              <option value="8">8x com juros</option>
+              <option value="9">9x com juros</option>
+              <option value="10">10x com juros</option>
+              <option value="11">11x com juros</option>
+              <option value="12">12x com juros</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="boletoInfo" style="display:none;padding:14px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:8px;margin-top:10px;">
+          <p style="font-size:13px;color:var(--mut2);">O boleto será gerado após a confirmação. Prazo de vencimento: 3 dias úteis.</p>
+        </div>
+
+        <div id="paymentSummary" style="margin-top:16px;"></div>
+
+        <div style="display:flex;gap:12px;margin-top:14px;">
+          <button class="btn-checkout" style="background:transparent;border:1.5px solid var(--ac);color:var(--ac);flex:1;" onclick="goStep('address')">← VOLTAR</button>
+          <button class="btn-checkout" style="flex:2;" id="btnPay" onclick="processPayment()">FINALIZAR COMPRA ✅</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ETAPA 4: CONFIRMAÇÃO -->
+  <div id="step-confirm" style="display:none;">
+    <div class="cart-grid">
+      <div class="cart-box" style="text-align:center;padding:40px 20px;">
+        <div style="font-size:48px;margin-bottom:16px;">✅</div>
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:8px;">PEDIDO REALIZADO!</h2>
+        <p style="color:var(--mut2);font-size:14px;margin-bottom:20px;" id="confirmMsg">Seu pagamento foi processado com sucesso.</p>
+        <div id="orderTracking" style="text-align:left;margin-top:20px;"></div>
+        <a href="/" class="btn-checkout" style="display:inline-block;margin-top:24px;padding:14px 32px;">VOLTAR À LOJA</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<style>
+.a-field{margin-bottom:14px}
+.a-label{display:block;font-size:9px;font-weight:900;color:var(--mut);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.a-input{width:100%;background:var(--card2);border:1px solid var(--bor);border-radius:8px;padding:11px 14px;color:#fff;font-size:14px;font-weight:600;outline:none;transition:border-color .2s}
+.a-input:focus{border-color:var(--ac)}
+.a-input::placeholder{color:var(--mut)}
+.a-row2{margin-bottom:14px}
+.pay-methods{display:flex;gap:10px;margin-bottom:16px}
+.pay-method{flex:1;padding:14px;border-radius:8px;background:var(--card2);border:1.5px solid var(--bor);color:var(--mut2);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;justify-content:center}
+.pay-method.active{border-color:var(--ac);color:#fff;background:rgba(232,0,28,.08)}
+.pay-method:hover{border-color:var(--ac)}
+.tracking-card{background:var(--card2);border:1px solid var(--bor);border-radius:10px;padding:16px;margin-top:12px}
+.tracking-status{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tracking-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tracking-dot.active{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.5)}
+.tracking-dot.pending{background:var(--mut)}
+.tracking-map{width:100%;height:200px;border-radius:8px;border:1px solid var(--bor);margin-top:10px;overflow:hidden}
+</style>
+
+<script type="module">
+import { toast, Cart, STORE_ADDRESS } from '/js/utils.js';
+
+let STEP = 'cart';
+let PAY_METHOD = 'credit';
+
+// ── Funções de Storage para Pedidos ────────────────────────
+function saveOrderLocal(order) {
+  const orders = JSON.parse(localStorage.getItem('kzc_orders') || '[]');
+  orders.push(order);
+  localStorage.setItem('kzc_orders', JSON.stringify(orders));
+}
+
+function fmtP(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+function getCart()  { return JSON.parse(localStorage.getItem('kzc') || '[]'); }
+function saveCart(c){ localStorage.setItem('kzc', JSON.stringify(c)); }
+
+// ── Navegação entre etapas ─────────────────────────────────
+window.goStep = (step) => {
+  ['cart','address','payment','confirm'].forEach(s => {
+    document.getElementById('step-'+s).style.display = s === step ? 'block' : 'none';
+  });
+  STEP = step;
+  document.getElementById('pageHeading').textContent =
+    step === 'cart' ? 'Seu Carrinho' : step === 'address' ? 'Endereço' : step === 'payment' ? 'Pagamento' : 'Pedido Confirmado';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (step === 'payment') updatePaymentSummary();
+};
+
+window.selectPayMethod = (el) => {
+  document.querySelectorAll('.pay-method').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  PAY_METHOD = el.dataset.method;
+  document.getElementById('creditForm').style.display = PAY_METHOD === 'credit' ? 'block' : 'none';
+  document.getElementById('boletoInfo').style.display = PAY_METHOD === 'boleto' ? 'block' : 'none';
+};
+
+function updatePaymentSummary() {
+  const cart = getCart();
+  const sub = cart.reduce((s, i) => s + i.preco * i.qty, 0);
+  const frete = sub >= 299 ? 0 : 19.90;
+  const total = sub + frete;
+  const inst = parseInt(document.getElementById('cardInstallments')?.value || '1');
+  const instVal = total / inst;
+
+  document.getElementById('paymentSummary').innerHTML = `
+    <div class="cart-box cart-summary" style="margin:0;">
+      <div class="sum-row"><span>Subtotal</span><span>${fmtP(sub)}</span></div>
+      <div class="sum-row"><span>Frete (Uber)</span><span>${frete === 0 ? '<span style="color:#22c55e">Grátis</span>' : fmtP(frete)}</span></div>
+      <div class="sum-total">
+        <span>Total</span>
+        <span class="sum-total-val">${fmtP(total)}</span>
+      </div>
+      ${inst > 1 ? `<p style="font-size:11px;color:var(--mut);margin-top:6px;">${inst}x de ${fmtP(instVal)}</p>` : ''}
+    </div>`;
+}
+
+// ── Render carrinho ────────────────────────────────────────
+function render() {
+  const cart = getCart();
+  const root = document.getElementById('cartRoot');
+  document.getElementById('cartCount').textContent = cart.length + ' item(s)';
+
+  if (!cart.length) {
+    root.innerHTML = `<div class="cart-empty">
+      <p>Seu carrinho está vazio.</p>
+      <a href="/">Ver Produtos</a>
+    </div>`;
+    return;
+  }
+
+  const sub   = cart.reduce((s, i) => s + i.preco * i.qty, 0);
+  const frete = sub >= 299 ? 0 : 19.90;
+  const total = sub + frete;
+
+  const itens = cart.map(i => `
+    <div class="cart-item">
+      <img src="${i.img || 'https://placehold.co/88x88/111/555?text=?'}" alt="${i.nome}">
+      <div class="cart-item-info">
+        <p class="ci-name">${i.nome}</p>
+        <p class="ci-size">Tamanho: ${i.tam || '—'}</p>
+        <p class="ci-price">${fmtP(i.preco)}</p>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px;">
+          <div class="qty-wrap">
+            <button class="qty-btn" onclick="chgQty('${i.id}','${i.tam}',-1)">−</button>
+            <span class="qty-val">${i.qty}</span>
+            <button class="qty-btn" onclick="chgQty('${i.id}','${i.tam}',1)">+</button>
+          </div>
+          <button class="remove-btn" onclick="rmItem('${i.id}','${i.tam}')">Remover</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  root.innerHTML = `
+    <div class="cart-box">${itens}</div>
+    <div class="cart-box cart-summary">
+      <p class="sum-label">Resumo</p>
+      <div class="sum-row"><span>Subtotal</span><span>${fmtP(sub)}</span></div>
+      <div class="sum-row"><span>Frete (Uber)</span><span>${frete === 0 ? '<span style="color:#22c55e">Grátis</span>' : fmtP(frete)}</span></div>
+      ${frete > 0 ? '<p style="font-size:11px;color:var(--mut);margin-bottom:8px;">Grátis acima de R$ 299</p>' : ''}
+      <div class="sum-total">
+        <span>Total</span>
+        <span class="sum-total-val">${fmtP(total)}</span>
+      </div>
+      <button class="btn-checkout" onclick="goStep('address')">FINALIZAR COMPRA 🛒</button>
+      <button class="btn-checkout" style="background:transparent;border:1.5px solid var(--bor);color:var(--mut2);margin-top:8px;font-size:11px;" onclick="finalizarWhatsApp()">Ou finalizar via WhatsApp 💬</button>
+    </div>`;
+}
+
+window.chgQty = (id, tam, d) => {
+  const c = getCart(), idx = c.findIndex(i => i.id === id && i.tam === tam);
+  if (idx < 0) return;
+  c[idx].qty = Math.max(0, c[idx].qty + d);
+  if (c[idx].qty === 0) c.splice(idx, 1);
+  saveCart(c); render();
+};
+
+window.rmItem = (id, tam) => {
+  saveCart(getCart().filter(i => !(i.id === id && i.tam === tam)));
+  render();
+};
+
+window.finalizarWhatsApp = () => {
+  const c = getCart(); if (!c.length) return;
+  const total = c.reduce((s, i) => s + i.preco * i.qty, 0);
+  const itens = c.map(i => `${i.qty}x ${i.nome} (${i.tam})`).join(', ');
+  const msg   = encodeURIComponent(`Olá! Quero finalizar meu pedido:\n${itens}\n\nTotal: R$ ${total.toFixed(2).replace('.', ',')}`);
+  window.open(`https://api.whatsapp.com/send?phone=5547989164910&text=${msg}`, '_blank');
+};
+
+// ── Validação de endereço ──────────────────────────────────
+function validateAddress() {
+  const fields = ['addrName','addrPhone','addrEmail','addrStreet','addrNumber','addrDistrict','addrZip'];
+  for (const f of fields) {
+    const el = document.getElementById(f);
+    if (!el.value.trim()) {
+      toast('Preencha todos os campos obrigatórios', 'erro');
+      el.focus();
+      return false;
+    }
+  }
+  return true;
+}
+
+function getAddress() {
+  return {
+    name: document.getElementById('addrName').value.trim(),
+    phone: document.getElementById('addrPhone').value.trim(),
+    email: document.getElementById('addrEmail').value.trim(),
+    street: document.getElementById('addrStreet').value.trim(),
+    number: document.getElementById('addrNumber').value.trim(),
+    district: document.getElementById('addrDistrict').value.trim(),
+    complement: document.getElementById('addrComplement').value.trim(),
+    zip: document.getElementById('addrZip').value.trim(),
+    city: 'Blumenau',
+    state: 'SC'
+  };
+}
+
+// ── Processar pagamento / Finalizar Pedido ────────────────
+window.processPayment = async () => {
+  const cart = getCart();
+  if (!cart.length) { toast('Carrinho vazio', 'erro'); return; }
+
+  const addr = getAddress();
+  if (!validateAddress()) return;
+
+  const sub = cart.reduce((s, i) => s + i.preco * i.qty, 0);
+  const frete = sub >= 299 ? 0 : 19.90;
+  const total = sub + frete;
+
+  const btn = document.getElementById('btnPay');
+  btn.disabled = true;
+  btn.textContent = 'Processando...';
+
+  try {
+    const pedidoId = 'kz_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const orderData = {
+      id: pedidoId,
+      criado: new Date().toISOString(),
+      itens: cart,
+      subtotal: sub,
+      frete: frete,
+      total: total,
+      endereco: addr,
+      metodoPagamento: PAY_METHOD,
+      status: 'pago' // Forçado para exemplo sem DB
+    };
+
+    // Auto-deletar produtos do sistema (estoque)
+    const resp = await fetch('/api/finalizar-pedido.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart })
+    });
+    
+    // Mesmo se falhar o unlink, nós salvamos o pedido.
+    
+    // Salva histórico no dispositivo
+    saveOrderLocal(orderData);
+    Cart.clear();
+
+    // Redireciona para WhatsApp
+    const itensMsg = cart.map(i => `${i.qty}x ${i.nome} (${i.tam})`).join('\n');
+    const msg = encodeURIComponent(
+      `🛍 *NOVO PEDIDO: #${pedidoId.toUpperCase()}*\n\n` +
+      `*Itens:*\n${itensMsg}\n\n` +
+      `*Total:* R$ ${total.toFixed(2).replace('.', ',')} (Frete: R$ ${frete.toFixed(2).replace('.', ',')})\n` +
+      `*Pagamento:* ${PAY_METHOD === 'credit' ? 'Cartão' : 'Boleto/Pix'}\n\n` +
+      `*Entrega:*\n${addr.name} - ${addr.phone}\n${addr.street}, ${addr.number} - ${addr.district}\n${addr.zip}` 
+    );
+    window.open(`https://api.whatsapp.com/send?phone=5547989164910&text=${msg}`, '_blank');
+
+    goStep('confirm');
+    document.getElementById('confirmMsg').textContent = 'Pedido confirmado e registrado. O dono da loja receberá seu pedido via WhatsApp!';
+    
+    // Simula tracking local
+    document.getElementById('orderTracking').innerHTML = `
+      <div class="tracking-card">
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:10px;">STATUS DO PEDIDO</p>
+        <div class="tracking-status">
+          <div class="tracking-dot active" style="background:#22c55e"></div>
+          <span style="font-weight:700;color:#22c55e">✅ Recebido! Entre em contato via WhatsApp para o Uber.</span>
+        </div>
+      </div>`;
+
+  } catch (e) {
+    console.error('[KAZZI] Erro ao finalizar:', e);
+    toast('Erro: Falha na finalização.', 'erro');
+    btn.disabled = false;
+    btn.textContent = 'FINALIZAR COMPRA ✅';
+  }
+};
+
+
+
+// ── Formatação de inputs ───────────────────────────────────
+document.getElementById('cardNumber')?.addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+});
+document.getElementById('cardExpiry')?.addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').replace(/^(.{2})/, '$1/').substring(0, 5);
+});
+document.getElementById('cardCpf')?.addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+});
+document.getElementById('addrZip')?.addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 9);
+});
+
+// Inicia
+render();
+</script>
+</body>
+</html>
