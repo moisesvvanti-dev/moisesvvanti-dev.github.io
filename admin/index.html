@@ -43,11 +43,10 @@
   <!-- CADASTRAR -->
   <section class="a-body" id="sec-cadastrar">
     <div class="a-card glass" style="margin-bottom:16px;">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:8px;">📁 PRODUTOS NA PASTA</p>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Selecione um produto da pasta para cadastrar no site. O nome do arquivo vira o nome do produto.</p>
-      <div class="pasta-grid" id="pastaGrid">
-        <p class="a-empty">Carregando produtos da pasta...</p>
-      </div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:8px;">📁 PRODUTO (GITHUB PAGES)</p>
+      <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Escolha o arquivo do produto do seu PC. O nome do arquivo definirá o nome e categoria.</p>
+      <label for="localFileInput" class="a-btn-midia" style="display:inline-block;cursor:pointer;">📷 ESCOLHER IMAGEM/VÍDEO</label>
+      <input type="file" id="localFileInput" class="sr-only" accept="image/*,video/*" onchange="selecionarArquivoUpload(this)">
     </div>
 
     <div class="a-card glass" id="cadFormCard" style="display:none;">
@@ -327,7 +326,7 @@ onAuthStateChanged(auth, u => {
       av.innerHTML = `<img src="${u.photoURL}" style="width:100%;height:100%;object-fit:cover;">`;
     else
       av.textContent = (u.displayName || u.email || 'U')[0].toUpperCase();
-    loadEstoque().then(() => loadPastaProdutos());
+    loadEstoque();
   } else if (u) {
     signOut(auth);
     $('loginErr').textContent = 'Acesso negado: ' + u.email;
@@ -360,7 +359,7 @@ window.goTab = t => {
   });
   $('tab-'+t).classList.add('active');
   $('sec-'+t).style.display = 'block';
-  if (t === 'cadastrar') { loadEstoque().then(() => loadPastaProdutos()); }
+  if (t === 'cadastrar') { loadEstoque(); }
   if (t === 'estoque') loadEstoque();
   if (t === 'entregas') loadEntregas();
   if (t === 'configs') loadConfigs();
@@ -441,83 +440,44 @@ window.mostrarProduto = async (id) => {
   } catch(e) { toast('Erro: ' + e.message, 'erro'); }
 };
 
-// ── PASTA PRODUTOS ─────────────────────────────────────────
-let _selectedPasta = null;
+// ── UPLOAD PRODUTOS GITHUB PAGES ───────────────────────────
+let _selectedFile = null;
 let _cadAtivo = true;
 
-async function loadPastaProdutos() {
-  $('pastaGrid').innerHTML = '<p class="a-empty">Carregando produtos da pasta...</p>';
-  try {
-    const resp = await fetch('/api/listar-produtos-pasta.php');
-    const data = await resp.json();
-    PASTA_CACHE = data.items || [];
-    renderPastaGrid();
-  } catch(e) {
-    $('pastaGrid').innerHTML = `<p class="a-empty" style="color:#f87171;">Erro ao carregar pasta: ${e.message}</p>`;
-  }
-}
+window.selecionarArquivoUpload = (input) => {
+  const f = input.files[0];
+  if (!f) return;
+  _selectedFile = f;
 
-function renderPastaGrid() {
-  const g = $('pastaGrid');
-  if (!PASTA_CACHE.length) {
-    g.innerHTML = '<p class="a-empty">Nenhum produto encontrado na pasta /produtos</p>';
-    return;
-  }
-
-  // Verifica quais já estão cadastrados
-  const cadastrados = new Set(CACHE.map(p => p.imagem));
-
-  g.innerHTML = PASTA_CACHE.map(item => {
-    const isV = item.tipo === 'video';
-    const m = isV
-      ? `<video src="${item.caminho}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-      : `<img src="${item.caminho}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`;
-    const jaCadastrado = cadastrados.has(item.caminho);
-    const selectedClass = _selectedPasta?.arquivo === item.arquivo ? ' selected' : '';
-    const cadastradoHtml = jaCadastrado ? '<div class="pasta-item-cadastrado">✓ CADASTRADO</div>' : '';
-
-    return `<div class="pasta-item${selectedClass}" onclick="selecionarPastaItem('${item.arquivo}')" title="${item.nome}">
-      ${m}
-      <div class="pasta-item-overlay">
-        <p class="pasta-item-nome">${item.nome}</p>
-      </div>
-      <div class="pasta-item-check">✓</div>
-      ${cadastradoHtml}
-    </div>`;
-  }).join('');
-}
-
-window.selecionarPastaItem = (arquivo) => {
-  const item = PASTA_CACHE.find(i => i.arquivo === arquivo);
-  if (!item) return;
-
-  _selectedPasta = item;
-  const isV = item.tipo === 'video';
+  const nomeCompleto = f.name;
+  const i = nomeCompleto.lastIndexOf('.');
+  const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
+  
+  const isV = f.type.startsWith('video/');
+  const url = URL.createObjectURL(f);
 
   $('previewThumb').innerHTML = isV
-    ? `<video src="${item.caminho}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-    : `<img src="${item.caminho}" style="width:100%;height:100%;object-fit:cover;">`;
-  $('previewNome').textContent = item.nome;
-  $('previewCat').textContent = detectarCat(item.nome);
-  $('fDesc').value = descAuto(item.nome, detectarCat(item.nome));
+    ? `<video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
+    : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onload="URL.revokeObjectURL(this.src)">`;
+  
+  $('previewNome').textContent = nome;
+  $('previewCat').textContent = detectarCat(nome);
+  $('fDesc').value = descAuto(nome, detectarCat(nome));
   window.setBadge('descBadge', 'AUTO', '#1e40af', '#93c5fd');
   hideFb($('fbCad'));
 
-  // Mostra formulário
   $('cadFormCard').style.display = 'block';
   $('cadFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  // Atualiza seleção visual
-  renderPastaGrid();
 };
 
 window.limparSelecao = () => {
-  _selectedPasta = null;
+  _selectedFile = null;
+  const input = $('localFileInput');
+  if (input) input.value = '';
   $('cadFormCard').style.display = 'none';
   $('fPreco').value = '';
   $('fEstoque').value = '';
   $('fDesc').value = '';
-  renderPastaGrid();
 };
 
 window.toggleCadAtivo = () => {
@@ -527,58 +487,45 @@ window.toggleCadAtivo = () => {
 };
 
 window.cadastrarLocal = async () => {
-  if (!_selectedPasta) { showFb($('fbCad'), '⚠️ Selecione um produto da pasta.', 'erro'); return; }
+  if (!_selectedFile) { showFb($('fbCad'), '⚠️ Selecione uma imagem primeiro.', 'erro'); return; }
   const preco = parseFloat($('fPreco').value);
   if (!preco || preco <= 0) { showFb($('fbCad'), '⚠️ Informe um preço válido.', 'erro'); return; }
 
   const est = parseInt($('fEstoque').value) || 0;
   const desc = $('fDesc').value.trim();
-  const nome = _selectedPasta.nome;
+  const nomeCompleto = _selectedFile.name;
+  const i = nomeCompleto.lastIndexOf('.');
+  const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
   const cat = detectarCat(nome);
   const btn = $('btnCad'), fb = $('fbCad');
   hideFb(fb);
 
   btn.disabled = true;
-  btn.textContent = 'Salvando...';
+  btn.textContent = 'Enviando (1/2)...';
 
   try {
-    const existente = CACHE.find(p => p.imagem === _selectedPasta.caminho);
-
-    if (existente) {
-      await editarProduto(existente.id, {
-        preco,
-        estoque: est,
-        descricao: desc || descAuto(nome, cat),
-        ativo: _cadAtivo,
-        storagePath: existente.storagePath
-      }, null, () => {});
-      showFb(fb, `✅ "${nome}" atualizado com sucesso!`, 'ok');
-    } else {
-      await criarProdutoLocal({
-        imagemLocal: _selectedPasta.caminho,
-        nome,
-        categoria: cat,
-        preco,
-        estoque: est,
-        descricao: desc || descAuto(nome, cat),
-        ativo: _cadAtivo
-      });
-      showFb(fb, `✅ "${nome}" cadastrado com sucesso!`, 'ok');
+    const prod = await criarProduto({
+      file: _selectedFile,
+      nome,
+      categoria: cat,
+      preco,
+      estoque: est,
+      descricao: desc || descAuto(nome, cat)
+    }, (pct, label) => {
+      btn.textContent = label + ` (${Math.round(pct*100)}%)`;
+    });
+    
+    if (!_cadAtivo && prod.id) {
+       await editarProduto(prod.id, { ativo: false }, null, ()=>{});
     }
 
-    $('fPreco').value = '';
-    $('fEstoque').value = '';
-    $('fDesc').value = '';
-    _selectedPasta = null;
-    $('cadFormCard').style.display = 'none';
+    showFb(fb, `✅ "${nome}" cadastrado com sucesso e enviado p/ Firebase!`, 'ok');
+    limparSelecao();
     btn.disabled = false;
     btn.textContent = '⚡ CADASTRAR PRODUTO';
-    hideFb(fb);
-    renderPastaGrid();
     await loadEstoque();
-
   } catch(e) {
-    console.error('[KAZZI] Erro cadastrar:', e);
+    console.error('[KAZZI] Erro ao criar:', e);
     showFb(fb, traduzErro(e), 'erro');
     btn.disabled = false;
     btn.textContent = '⚡ CADASTRAR PRODUTO';
