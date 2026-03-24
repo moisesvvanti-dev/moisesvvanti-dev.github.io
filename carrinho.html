@@ -47,7 +47,7 @@
         <div class="a-row2" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
           <div class="a-field">
             <label class="a-label">CEP *</label>
-            <input type="text" id="addrZip" class="a-input" placeholder="89070-000">
+            <input type="text" id="addrZip" class="a-input" placeholder="89070-000" oninput="window.fetchCep(this.value)">
           </div>
           <div class="a-field">
             <label class="a-label">Rua *</label>
@@ -62,6 +62,16 @@
           <div class="a-field">
             <label class="a-label">Bairro *</label>
             <input type="text" id="addrDistrict" class="a-input" placeholder="Bairro">
+          </div>
+        </div>
+        <div class="a-row2" style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+          <div class="a-field">
+            <label class="a-label">Cidade *</label>
+            <input type="text" id="addrCity" class="a-input" placeholder="Sua cidade">
+          </div>
+          <div class="a-field">
+            <label class="a-label">UF *</label>
+            <input type="text" id="addrState" class="a-input" placeholder="SP" maxlength="2">
           </div>
         </div>
         <div class="a-field">
@@ -273,9 +283,29 @@ window.finalizarWhatsApp = () => {
   window.open(`https://api.whatsapp.com/send?phone=5547989164910&text=${msg}`, '_blank');
 };
 
+// ── Busca de CEP (ViaCEP) ─────────────────────────────────
+window.fetchCep = async (cep) => {
+  const c = cep.replace(/\D/g, '');
+  if (c.length === 8) {
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${c}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
+        document.getElementById('addrStreet').value = data.logradouro || '';
+        document.getElementById('addrDistrict').value = data.bairro || '';
+        document.getElementById('addrCity').value = data.localidade || '';
+        document.getElementById('addrState').value = data.uf || '';
+        document.getElementById('addrNumber').focus();
+      } else {
+        toast('CEP não encontrado', 'warning');
+      }
+    } catch(e) { console.error('Erro ViaCEP', e); }
+  }
+};
+
 // ── Validação de endereço ──────────────────────────────────
 function validateAddress() {
-  const fields = ['addrName','addrPhone','addrEmail','addrStreet','addrNumber','addrDistrict','addrZip'];
+  const fields = ['addrName','addrPhone','addrEmail','addrZip','addrStreet','addrNumber','addrDistrict','addrCity','addrState'];
   for (const f of fields) {
     const el = document.getElementById(f);
     if (!el.value.trim()) {
@@ -297,8 +327,8 @@ function getAddress() {
     district: document.getElementById('addrDistrict').value.trim(),
     complement: document.getElementById('addrComplement').value.trim(),
     zip: document.getElementById('addrZip').value.trim(),
-    city: 'Blumenau',
-    state: 'SC'
+    city: document.getElementById('addrCity').value.trim(),
+    state: document.getElementById('addrState').value.trim()
   };
 }
 

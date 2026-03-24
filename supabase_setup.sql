@@ -27,6 +27,9 @@ BEGIN
     END;
 END $$;
 
+-- Force Supabase API to clear schema cache
+NOTIFY pgrst, 'reload schema';
+
 -- 2. Create kazzi_orders table
 CREATE TABLE IF NOT EXISTS public.kazzi_orders (
     id TEXT PRIMARY KEY,
@@ -47,11 +50,24 @@ CREATE TABLE IF NOT EXISTS public.kazzi_settings (
     id TEXT PRIMARY KEY,
     pagseguro_email TEXT,
     uber_email TEXT,
+    uber_senha TEXT,
     store_name TEXT,
     store_phone TEXT,
-    store_addr TEXT,
+    store_address TEXT,
     atualizado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Fix for existing tables: ensure store_address and uber_senha columns exist
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER TABLE public.kazzi_settings ADD COLUMN store_address TEXT;
+    EXCEPTION WHEN duplicate_column THEN null; END;
+    
+    BEGIN
+        ALTER TABLE public.kazzi_settings ADD COLUMN uber_senha TEXT;
+    EXCEPTION WHEN duplicate_column THEN null; END;
+END $$;
 
 -- Basic row-level security (RLS) setup to allow read and write
 -- WARNING: In a production environment, you should secure the WRITE policies 
