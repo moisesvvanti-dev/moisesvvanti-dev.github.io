@@ -148,6 +148,18 @@
   </div>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModalOverlay">
+  <div class="modal" style="max-width:400px; padding:2rem; text-align:center;">
+    <button class="modal-close" onclick="document.getElementById('authModalOverlay').classList.remove('open');document.body.style.overflow='';">×</button>
+    <h2 style="margin-bottom:1rem; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:2rem; color:white;">ACESSAR CONTA</h2>
+    <input type="email" id="authEmail" placeholder="Seu E-mail" style="width:100%; margin-bottom:1rem; padding:0.8rem; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; font-family:inherit;">
+    <input type="password" id="authSenha" placeholder="Sua Senha" style="width:100%; margin-bottom:1rem; padding:0.8rem; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; font-family:inherit;">
+    <button class="btn-buy" id="btnAcessar" style="width:100%; margin-bottom:0.5rem;">ENTRAR</button>
+    <button class="btn-hero" id="btnRegistrar" style="width:100%; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.2); background:transparent; padding:1rem; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">CRIAR CONTA</button>
+  </div>
+</div>
+
 <style>
 .grid-msg { grid-column:1/-1; text-align:center; padding:3rem; color:var(--mut); }
 </style>
@@ -272,29 +284,50 @@ window.addEventListener('scroll', () => {
   });
 })();
 
-// ── Auth (botão Entrar) ───────────────────────────────────
+// ── Auth (botão Entrar e Registrar) ───────────────────────
 supabase.auth.onAuthStateChange((event, session) => {
   const u = session?.user;
   const btn = document.getElementById('btnLogin');
   const btnOrders = document.getElementById('btnMyOrders');
   if (u) {
-    btn.textContent = 'Sair (' + (u.user_metadata?.full_name || 'Usuário').split(' ')[0] + ')';
+    btn.textContent = 'Sair (' + (u.user_metadata?.full_name || u.email || 'Usuário').split('@')[0] + ')';
     btn.onclick = () => supabase.auth.signOut().then(() => toast('Você saiu.', 'info'));
     if (btnOrders) btnOrders.style.display = 'inline-block';
   } else {
     btn.textContent = 'Entrar';
-    btn.onclick = async () => {
-      const email = prompt('✉️ Digite seu e-mail de acesso:');
-      if (!email) return;
-      const pwd = prompt('🔑 Digite sua senha (cuidado com olhares!):');
-      if (!pwd) return;
-      
-      const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
-      if (error) toast('Erro ao entrar: ' + error.message, 'erro');
+    btn.onclick = () => {
+      document.getElementById('authModalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
     };
     if (btnOrders) btnOrders.style.display = 'none';
   }
 });
+
+document.getElementById('btnAcessar').onclick = async () => {
+  const email = document.getElementById('authEmail').value.trim();
+  const pwd = document.getElementById('authSenha').value.trim();
+  if(!email || !pwd) { toast('Preencha os campos', 'info'); return; }
+  const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
+  if (error) { toast('Erro ao entrar: ' + error.message, 'erro'); }
+  else {
+    toast('Login efetuado com sucesso!', 'ok');
+    document.getElementById('authModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+};
+
+document.getElementById('btnRegistrar').onclick = async () => {
+  const email = document.getElementById('authEmail').value.trim();
+  const pwd = document.getElementById('authSenha').value.trim();
+  if(!email || !pwd) { toast('Preencha os campos', 'info'); return; }
+  const { error } = await supabase.auth.signUp({ email: email, password: pwd });
+  if (error) { toast('Erro ao registrar: ' + error.message, 'erro'); }
+  else {
+    toast('Conta cadastrada com sucesso!', 'ok');
+    document.getElementById('authModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+};
 
 // Inicia
 loadProducts();
