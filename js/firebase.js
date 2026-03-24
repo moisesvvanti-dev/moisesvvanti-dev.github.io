@@ -98,57 +98,22 @@ function toWebP(file, onProgress) {
   });
 }
 
-// ─── Upload para o GitHub Pages ──────────────────────────────
+// ─── Upload para o Storage com progresso ─────────────────
 function uploadToStorage(blob, filename, contentType, onProgress) {
   return new Promise((resolve, reject) => {
-    const token = localStorage.getItem('ghToken');
-    if (!token) {
-      return reject(new Error('Token do GitHub não encontrado. Faça logout e login novamente no admin com o GitHub.'));
-    }
+    const path = `kazzi_produtos/${Date.now()}_${Math.random().toString(36).slice(2)}_${filename}`;
+    const task = uploadBytesResumable(sRef(storage, path), blob, { contentType });
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      onProgress && onProgress(0.5, 'Gerando base64...');
-      const base64Content = reader.result.split(',')[1];
-      
-      const path = `produtos/${Date.now()}_${filename}`;
-      const apiUrl = `https://api.github.com/repos/moisesvvanti-dev/moisesvvanti-dev.github.io/contents/${path}`;
-      
-      onProgress && onProgress(0.7, 'Enviando para o repositório...');
-
-      try {
-        const res = await fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `🤖 Kazzi Admin: Novo produto ${filename}`,
-            content: base64Content,
-            branch: 'main'
-          })
-        });
-
-        if (!res.ok) {
-          const errData = await res.json();
-          if (res.status === 401 || res.status === 403 || res.status === 404) {
-             throw new Error('Acesso negado no GitHub. Faça logout no Painel e login novamente.');
-          }
-          throw new Error(errData.message || 'Erro no GitHub API');
-        }
-
-        onProgress && onProgress(1.0, 'Upload finalizado');
-        
-        // Link direto do GitHub Pages
-        const url = `https://moisesvvanti-dev.github.io/${path}`;
-        resolve({ url, path });
-      } catch (err) {
-        reject(err);
+    task.on('state_changed',
+      snap => onProgress && onProgress(snap.bytesTransferred / snap.totalBytes, 'upload'),
+      err  => reject(err),
+      async () => {
+        try {
+          const url = await getDownloadURL(task.snapshot.ref);
+          resolve({ url, path });
+        } catch(e) { reject(e); }
       }
-    };
-    reader.onerror = () => reject(new Error('Falha ao processar arquivo para o GitHub'));
-    reader.readAsDataURL(blob);
+    );
   });
 }
 
@@ -282,8 +247,8 @@ export async function editarProduto(id, dados, file, onProgress) {
     const { url, path } = await processAndUpload(file, (pct, label) => {
       onProgress && onProgress(pct * 0.88, label);
     });
-    // Apaga imagem antiga (ignorando as imagens hospedadas no github)
-    if (storagePath && !storagePath.startsWith('produtos/')) {
+    // Apaga imagem antiga
+    if (storagePath) {
       try { await deleteObject(sRef(storage, storagePath)); } catch(_) {}
     }
     campos.imagem      = url;
@@ -298,8 +263,8 @@ export async function editarProduto(id, dados, file, onProgress) {
 // ─── Excluir produto ──────────────────────────────────────
 export async function excluirProduto(id, storagePath) {
   await deleteDoc(doc(db, COLL, id));
-  if (storagePath && !storagePath.startsWith('produtos/')) {
-      try { await deleteObject(sRef(storage, storagePath)); } catch(_) {}
+  if (storagePath) {
+    try { await deleteObject(sRef(storage, storagePath)); } catch(_) {}
   }
 }
 

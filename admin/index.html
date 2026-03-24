@@ -1,422 +1,519 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>Kazzi Admin</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="admin-body">
 
-<!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
-  <div class="login-box glass">
-    <div class="login-icon">⚡</div>
-    <h1 class="login-title">KAZZI <span>ADM</span></h1>
-    <p class="login-sub">Painel de administração</p>
-    <button class="btn-google" id="btnLoginAdmin" style="background:#24292e;color:white;">
-      <svg height="20" width="20" aria-hidden="true" viewBox="0 0 16 16" version="1.1" fill="currentColor">
-        <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.46-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
-      </svg>
-      &nbsp; ENTRAR COM GITHUB
-    </button>
-    <p id="loginErr" class="login-err"></p>
+  <!-- LOGIN -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box glass">
+      <div class="login-icon">⚡</div>
+      <h1 class="login-title">KAZZI <span>ADM</span></h1>
+      <p class="login-sub">Painel de administração</p>
+      <button class="btn-google" id="btnLoginAdmin" style="background:#24292e;color:white;">
+        <svg height="20" width="20" aria-hidden="true" viewBox="0 0 16 16" version="1.1" fill="currentColor">
+          <path
+            d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.46-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z">
+          </path>
+        </svg>
+        &nbsp; ENTRAR COM GITHUB
+      </button>
+      <p id="loginErr" class="login-err"></p>
+    </div>
   </div>
-</div>
 
-<!-- APP -->
-<div id="appAdmin" class="adm-hidden">
+  <!-- APP -->
+  <div id="appAdmin" class="adm-hidden">
 
-  <header class="a-header glass">
-    <span class="a-logo">KAZZI<span>.</span></span>
-    <div class="a-header-right">
-      <div class="a-avatar" id="adminAv">👤</div>
-      <button class="a-signout" onclick="adminSignOut()" title="Sair">⏻</button>
-    </div>
-  </header>
-
-  <nav class="a-tabs">
-    <button class="a-tab active" onclick="goTab('cadastrar')" id="tab-cadastrar">➕ CADASTRAR</button>
-    <button class="a-tab" onclick="goTab('estoque')" id="tab-estoque">📦 ESTOQUE</button>
-    <button class="a-tab" onclick="goTab('entregas')" id="tab-entregas">🚗 ENTREGAS</button>
-    <button class="a-tab" onclick="goTab('configs')" id="tab-configs">⚙️ CONFIGS</button>
-  </nav>
-
-  <!-- CADASTRAR -->
-  <section class="a-body" id="sec-cadastrar">
-    <div class="a-card glass" style="margin-bottom:16px;">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:8px;">📁 PRODUTO (GITHUB PAGES)</p>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Escolha o arquivo do produto do seu PC. O nome do arquivo definirá o nome e categoria.</p>
-      <label for="localFileInput" class="a-btn-midia" style="display:inline-block;cursor:pointer;">📷 ESCOLHER IMAGEM/VÍDEO</label>
-      <input type="file" id="localFileInput" class="sr-only" accept="image/*,video/*" onchange="selecionarArquivoUpload(this)">
-    </div>
-
-    <div class="a-card glass" id="cadFormCard" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;">⚡ CADASTRAR PRODUTO</p>
-        <button class="a-btn" style="background:#334155;color:#f1f5f9;padding:6px 12px;font-size:11px;" onclick="limparSelecao()">✕ LIMPAR</button>
+    <header class="a-header glass">
+      <span class="a-logo">KAZZI<span>.</span></span>
+      <div class="a-header-right">
+        <div class="a-avatar" id="adminAv">👤</div>
+        <button class="a-signout" onclick="adminSignOut()" title="Sair">⏻</button>
       </div>
+    </header>
 
-      <div class="a-preview" id="previewWrap" style="display:flex;">
-        <div class="a-thumb a-thumb-lg" id="previewThumb">📷</div>
-        <div class="a-preview-info">
-          <p class="a-preview-nome" id="previewNome"></p>
-          <p class="a-preview-cat"  id="previewCat"></p>
+    <nav class="a-tabs">
+      <button class="a-tab active" onclick="goTab('cadastrar')" id="tab-cadastrar">➕ CADASTRAR</button>
+      <button class="a-tab" onclick="goTab('estoque')" id="tab-estoque">📦 ESTOQUE</button>
+      <button class="a-tab" onclick="goTab('entregas')" id="tab-entregas">🚗 ENTREGAS</button>
+      <button class="a-tab" onclick="goTab('caixa')" id="tab-caixa">💰 CAIXA</button>
+      <button class="a-tab" onclick="goTab('configs')" id="tab-configs">⚙️ CONFIGS</button>
+    </nav>
+
+    <!-- CADASTRAR -->
+    <section class="a-body" id="sec-cadastrar">
+
+      <div class="a-card glass" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;">🔄 IMPORTAR
+            PRODUTOS DA PASTA GITHUB</p>
         </div>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Sincronize arquivos que já existem na sua pasta
+          <code>produtos/</code> do GitHub. Produtos importados entrarão automaticamente no estoque (Ocultos e sem
+          preço) para você editar.</p>
+        <button class="a-btn" id="btnSyncGh" onclick="sincronizarProdutosGithub()"
+          style="background:#10b981;color:white;cursor:pointer;width:100%;text-align:center;">
+          ⬇️ SINCRONIZAR ARQUIVOS DA PASTA /PRODUTOS
+        </button>
+        <pre id="syncLog"
+          style="margin-top:12px;font-size:11px;color:#94a3b8;white-space:pre-wrap;background:#0f172a;padding:8px;border-radius:6px;display:none;max-height:120px;overflow-y:auto;"></pre>
       </div>
 
-      <div class="a-row2" style="margin-top:16px;">
+      <div class="a-card glass" style="margin-bottom:16px;">
+        <p
+          style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:8px;">
+          📁 PRODUTO (GITHUB PAGES)</p>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Escolha o arquivo do produto do seu PC. O nome do
+          arquivo definirá o nome e categoria.</p>
+        <label for="localFileInput" class="a-btn-midia" style="display:inline-block;cursor:pointer;">📷 ESCOLHER
+          IMAGEM/VÍDEO</label>
+        <input type="file" id="localFileInput" class="sr-only" accept="image/*,video/*"
+          onchange="selecionarArquivoUpload(this)">
+      </div>
+
+      <div class="a-card glass" id="cadFormCard" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;">⚡ CADASTRAR
+            PRODUTO</p>
+          <button class="a-btn" style="background:#334155;color:#f1f5f9;padding:6px 12px;font-size:11px;"
+            onclick="limparSelecao()">✕ LIMPAR</button>
+        </div>
+
+        <div class="a-preview" id="previewWrap" style="display:flex;">
+          <div class="a-thumb a-thumb-lg" id="previewThumb">📷</div>
+          <div class="a-preview-info">
+            <p class="a-preview-nome" id="previewNome"></p>
+            <p class="a-preview-cat" id="previewCat"></p>
+          </div>
+        </div>
+
+        <div class="a-row2" style="margin-top:16px;">
+          <div class="a-field">
+            <label class="a-label">Preço (R$) *</label>
+            <input id="fPreco" type="number" step="0.01" min="0" placeholder="0,00" class="a-input">
+          </div>
+          <div class="a-field">
+            <label class="a-label">Estoque</label>
+            <input id="fEstoque" type="number" min="0" placeholder="0" class="a-input">
+          </div>
+        </div>
+
         <div class="a-field">
-          <label class="a-label">Preço (R$) *</label>
-          <input id="fPreco" type="number" step="0.01" min="0" placeholder="0,00" class="a-input">
+          <label class="a-label">
+            Descrição
+            <span class="a-badge" id="descBadge">AUTO</span>
+          </label>
+          <textarea id="fDesc" rows="3" class="a-input"
+            placeholder="Gerada automaticamente pelo nome do produto..."></textarea>
         </div>
-        <div class="a-field">
-          <label class="a-label">Estoque</label>
-          <input id="fEstoque" type="number" min="0" placeholder="0" class="a-input">
-        </div>
-      </div>
 
-      <div class="a-field">
-        <label class="a-label">
-          Descrição
-          <span class="a-badge" id="descBadge">AUTO</span>
-        </label>
-        <textarea id="fDesc" rows="3" class="a-input" placeholder="Gerada automaticamente pelo nome do produto..."></textarea>
-      </div>
-
-      <div class="a-toggle-row">
-        <div>
-          <p class="a-toggle-label">Visível na loja</p>
-          <p class="a-toggle-sub">Ative para aparecer no site</p>
+        <div class="a-toggle-row">
+          <div>
+            <p class="a-toggle-label">Visível na loja</p>
+            <p class="a-toggle-sub">Ative para aparecer no site</p>
+          </div>
+          <button id="cadToggleBtn" class="toggle-btn" onclick="toggleCadAtivo()" style="background:#334155;">
+            <span id="cadToggleDot" class="toggle-dot" style="transform:translateX(0);"></span>
+          </button>
         </div>
-        <button id="cadToggleBtn" class="toggle-btn" onclick="toggleCadAtivo()" style="background:#2563eb;">
-          <span id="cadToggleDot" class="toggle-dot" style="transform:translateX(21px);"></span>
+
+        <div class="a-fb" id="fbCad" style="display:none;"></div>
+
+        <button class="a-btn a-btn-blue" id="btnCad" onclick="cadastrarLocal()">
+          ⚡ CADASTRAR PRODUTO
         </button>
       </div>
+    </section>
 
-      <div class="a-fb" id="fbCad" style="display:none;"></div>
+    <!-- ESTOQUE KANBAN -->
+    <section class="a-body" id="sec-estoque" style="display:none;">
+      <div class="a-estoque-header">
+        <span class="a-estoque-title">Produtos</span>
+        <span class="a-badge-count" id="stockBadge"></span>
+      </div>
+      <div class="kanban-board" id="kanbanBoard">
+        <div class="kanban-col">
+          <div class="kanban-col-header kanban-visivel">
+            <span class="kanban-dot" style="background:#22c55e;"></span>
+            VISÍVEL NO SITE
+            <span class="kanban-count" id="kanbanVisivelCount">0</span>
+          </div>
+          <div class="kanban-list" id="kanbanVisivel">
+            <p class="a-empty">Carregando...</p>
+          </div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header kanban-oculto">
+            <span class="kanban-dot" style="background:#f59e0b;"></span>
+            OCULTO (CONFIGURADO)
+            <span class="kanban-count" id="kanbanOcultoCount">0</span>
+          </div>
+          <div class="kanban-list" id="kanbanOculto">
+            <p class="a-empty">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-      <button class="a-btn a-btn-blue" id="btnCad" onclick="cadastrarLocal()">
-        ⚡ CADASTRAR PRODUTO
+    <!-- ENTREGAS -->
+    <section class="a-body" id="sec-entregas" style="display:none;">
+      <div class="a-estoque-header">
+        <span class="a-estoque-title">Pedidos & Entregas</span>
+        <span class="a-badge-count" id="deliveriesBadge"></span>
+      </div>
+      <div class="orders-list" id="ordersList">
+        <p class="a-empty">Carregando...</p>
+      </div>
+    </section>
+
+    <!-- CAIXA -->
+    <section class="a-body" id="sec-caixa" style="display:none;">
+      <div class="a-estoque-header">
+        <span class="a-estoque-title">Fluxo de Caixa</span>
+      </div>
+
+      <!-- Cards de Resumo -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+         <div class="a-card glass" style="text-align:center;">
+           <p style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Faturamento (Mês)</p>
+           <p style="font-size:24px;font-weight:700;color:#22c55e;" id="cxMesCtx">R$ 0,00</p>
+         </div>
+         <div class="a-card glass" style="text-align:center;">
+           <p style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Lucro Líquido (Mês)</p>
+           <p style="font-size:24px;font-weight:700;color:#38bdf8;" id="cxLucroCtx">R$ 0,00</p>
+         </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+         <div class="a-card glass" style="text-align:center;padding:12px;">
+           <p style="font-size:10px;color:#94a3b8;">DIA</p>
+           <p style="font-size:14px;font-weight:700;color:#f1f5f9;" id="cxDia">R$ 0,00</p>
+         </div>
+         <div class="a-card glass" style="text-align:center;padding:12px;">
+           <p style="font-size:10px;color:#94a3b8;">SEMANA</p>
+           <p style="font-size:14px;font-weight:700;color:#f1f5f9;" id="cxSemana">R$ 0,00</p>
+         </div>
+         <div class="a-card glass" style="text-align:center;padding:12px;">
+           <p style="font-size:10px;color:#94a3b8;">ANO</p>
+           <p style="font-size:14px;font-weight:700;color:#f1f5f9;" id="cxAno">R$ 0,00</p>
+         </div>
+      </div>
+
+      <!-- Tabela Detalhada -->
+      <div class="a-card glass" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+           <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#f1f5f9;">ÚLTIMAS MOVIMENTAÇÕES</p>
+           <button class="a-btn" style="background:#ef4444;color:white;padding:4px 8px;font-size:11px;" onclick="addDespesaPrompt()">➖ ADD DESPESA</button>
+        </div>
+        <div id="cxTable" style="max-height:300px;overflow-y:auto;padding-right:4px;">
+           <p class="a-empty">Carregando...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIGS -->
+    <section class="a-body" id="sec-configs" style="display:none;">
+      <div class="a-card glass" style="margin-bottom:16px;">
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:16px;">💳 PAGSEGURO</p>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Email oficial da sua conta do PagSeguro (necessário para receber os pagamentos da loja online).</p>
+        <div class="a-field">
+          <label class="a-label">Email do PagSeguro</label>
+          <input id="cfgPagSeguro" type="email" class="a-input" placeholder="seuemail@pagseguro.com">
+        </div>
+      </div>
+
+      <div class="a-card glass" style="margin-bottom:16px;">
+        <p
+          style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:16px;">
+          🚗 CONTA UBER</p>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Cadastre sua conta Uber aqui. Ao confirmar um
+          pedido, o sistema usa automaticamente esses dados para criar a entrega.</p>
+
+        <div class="a-field">
+          <label class="a-label">Email do Uber</label>
+          <input id="cfgUberEmail" type="email" class="a-input" placeholder="seu@email.com">
+        </div>
+        <div class="a-field">
+          <label class="a-label">Senha do Uber</label>
+          <input id="cfgUberSenha" type="password" class="a-input" placeholder="Sua senha do Uber">
+        </div>
+
+        <div
+          style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:8px;padding:12px;margin-top:4px;">
+          <p style="font-size:11px;color:#22c55e;font-weight:700;margin-bottom:4px;">✅ Entrega Uber</p>
+          <p style="font-size:11px;color:#94a3b8;line-height:1.5;">Ao confirmar um pedido, o sistema abre o Uber com a
+            loja como retirada e o endereço do cliente como entrega. Você só confirma no Uber.</p>
+        </div>
+      </div>
+
+      <div class="a-card glass" style="margin-bottom:16px;">
+        <p
+          style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:16px;">
+          📍 DADOS DA LOJA</p>
+
+        <div class="a-field">
+          <label class="a-label">Nome da Loja</label>
+          <input id="cfgStoreName" type="text" class="a-input" placeholder="Kazzi Company">
+        </div>
+        <div class="a-field">
+          <label class="a-label">Telefone da Loja</label>
+          <input id="cfgStorePhone" type="text" class="a-input" placeholder="(47) 98916-4910">
+        </div>
+        <div class="a-field">
+          <label class="a-label">Endereço de Retirada</label>
+          <input id="cfgStoreAddr" type="text" class="a-input"
+            placeholder="R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC">
+        </div>
+      </div>
+
+      <div class="a-fb" id="fbCfg" style="display:none;margin-bottom:12px;"></div>
+
+      <button class="a-btn a-btn-blue" id="btnSalvarCfg" onclick="salvarConfigs()">
+        💾 SALVAR CONFIGURAÇÕES
+      </button>
+    </section>
+
+  </div>
+
+  <!-- DRAWER -->
+  <div class="d-overlay" id="dOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer glass" id="drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">✏️ Editar Produto</span>
+      <button class="drawer-close" onclick="closeDrawer()">×</button>
+    </div>
+
+    <div class="a-edit-midia">
+      <div class="a-thumb a-thumb-lg" id="editThumb">📷</div>
+      <div>
+        <label for="editArq" class="a-btn-midia">📷 TROCAR MÍDIA</label>
+        <input type="file" id="editArq" class="sr-only" accept="image/*,video/*" onchange="onEditMidia(this)">
+        <p class="a-midia-status" id="editMidStatus"></p>
+      </div>
+    </div>
+
+    <div class="a-field">
+      <label class="a-label">Nome</label>
+      <input id="editNome" type="text" class="a-input" oninput="onEditNome()">
+    </div>
+
+    <div class="a-row2">
+      <div class="a-field">
+        <label class="a-label">Preço (R$)</label>
+        <input id="editPreco" type="number" step="0.01" class="a-input">
+      </div>
+      <div class="a-field">
+        <label class="a-label">Estoque</label>
+        <input id="editEstoque" type="number" class="a-input">
+      </div>
+    </div>
+
+    <div class="a-field">
+      <label class="a-label">
+        Descrição
+        <span class="a-badge" id="editDescBadge">AUTO</span>
+      </label>
+      <textarea id="editDesc" rows="3" class="a-input"
+        oninput="setBadge('editDescBadge','EDITADA','#1e293b','#94a3b8')"></textarea>
+    </div>
+
+    <div class="a-toggle-row">
+      <div>
+        <p class="a-toggle-label">Visível na loja</p>
+        <p class="a-toggle-sub">Desative para ocultar sem apagar</p>
+      </div>
+      <button id="toggleBtn" class="toggle-btn" onclick="toggleAtivo()" style="background:#334155;">
+        <span id="toggleDot" class="toggle-dot"></span>
       </button>
     </div>
-  </section>
 
-  <!-- ESTOQUE KANBAN -->
-  <section class="a-body" id="sec-estoque" style="display:none;">
-    <div class="a-estoque-header">
-      <span class="a-estoque-title">Produtos</span>
-      <span class="a-badge-count" id="stockBadge"></span>
-    </div>
-    <div class="kanban-board" id="kanbanBoard">
-      <div class="kanban-col">
-        <div class="kanban-col-header kanban-visivel">
-          <span class="kanban-dot" style="background:#22c55e;"></span>
-          VISÍVEL NO SITE
-          <span class="kanban-count" id="kanbanVisivelCount">0</span>
-        </div>
-        <div class="kanban-list" id="kanbanVisivel">
-          <p class="a-empty">Carregando...</p>
-        </div>
-      </div>
-      <div class="kanban-col">
-        <div class="kanban-col-header kanban-oculto">
-          <span class="kanban-dot" style="background:#f59e0b;"></span>
-          OCULTO (CONFIGURADO)
-          <span class="kanban-count" id="kanbanOcultoCount">0</span>
-        </div>
-        <div class="kanban-list" id="kanbanOculto">
-          <p class="a-empty">Carregando...</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    <div class="a-fb" id="fbEdit" style="display:none;margin-bottom:12px;"></div>
 
-  <!-- ENTREGAS -->
-  <section class="a-body" id="sec-entregas" style="display:none;">
-    <div class="a-estoque-header">
-      <span class="a-estoque-title">Pedidos & Entregas</span>
-      <span class="a-badge-count" id="deliveriesBadge"></span>
-    </div>
-    <div class="orders-list" id="ordersList">
-      <p class="a-empty">Carregando...</p>
-    </div>
-  </section>
-
-  <!-- CONFIGS -->
-  <section class="a-body" id="sec-configs" style="display:none;">
-    <div class="a-card glass" style="margin-bottom:16px;">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:16px;">🚗 CONTA UBER</p>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Cadastre sua conta Uber aqui. Ao confirmar um pedido, o sistema usa automaticamente esses dados para criar a entrega.</p>
-
-      <div class="a-field">
-        <label class="a-label">Email do Uber</label>
-        <input id="cfgUberEmail" type="email" class="a-input" placeholder="seu@email.com">
-      </div>
-      <div class="a-field">
-        <label class="a-label">Senha do Uber</label>
-        <input id="cfgUberSenha" type="password" class="a-input" placeholder="Sua senha do Uber">
-      </div>
-
-      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:8px;padding:12px;margin-top:4px;">
-        <p style="font-size:11px;color:#22c55e;font-weight:700;margin-bottom:4px;">✅ Entrega Uber</p>
-        <p style="font-size:11px;color:#94a3b8;line-height:1.5;">Ao confirmar um pedido, o sistema abre o Uber com a loja como retirada e o endereço do cliente como entrega. Você só confirma no Uber.</p>
-      </div>
-    </div>
-
-    <div class="a-card glass" style="margin-bottom:16px;">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:16px;">📍 DADOS DA LOJA</p>
-
-      <div class="a-field">
-        <label class="a-label">Nome da Loja</label>
-        <input id="cfgStoreName" type="text" class="a-input" placeholder="Kazzi Company">
-      </div>
-      <div class="a-field">
-        <label class="a-label">Telefone da Loja</label>
-        <input id="cfgStorePhone" type="text" class="a-input" placeholder="(47) 98916-4910">
-      </div>
-      <div class="a-field">
-        <label class="a-label">Endereço de Retirada</label>
-        <input id="cfgStoreAddr" type="text" class="a-input" placeholder="R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC">
-      </div>
-    </div>
-
-    <div class="a-fb" id="fbCfg" style="display:none;margin-bottom:12px;"></div>
-
-    <button class="a-btn a-btn-blue" id="btnSalvarCfg" onclick="salvarConfigs()">
-      💾 SALVAR CONFIGURAÇÕES
-    </button>
-  </section>
-
-</div>
-
-<!-- DRAWER -->
-<div class="d-overlay" id="dOverlay" onclick="closeDrawer()"></div>
-<div class="drawer glass" id="drawer">
-  <div class="drawer-header">
-    <span class="drawer-title">✏️ Editar Produto</span>
-    <button class="drawer-close" onclick="closeDrawer()">×</button>
-  </div>
-
-  <div class="a-edit-midia">
-    <div class="a-thumb a-thumb-lg" id="editThumb">📷</div>
-    <div>
-      <label for="editArq" class="a-btn-midia">📷 TROCAR MÍDIA</label>
-      <input type="file" id="editArq" class="sr-only" accept="image/*,video/*" onchange="onEditMidia(this)">
-      <p class="a-midia-status" id="editMidStatus"></p>
+    <div class="a-row2">
+      <button class="a-btn a-btn-red" onclick="excluir()">🗑 APAGAR</button>
+      <button class="a-btn a-btn-blue" id="btnSalvar" onclick="salvar()">✓ SALVAR</button>
     </div>
   </div>
 
-  <div class="a-field">
-    <label class="a-label">Nome</label>
-    <input id="editNome" type="text" class="a-input" oninput="onEditNome()">
-  </div>
-
-  <div class="a-row2">
-    <div class="a-field">
-      <label class="a-label">Preço (R$)</label>
-      <input id="editPreco" type="number" step="0.01" class="a-input">
+  <!-- DELIVERY DRAWER -->
+  <div class="d-overlay" id="delOverlay" onclick="closeDelDrawer()"></div>
+  <div class="drawer glass" id="delDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">🚚 Detalhes da Entrega</span>
+      <button class="drawer-close" onclick="closeDelDrawer()">×</button>
     </div>
-    <div class="a-field">
-      <label class="a-label">Estoque</label>
-      <input id="editEstoque" type="number" class="a-input">
-    </div>
+    <div id="delDrawerContent"></div>
   </div>
 
-  <div class="a-field">
-    <label class="a-label">
-      Descrição
-      <span class="a-badge" id="editDescBadge">AUTO</span>
-    </label>
-    <textarea id="editDesc" rows="3" class="a-input"
-      oninput="setBadge('editDescBadge','EDITADA','#1e293b','#94a3b8')"></textarea>
-  </div>
+  <script type="module">
+    import {
+      auth, db, storage,
+      listarTodos, criarProduto, criarProdutoLocal, editarProduto, excluirProduto
+    } from '/js/firebase.js?v=2';
+    import { detectarCat, formatarNome, descAuto, fmtBytes, ADMIN_EMAILS, toast }
+      from '/js/utils.js';
+    import {
+      GithubAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js?v=2';
 
-  <div class="a-toggle-row">
-    <div>
-      <p class="a-toggle-label">Visível na loja</p>
-      <p class="a-toggle-sub">Desative para ocultar sem apagar</p>
-    </div>
-    <button id="toggleBtn" class="toggle-btn" onclick="toggleAtivo()" style="background:#334155;">
-      <span id="toggleDot" class="toggle-dot"></span>
-    </button>
-  </div>
+    const CAT_N = {
+      camisetas: 'Camiseta', polos: 'Polo', moletons: 'Moletom',
+      calcas: 'Calça', calcados: 'Calçado',
+      cintos: 'Cinto', meias: 'Meia', oculos: 'Óculos',
+      acessorios: 'Acessório', outfits: 'Outfit', all: 'Produto'
+    };
 
-  <div class="a-fb" id="fbEdit" style="display:none;margin-bottom:12px;"></div>
+    const $ = id => document.getElementById(id);
+    const fmtP = v => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
-  <div class="a-row2">
-    <button class="a-btn a-btn-red" onclick="excluir()">🗑 APAGAR</button>
-    <button class="a-btn a-btn-blue" id="btnSalvar" onclick="salvar()">✓ SALVAR</button>
-  </div>
-</div>
-
-<!-- DELIVERY DRAWER -->
-<div class="d-overlay" id="delOverlay" onclick="closeDelDrawer()"></div>
-<div class="drawer glass" id="delDrawer">
-  <div class="drawer-header">
-    <span class="drawer-title">🚚 Detalhes da Entrega</span>
-    <button class="drawer-close" onclick="closeDelDrawer()">×</button>
-  </div>
-  <div id="delDrawerContent"></div>
-</div>
-
-<script type="module">
-import {
-  auth, db, storage,
-  listarTodos, criarProduto, criarProdutoLocal, editarProduto, excluirProduto
-} from '/js/firebase.js?v=2';
-import { detectarCat, formatarNome, descAuto, fmtBytes, ADMIN_EMAILS, toast }
-  from '/js/utils.js';
-import {
-  GithubAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js?v=2';
-
-const CAT_N = {
-  camisetas:'Camiseta', polos:'Polo', moletons:'Moletom',
-  calcas:'Calça', calcados:'Calçado',
-  cintos:'Cinto', meias:'Meia', oculos:'Óculos',
-  acessorios:'Acessório', outfits:'Outfit', all:'Produto'
-};
-
-const $   = id => document.getElementById(id);
-const fmtP = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2});
-
-function showFb(el, msg, tipo) {
-  el.className = 'a-fb ' + tipo;
-  el.innerHTML = msg;
-  el.style.display = 'block';
-}
-function hideFb(el) { el.style.display = 'none'; }
-
-window.setBadge = (id, txt, bg, col) => {
-  const e = $(id); if (!e) return;
-  e.textContent = txt; e.style.background = bg; e.style.color = col;
-};
-
-function setP(label, pct) {
-  const l = $('pLabel'), p = $('pPct'), f = $('pFill');
-  if (l) l.textContent = label;
-  if (p) p.textContent = Math.round(pct * 100) + '%';
-  if (f) f.style.width = Math.min(pct * 100, 100) + '%';
-}
-
-// ── Traduz erros Firebase ─────────────────────────────────
-function traduzErro(e) {
-  const code = e.code || '';
-  if (code.includes('permission-denied') || code.includes('unauthorized'))
-    return '❌ Sem permissão. Configure as regras do Firestore/Storage no Firebase Console.';
-  if (code.includes('storage/unauthorized'))
-    return '❌ Storage sem permissão. Cole as regras do Storage no Firebase Console.';
-  if (code.includes('storage/object-not-found'))
-    return '❌ Arquivo não encontrado no Storage.';
-  if (code.includes('storage/canceled'))
-    return '❌ Upload cancelado.';
-  if (code.includes('unavailable') || code.includes('network'))
-    return '❌ Sem conexão. Verifique a internet.';
-  if (code.includes('not-found'))
-    return '❌ Banco de dados não encontrado. Crie o Firestore no Console.';
-  return '❌ ' + (e.message || 'Erro desconhecido: ' + code);
-}
-
-// ── AUTH ──────────────────────────────────────────────────
-onAuthStateChanged(auth, u => {
-  if (u && ADMIN_EMAILS.includes(u.email)) {
-    $('loginScreen').style.display = 'none';
-    $('appAdmin').style.display    = 'block';
-    const av = $('adminAv');
-    if (u.photoURL)
-      av.innerHTML = `<img src="${u.photoURL}" style="width:100%;height:100%;object-fit:cover;">`;
-    else
-      av.textContent = (u.displayName || u.email || 'U')[0].toUpperCase();
-    loadEstoque();
-  } else if (u) {
-    signOut(auth);
-    $('loginErr').textContent = 'Acesso negado: ' + u.email;
-  } else {
-    $('loginScreen').style.display = 'flex';
-    $('appAdmin').style.display    = 'none';
-  }
-});
-
-$('btnLoginAdmin').onclick = () => {
-  $('loginErr').textContent = '';
-  $('btnLoginAdmin').innerHTML = '<span class="spin">↻</span> Entrando...';
-  $('btnLoginAdmin').disabled = true;
-  const provider = new GithubAuthProvider();
-  provider.addScope('repo'); // Pede permissão para salvar arquivos no GitHub Pages
-
-  signInWithPopup(auth, provider).then((result) => {
-    const cred = GithubAuthProvider.credentialFromResult(result);
-    if (cred && cred.accessToken) {
-      localStorage.setItem('ghToken', cred.accessToken);
+    function showFb(el, msg, tipo) {
+      el.className = 'a-fb ' + tipo;
+      el.innerHTML = msg;
+      el.style.display = 'block';
     }
-  }).catch(e => {
-    $('loginErr').textContent =
-      e.code === 'auth/popup-closed-by-user' ? 'Cancelado.' : e.message;
-    $('btnLoginAdmin').disabled = false;
-    $('btnLoginAdmin').innerHTML = 'ENTRAR COM GITHUB';
-  });
-};
+    function hideFb(el) { el.style.display = 'none'; }
 
-window.adminSignOut = () => { if (confirm('Sair do painel?')) { localStorage.removeItem('ghToken'); signOut(auth); } };
+    window.setBadge = (id, txt, bg, col) => {
+      const e = $(id); if (!e) return;
+      e.textContent = txt; e.style.background = bg; e.style.color = col;
+    };
 
-// ── TABS ──────────────────────────────────────────────────
-window.goTab = t => {
-  ['cadastrar','estoque','entregas','configs'].forEach(x => {
-    $('tab-'+x).classList.remove('active');
-    $('sec-'+x).style.display = 'none';
-  });
-  $('tab-'+t).classList.add('active');
-  $('sec-'+t).style.display = 'block';
-  if (t === 'cadastrar') { loadEstoque(); }
-  if (t === 'estoque') loadEstoque();
-  if (t === 'entregas') loadEntregas();
-  if (t === 'configs') loadConfigs();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-// ── ESTOQUE KANBAN ────────────────────────────────────────
-let CACHE = [];
-let PASTA_CACHE = [];
-
-async function loadEstoque() {
-  $('kanbanVisivel').innerHTML = '<p class="a-empty">Carregando...</p>';
-  $('kanbanOculto').innerHTML = '<p class="a-empty">Carregando...</p>';
-  try {
-    CACHE = await listarTodos();
-    renderKanban();
-  } catch(e) {
-    $('kanbanVisivel').innerHTML = `<p class="a-empty" style="color:#f87171;">${traduzErro(e)}</p>`;
-  }
-}
-
-function renderKanban() {
-  const visivel = CACHE.filter(p => p.ativo !== false);
-  const oculto = CACHE.filter(p => p.ativo === false);
-
-  $('kanbanVisivelCount').textContent = visivel.length;
-  $('kanbanOcultoCount').textContent = oculto.length;
-  $('stockBadge').textContent = CACHE.length + ' produto(s)';
-
-  function renderList(items, containerId, isVisivel) {
-    const g = $(containerId);
-    if (!items.length) {
-      g.innerHTML = `<p class="a-empty">${isVisivel ? 'Nenhum produto visível' : 'Nenhum produto oculto'}</p>`;
-      return;
+    function setP(label, pct) {
+      const l = $('pLabel'), p = $('pPct'), f = $('pFill');
+      if (l) l.textContent = label;
+      if (p) p.textContent = Math.round(pct * 100) + '%';
+      if (f) f.style.width = Math.min(pct * 100, 100) + '%';
     }
-    g.innerHTML = items.map(p => {
-      const img = p.imagem || '';
-      const isV = /\.(mp4|webm|mov)$/i.test(img);
-      const m = !img
-        ? '<span style="font-size:20px;">📷</span>'
-        : isV ? `<video src="${img}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-               : `<img src="${img}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`;
-      const toggleAction = isVisivel ? 'window.ocultarProduto' : 'window.mostrarProduto';
-      const toggleIcon = isVisivel ? '🙈' : '👁️';
-      const toggleTitle = isVisivel ? 'Ocultar do site' : 'Tornar visível';
-      const toggleClass = isVisivel ? 'oculto-btn' : 'visivel-btn';
 
-      return `<div class="kanban-item" onclick="window._openEditor('${p.id}')">
+    // ── Traduz erros Firebase ─────────────────────────────────
+    function traduzErro(e) {
+      const code = e.code || '';
+      if (code.includes('permission-denied') || code.includes('unauthorized'))
+        return '❌ Sem permissão. Configure as regras do Firestore/Storage no Firebase Console.';
+      if (code.includes('storage/unauthorized'))
+        return '❌ Storage sem permissão. Cole as regras do Storage no Firebase Console.';
+      if (code.includes('storage/object-not-found'))
+        return '❌ Arquivo não encontrado no Storage.';
+      if (code.includes('storage/canceled'))
+        return '❌ Upload cancelado.';
+      if (code.includes('unavailable') || code.includes('network'))
+        return '❌ Sem conexão. Verifique a internet.';
+      if (code.includes('not-found'))
+        return '❌ Banco de dados não encontrado. Crie o Firestore no Console.';
+      return '❌ ' + (e.message || 'Erro desconhecido: ' + code);
+    }
+
+    // ── AUTH ──────────────────────────────────────────────────
+    onAuthStateChanged(auth, u => {
+      if (u && ADMIN_EMAILS.includes(u.email)) {
+        if (!localStorage.getItem('ghToken')) {
+          signOut(auth);
+          $('loginErr').textContent = '⚠️ Seu login é muito antigo ou falta acesso. Clique em ENTRAR COM GITHUB.';
+          return;
+        }
+        $('loginScreen').style.display = 'none';
+        $('appAdmin').style.display = 'block';
+        const av = $('adminAv');
+        if (u.photoURL)
+          av.innerHTML = `<img src="${u.photoURL}" style="width:100%;height:100%;object-fit:cover;">`;
+        else
+          av.textContent = (u.displayName || u.email || 'U')[0].toUpperCase();
+        loadEstoque();
+      } else if (u) {
+        signOut(auth);
+        $('loginErr').textContent = 'Acesso negado: ' + u.email;
+      } else {
+        $('loginScreen').style.display = 'flex';
+        $('appAdmin').style.display = 'none';
+      }
+    });
+
+    $('btnLoginAdmin').onclick = () => {
+      $('loginErr').textContent = '';
+      $('btnLoginAdmin').innerHTML = '<span class="spin">↻</span> Entrando...';
+      $('btnLoginAdmin').disabled = true;
+      const provider = new GithubAuthProvider();
+      provider.addScope('repo'); // Pede permissão para salvar arquivos no GitHub Pages
+
+      signInWithPopup(auth, provider).then((result) => {
+        const cred = GithubAuthProvider.credentialFromResult(result);
+        if (cred && cred.accessToken) {
+          localStorage.setItem('ghToken', cred.accessToken);
+        }
+      }).catch(e => {
+        $('loginErr').textContent =
+          e.code === 'auth/popup-closed-by-user' ? 'Cancelado.' : e.message;
+        $('btnLoginAdmin').disabled = false;
+        $('btnLoginAdmin').innerHTML = 'ENTRAR COM GITHUB';
+      });
+    };
+
+    window.adminSignOut = () => { if (confirm('Sair do painel?')) { localStorage.removeItem('ghToken'); signOut(auth); } };
+
+    // ── TABS ──────────────────────────────────────────────────
+    window.goTab = t => {
+      ['cadastrar', 'estoque', 'entregas', 'caixa', 'configs'].forEach(x => {
+        $('tab-' + x).classList.remove('active');
+        $('sec-' + x).style.display = 'none';
+      });
+      $('tab-' + t).classList.add('active');
+      $('sec-' + t).style.display = 'block';
+      if (t === 'cadastrar') { loadEstoque(); }
+      if (t === 'estoque') loadEstoque();
+      if (t === 'entregas') loadEntregas();
+      if (t === 'caixa') loadCaixa();
+      if (t === 'configs') loadConfigs();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // ── ESTOQUE KANBAN ────────────────────────────────────────
+    let CACHE = [];
+    let PASTA_CACHE = [];
+
+    async function loadEstoque() {
+      $('kanbanVisivel').innerHTML = '<p class="a-empty">Carregando...</p>';
+      $('kanbanOculto').innerHTML = '<p class="a-empty">Carregando...</p>';
+      try {
+        CACHE = await listarTodos();
+        renderKanban();
+      } catch (e) {
+        $('kanbanVisivel').innerHTML = `<p class="a-empty" style="color:#f87171;">${traduzErro(e)}</p>`;
+      }
+    }
+
+    function renderKanban() {
+      const visivel = CACHE.filter(p => p.ativo !== false);
+      const oculto = CACHE.filter(p => p.ativo === false);
+
+      $('kanbanVisivelCount').textContent = visivel.length;
+      $('kanbanOcultoCount').textContent = oculto.length;
+      $('stockBadge').textContent = CACHE.length + ' produto(s)';
+
+      function renderList(items, containerId, isVisivel) {
+        const g = $(containerId);
+        if (!items.length) {
+          g.innerHTML = `<p class="a-empty">${isVisivel ? 'Nenhum produto visível' : 'Nenhum produto oculto'}</p>`;
+          return;
+        }
+        g.innerHTML = items.map(p => {
+          const img = p.imagem || '';
+          const isV = /\.(mp4|webm|mov)$/i.test(img);
+          const m = !img
+            ? '<span style="font-size:20px;">📷</span>'
+            : isV ? `<video src="${img}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
+              : `<img src="${img}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`;
+          const toggleAction = isVisivel ? 'window.ocultarProduto' : 'window.mostrarProduto';
+          const toggleIcon = isVisivel ? '🙈' : '👁️';
+          const toggleTitle = isVisivel ? 'Ocultar do site' : 'Tornar visível';
+          const toggleClass = isVisivel ? 'oculto-btn' : 'visivel-btn';
+
+          return `<div class="kanban-item" onclick="window._openEditor('${p.id}')">
         <div class="kanban-item-img">${m}</div>
         <div class="kanban-item-info">
           <p class="kanban-item-nome">${p.nome}</p>
@@ -426,294 +523,369 @@ function renderKanban() {
           <button class="kanban-action-btn ${toggleClass}" onclick="${toggleAction}('${p.id}')" title="${toggleTitle}">${toggleIcon}</button>
         </div>
       </div>`;
-    }).join('');
-  }
+        }).join('');
+      }
 
-  renderList(visivel, 'kanbanVisivel', true);
-  renderList(oculto, 'kanbanOculto', false);
-}
-
-window.ocultarProduto = async (id) => {
-  try {
-    await editarProduto(id, { ativo: false, storagePath: CACHE.find(x=>x.id===id)?.storagePath }, null, ()=>{});
-    await loadEstoque();
-    toast('Produto ocultado do site', 'ok');
-  } catch(e) { toast('Erro: ' + e.message, 'erro'); }
-};
-
-window.mostrarProduto = async (id) => {
-  try {
-    await editarProduto(id, { ativo: true, storagePath: CACHE.find(x=>x.id===id)?.storagePath }, null, ()=>{});
-    await loadEstoque();
-    toast('Produto visível no site!', 'ok');
-  } catch(e) { toast('Erro: ' + e.message, 'erro'); }
-};
-
-// ── UPLOAD PRODUTOS GITHUB PAGES ───────────────────────────
-let _selectedFile = null;
-let _cadAtivo = true;
-
-window.selecionarArquivoUpload = (input) => {
-  const f = input.files[0];
-  if (!f) return;
-  _selectedFile = f;
-
-  const nomeCompleto = f.name;
-  const i = nomeCompleto.lastIndexOf('.');
-  const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
-  
-  const isV = f.type.startsWith('video/');
-  const url = URL.createObjectURL(f);
-
-  $('previewThumb').innerHTML = isV
-    ? `<video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-    : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onload="URL.revokeObjectURL(this.src)">`;
-  
-  $('previewNome').textContent = nome;
-  $('previewCat').textContent = detectarCat(nome);
-  $('fDesc').value = descAuto(nome, detectarCat(nome));
-  window.setBadge('descBadge', 'AUTO', '#1e40af', '#93c5fd');
-  hideFb($('fbCad'));
-
-  $('cadFormCard').style.display = 'block';
-  $('cadFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
-window.limparSelecao = () => {
-  _selectedFile = null;
-  const input = $('localFileInput');
-  if (input) input.value = '';
-  $('cadFormCard').style.display = 'none';
-  $('fPreco').value = '';
-  $('fEstoque').value = '';
-  $('fDesc').value = '';
-};
-
-window.toggleCadAtivo = () => {
-  _cadAtivo = !_cadAtivo;
-  $('cadToggleBtn').style.background = _cadAtivo ? '#2563eb' : '#334155';
-  $('cadToggleDot').style.transform = _cadAtivo ? 'translateX(21px)' : 'translateX(0)';
-};
-
-window.cadastrarLocal = async () => {
-  if (!_selectedFile) { showFb($('fbCad'), '⚠️ Selecione uma imagem primeiro.', 'erro'); return; }
-  const preco = parseFloat($('fPreco').value);
-  if (!preco || preco <= 0) { showFb($('fbCad'), '⚠️ Informe um preço válido.', 'erro'); return; }
-
-  const est = parseInt($('fEstoque').value) || 0;
-  const desc = $('fDesc').value.trim();
-  const nomeCompleto = _selectedFile.name;
-  const i = nomeCompleto.lastIndexOf('.');
-  const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
-  const cat = detectarCat(nome);
-  const btn = $('btnCad'), fb = $('fbCad');
-  hideFb(fb);
-
-  btn.disabled = true;
-  btn.textContent = 'Enviando (1/2)...';
-
-  try {
-    const prod = await criarProduto({
-      file: _selectedFile,
-      nome,
-      categoria: cat,
-      preco,
-      estoque: est,
-      descricao: desc || descAuto(nome, cat)
-    }, (pct, label) => {
-      btn.textContent = label + ` (${Math.round(pct*100)}%)`;
-    });
-    
-    if (!_cadAtivo && prod.id) {
-       await editarProduto(prod.id, { ativo: false }, null, ()=>{});
+      renderList(visivel, 'kanbanVisivel', true);
+      renderList(oculto, 'kanbanOculto', false);
     }
 
-    showFb(fb, `✅ "${nome}" cadastrado com sucesso e enviado p/ Firebase!`, 'ok');
-    limparSelecao();
-    btn.disabled = false;
-    btn.textContent = '⚡ CADASTRAR PRODUTO';
-    await loadEstoque();
-  } catch(e) {
-    console.error('[KAZZI] Erro ao criar:', e);
-    showFb(fb, traduzErro(e), 'erro');
-    btn.disabled = false;
-    btn.textContent = '⚡ CADASTRAR PRODUTO';
-  }
-};
-
-
-
-// ── EDITOR ────────────────────────────────────────────────
-let _editId = null, _editAtivo = true, _editFile = null;
-
-window._openEditor = id => {
-  const p = CACHE.find(x => x.id === id); if (!p) return;
-  _editId = id; _editAtivo = p.ativo !== false; _editFile = null;
-
-  $('editNome').value    = p.nome || '';
-  $('editPreco').value   = p.preco || '';
-  $('editEstoque').value = p.estoque ?? '';
-  $('editDesc').value    = p.descricao || descAuto(p.nome||'', p.categoria||'all');
-  $('editMidStatus').textContent = '';
-  hideFb($('fbEdit'));
-  window.setBadge('editDescBadge', 'AUTO', '#1e40af', '#93c5fd');
-
-  const img = p.imagem || '';
-  const et  = $('editThumb');
-  et.innerHTML = !img ? '📷'
-    : /\.(mp4|webm|mov)$/i.test(img)
-      ? `<video src="${img}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-      : `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
-
-  updToggle();
-  $('dOverlay').classList.add('open');
-  $('drawer').classList.add('open');
-  document.body.style.overflow = 'hidden';
-};
-
-window.closeDrawer = () => {
-  $('dOverlay').classList.remove('open');
-  $('drawer').classList.remove('open');
-  document.body.style.overflow = '';
-};
-document.addEventListener('keydown', e => { if (e.key === 'Escape') window.closeDrawer(); });
-
-window.toggleAtivo = () => { _editAtivo = !_editAtivo; updToggle(); };
-function updToggle() {
-  $('toggleBtn').style.background = _editAtivo ? '#2563eb' : '#334155';
-  $('toggleDot').style.transform  = _editAtivo ? 'translateX(21px)' : 'translateX(0)';
-}
-
-window.onEditNome = () => {
-  const n = $('editNome').value.trim(); if (!n) return;
-  const p = CACHE.find(x => x.id === _editId);
-  $('editDesc').value = descAuto(n, p?.categoria || detectarCat(n));
-  window.setBadge('editDescBadge', 'AUTO', '#1e40af', '#93c5fd');
-};
-
-window.onEditMidia = input => {
-  const f = input.files[0]; if (!f) return;
-  _editFile = f;
-  const url = URL.createObjectURL(f);
-  $('editThumb').innerHTML = f.type.startsWith('video/')
-    ? `<video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-    : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onload="URL.revokeObjectURL(this.src)">`;
-  $('editMidStatus').textContent = fmtBytes(f.size) + ' — pronto para enviar';
-};
-
-window.salvar = async () => {
-  const nome  = $('editNome').value.trim();
-  const preco = parseFloat($('editPreco').value);
-  const est   = parseInt($('editEstoque').value) || 0;
-  const desc  = $('editDesc').value.trim();
-  const btn   = $('btnSalvar'), fb = $('fbEdit');
-  hideFb(fb);
-
-  if (!nome)               { showFb(fb, '⚠️ Informe o nome.', 'erro'); return; }
-  if (!preco || preco <= 0){ showFb(fb, '⚠️ Informe um preço válido.', 'erro'); return; }
-
-  btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> Salvando...';
-  showFb(fb, 'Salvando...', 'info');
-
-  const p = CACHE.find(x => x.id === _editId);
-
-  try {
-    await editarProduto(
-      _editId,
-      { nome, preco, estoque: est, descricao: desc, ativo: _editAtivo, storagePath: p?.storagePath },
-      _editFile,
-      (pct, label) => {}
-    );
-    showFb(fb, '✅ Produto salvo com sucesso!', 'ok');
-    await loadEstoque();
-    setTimeout(window.closeDrawer, 1200);
-  } catch(e) {
-    console.error('[KAZZI] Erro salvar:', e);
-    showFb(fb, traduzErro(e), 'erro');
-  }
-  btn.disabled = false; btn.innerHTML = '✓ SALVAR';
-};
-
-window.excluir = async () => {
-  const p = CACHE.find(x => x.id === _editId);
-  if (!confirm(`Apagar "${p?.nome || 'produto'}"?\nA imagem também será removida.`)) return;
-  try {
-    await excluirProduto(_editId, p?.storagePath);
-    window.closeDrawer();
-    await loadEstoque();
-  } catch(e) {
-    alert('Erro ao apagar: ' + e.message);
-  }
-};
-
-// ═══════════════════════════════════════════
-// ENTREGAS — Uber Direct
-// ═══════════════════════════════════════════
-import {
-  collection as fCollection, doc as fDoc, getDocs as fGetDocs,
-  getDoc as fGetDoc, query as fQuery, where as fWhere, orderBy as fOrderBy,
-  updateDoc as fUpdateDoc, setDoc as fSetDoc, addDoc as fAddDoc, serverTimestamp as fServerTimestamp, onSnapshot
-} from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
-
-let ORDERS_CACHE = [];
-let DELIVERIES_CACHE = [];
-
-async function loadEntregas() {
-  $('ordersList').innerHTML = '<p class="a-empty">Carregando pedidos...</p>';
-  try {
-    const ordersSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_orders'), fOrderBy('criado', 'desc')));
-    ORDERS_CACHE = [];
-    ordersSnap.forEach(d => ORDERS_CACHE.push({ id: d.id, ...d.data() }));
-
-    const delSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_deliveries'), fOrderBy('criado', 'desc')));
-    DELIVERIES_CACHE = [];
-    delSnap.forEach(d => DELIVERIES_CACHE.push({ id: d.id, ...d.data() }));
-
-    renderEntregas();
-  } catch(e) {
-    $('ordersList').innerHTML = `<p class="a-empty" style="color:#f87171;">Erro: ${e.message}</p>`;
-  }
-}
-
-function renderEntregas() {
-  const g = $('ordersList');
-  $('deliveriesBadge').textContent = ORDERS_CACHE.length + ' pedido(s)';
-
-  if (!ORDERS_CACHE.length) {
-    g.innerHTML = '<p class="a-empty">Nenhum pedido ainda.</p>';
-    return;
-  }
-
-  g.innerHTML = ORDERS_CACHE.map(o => {
-    const delivery = DELIVERIES_CACHE.find(d => d.pedidoId === o.id);
-    const statusColors = {
-      'aguardando_pagamento': '#f59e0b',
-      'pago': '#22c55e',
-      'confirmado': '#3b82f6',
-      'uber_criado': '#8b5cf6',
-      'em_entrega': '#8b5cf6',
-      'entregue': '#22c55e',
-      'cancelado': '#ef4444'
+    window.ocultarProduto = async (id) => {
+      try {
+        await editarProduto(id, { ativo: false, storagePath: CACHE.find(x => x.id === id)?.storagePath }, null, () => { });
+        await loadEstoque();
+        toast('Produto ocultado do site', 'ok');
+      } catch (e) { toast('Erro: ' + e.message, 'erro'); }
     };
-    const statusLabels = {
-      'aguardando_pagamento': 'Aguardando Pagamento',
-      'pago': 'Pago',
-      'confirmado': 'Confirmado',
-      'uber_criado': 'Uber Solicitado',
-      'em_entrega': 'Em Entrega',
-      'entregue': 'Entregue',
-      'cancelado': 'Cancelado'
-    };
-    const col = statusColors[o.status] || '#6b7280';
-    const label = statusLabels[o.status] || o.status;
-    const itens = (o.itens || []).map(i => `${i.qty}x ${i.nome}`).join(', ');
-    const total = Number(o.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    const data = o.criado?.toDate ? o.criado.toDate().toLocaleString('pt-BR') : '—';
-    const dStatus = delivery?.status || 'sem_entrega';
-    const dStatusColors = { 'pendente': '#f59e0b', 'aguardando_confirmacao': '#f59e0b', 'ativo': '#22c55e', 'concluido': '#22c55e', 'cancelado': '#ef4444' };
-    const dCol = dStatusColors[dStatus] || '#6b7280';
 
-    return `<div class="order-card glass" onclick="window._openDelDrawer('${o.id}')">
+    window.mostrarProduto = async (id) => {
+      try {
+        await editarProduto(id, { ativo: true, storagePath: CACHE.find(x => x.id === id)?.storagePath }, null, () => { });
+        await loadEstoque();
+        toast('Produto visível no site!', 'ok');
+      } catch (e) { toast('Erro: ' + e.message, 'erro'); }
+    };
+
+    // ── SINCRONIZAR PRODUTOS DO GITHUB ───────────────────────────
+    window.sincronizarProdutosGithub = async () => {
+      const token = localStorage.getItem('ghToken');
+      if (!token) { toast('Faça login com o GitHub primeiro!', 'erro'); return; }
+
+      const btn = $('btnSyncGh');
+      const log = $('syncLog');
+      btn.disabled = true;
+      btn.textContent = 'Buscando arquivos no GitHub...';
+      log.style.display = 'block';
+      log.textContent = 'Carregando...\n';
+
+      try {
+        const res = await fetch('https://api.github.com/repos/moisesvvanti-dev/moisesvvanti-dev.github.io/produtos', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Não foi possível ler a pasta /produtos no GitHub.');
+
+        const files = await res.json();
+        if (!Array.isArray(files)) throw new Error('O formato retornado pelo GitHub é inválido. A pasta /produtos existe?');
+
+        let importados = 0;
+
+        for (const f of files) {
+          if (f.type !== 'file') continue;
+          // Procura apenas extensões de imagem/vídeo válidas
+          if (!f.name.match(/\.(jpe?g|png|webp|gif|mp4|webm|mov)$/i)) continue;
+
+          const directUrl = `https://moisesvvanti-dev.github.io/produtos/${f.name}`;
+
+          // Checa se já temos um produto com este arquivo no final da URL
+          const jaExiste = CACHE.some(p => p.imagem && (p.imagem === directUrl || p.imagem.endsWith(`/${f.name}`)));
+
+          if (jaExiste) continue;
+
+          log.textContent += `+ Importando ${f.name}...\n`;
+          let nomeCompleto = f.name;
+          const tIdx = nomeCompleto.indexOf('_');
+          // Limpa timestamps do nome se vier do upload automático
+          if (tIdx > 10 && tIdx < 16 && !isNaN(nomeCompleto.substring(0, tIdx))) {
+            nomeCompleto = nomeCompleto.substring(tIdx + 1);
+          }
+
+          const i = nomeCompleto.lastIndexOf('.');
+          const nomeLimpo = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
+          const cat = detectarCat(nomeLimpo);
+
+          await criarProdutoLocal({
+            imagemLocal: directUrl,
+            nome: nomeLimpo,
+            categoria: cat,
+            preco: 0,
+            estoque: 0,
+            descricao: descAuto(nomeLimpo, cat),
+            ativo: false // Esconde até o admin colocar o preco
+          });
+
+          importados++;
+        }
+
+        if (importados === 0) {
+          log.textContent += `\nNenhum produto novo encontrado na pasta /produtos.`;
+        } else {
+          log.textContent += `\n✅ Finalizado! ${importados} produto(s) importado(s).\nVá na aba ESTOQUE para editar o PREÇO e colocá-los visíveis na tela.`;
+        }
+        await loadEstoque();
+      } catch (err) {
+        log.textContent += '\nErro: ' + err.message;
+      }
+
+      btn.disabled = false;
+      btn.textContent = '⬇️ SINCRONIZAR ARQUIVOS DA PASTA /PRODUTOS';
+    };
+
+    // ── UPLOAD INDIVIDUAL PRODUTOS ───────────────────────────
+    let _selectedFile = null;
+    let _cadAtivo = false;
+
+    window.selecionarArquivoUpload = (input) => {
+      const f = input.files[0];
+      if (!f) return;
+      _selectedFile = f;
+
+      const nomeCompleto = f.name;
+      const i = nomeCompleto.lastIndexOf('.');
+      const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
+
+      const isV = f.type.startsWith('video/');
+      const url = URL.createObjectURL(f);
+
+      $('previewThumb').innerHTML = isV
+        ? `<video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
+        : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onload="URL.revokeObjectURL(this.src)">`;
+
+      $('previewNome').textContent = nome;
+      $('previewCat').textContent = detectarCat(nome);
+      $('fDesc').value = descAuto(nome, detectarCat(nome));
+      window.setBadge('descBadge', 'AUTO', '#1e40af', '#93c5fd');
+      hideFb($('fbCad'));
+
+      $('cadFormCard').style.display = 'block';
+      $('cadFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.limparSelecao = () => {
+      _selectedFile = null;
+      const input = $('localFileInput');
+      if (input) input.value = '';
+      $('cadFormCard').style.display = 'none';
+      $('fPreco').value = '';
+      $('fEstoque').value = '';
+      $('fDesc').value = '';
+    };
+
+    window.toggleCadAtivo = () => {
+      _cadAtivo = !_cadAtivo;
+      $('cadToggleBtn').style.background = _cadAtivo ? '#2563eb' : '#334155';
+      $('cadToggleDot').style.transform = _cadAtivo ? 'translateX(21px)' : 'translateX(0)';
+    };
+
+    window.cadastrarLocal = async () => {
+      if (!_selectedFile) { showFb($('fbCad'), '⚠️ Selecione uma imagem primeiro.', 'erro'); return; }
+      const preco = parseFloat($('fPreco').value);
+      if (!preco || preco <= 0) { showFb($('fbCad'), '⚠️ Informe um preço válido.', 'erro'); return; }
+
+      const est = parseInt($('fEstoque').value) || 0;
+      const desc = $('fDesc').value.trim();
+      const nomeCompleto = _selectedFile.name;
+      const i = nomeCompleto.lastIndexOf('.');
+      const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
+      const cat = detectarCat(nome);
+      const btn = $('btnCad'), fb = $('fbCad');
+      hideFb(fb);
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando (1/2)...';
+
+      try {
+        const prod = await criarProduto({
+          file: _selectedFile,
+          nome,
+          categoria: cat,
+          preco,
+          estoque: est,
+          descricao: desc || descAuto(nome, cat)
+        }, (pct, label) => {
+          btn.textContent = label + ` (${Math.round(pct * 100)}%)`;
+        });
+
+        if (!_cadAtivo && prod.id) {
+          await editarProduto(prod.id, { ativo: false }, null, () => { });
+        }
+
+        showFb(fb, `✅ "${nome}" cadastrado com sucesso e enviado p/ Firebase!`, 'ok');
+        limparSelecao();
+        btn.disabled = false;
+        btn.textContent = '⚡ CADASTRAR PRODUTO';
+        await loadEstoque();
+      } catch (e) {
+        console.error('[KAZZI] Erro ao criar:', e);
+        showFb(fb, traduzErro(e), 'erro');
+        btn.disabled = false;
+        btn.textContent = '⚡ CADASTRAR PRODUTO';
+      }
+    };
+
+
+
+    // ── EDITOR ────────────────────────────────────────────────
+    let _editId = null, _editAtivo = true, _editFile = null;
+
+    window._openEditor = id => {
+      const p = CACHE.find(x => x.id === id); if (!p) return;
+      _editId = id; _editAtivo = p.ativo !== false; _editFile = null;
+
+      $('editNome').value = p.nome || '';
+      $('editPreco').value = p.preco || '';
+      $('editEstoque').value = p.estoque ?? '';
+      $('editDesc').value = p.descricao || descAuto(p.nome || '', p.categoria || 'all');
+      $('editMidStatus').textContent = '';
+      hideFb($('fbEdit'));
+      window.setBadge('editDescBadge', 'AUTO', '#1e40af', '#93c5fd');
+
+      const img = p.imagem || '';
+      const et = $('editThumb');
+      et.innerHTML = !img ? '📷'
+        : /\.(mp4|webm|mov)$/i.test(img)
+          ? `<video src="${img}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
+          : `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
+
+      updToggle();
+      $('dOverlay').classList.add('open');
+      $('drawer').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeDrawer = () => {
+      $('dOverlay').classList.remove('open');
+      $('drawer').classList.remove('open');
+      document.body.style.overflow = '';
+    };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') window.closeDrawer(); });
+
+    window.toggleAtivo = () => { _editAtivo = !_editAtivo; updToggle(); };
+    function updToggle() {
+      $('toggleBtn').style.background = _editAtivo ? '#2563eb' : '#334155';
+      $('toggleDot').style.transform = _editAtivo ? 'translateX(21px)' : 'translateX(0)';
+    }
+
+    window.onEditNome = () => {
+      const n = $('editNome').value.trim(); if (!n) return;
+      const p = CACHE.find(x => x.id === _editId);
+      $('editDesc').value = descAuto(n, p?.categoria || detectarCat(n));
+      window.setBadge('editDescBadge', 'AUTO', '#1e40af', '#93c5fd');
+    };
+
+    window.onEditMidia = input => {
+      const f = input.files[0]; if (!f) return;
+      _editFile = f;
+      const url = URL.createObjectURL(f);
+      $('editThumb').innerHTML = f.type.startsWith('video/')
+        ? `<video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
+        : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onload="URL.revokeObjectURL(this.src)">`;
+      $('editMidStatus').textContent = fmtBytes(f.size) + ' — pronto para enviar';
+    };
+
+    window.salvar = async () => {
+      const nome = $('editNome').value.trim();
+      const preco = parseFloat($('editPreco').value);
+      const est = parseInt($('editEstoque').value) || 0;
+      const desc = $('editDesc').value.trim();
+      const btn = $('btnSalvar'), fb = $('fbEdit');
+      hideFb(fb);
+
+      if (!nome) { showFb(fb, '⚠️ Informe o nome.', 'erro'); return; }
+      if (!preco || preco <= 0) { showFb(fb, '⚠️ Informe um preço válido.', 'erro'); return; }
+
+      btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> Salvando...';
+      showFb(fb, 'Salvando...', 'info');
+
+      const p = CACHE.find(x => x.id === _editId);
+
+      try {
+        await editarProduto(
+          _editId,
+          { nome, preco, estoque: est, descricao: desc, ativo: _editAtivo, storagePath: p?.storagePath },
+          _editFile,
+          (pct, label) => { }
+        );
+        showFb(fb, '✅ Produto salvo com sucesso!', 'ok');
+        await loadEstoque();
+        setTimeout(window.closeDrawer, 1200);
+      } catch (e) {
+        console.error('[KAZZI] Erro salvar:', e);
+        showFb(fb, traduzErro(e), 'erro');
+      }
+      btn.disabled = false; btn.innerHTML = '✓ SALVAR';
+    };
+
+    window.excluir = async () => {
+      const p = CACHE.find(x => x.id === _editId);
+      if (!confirm(`Apagar "${p?.nome || 'produto'}"?\nA imagem também será removida.`)) return;
+      try {
+        await excluirProduto(_editId, p?.storagePath);
+        window.closeDrawer();
+        await loadEstoque();
+      } catch (e) {
+        alert('Erro ao apagar: ' + e.message);
+      }
+    };
+
+    // ═══════════════════════════════════════════
+    // ENTREGAS — Uber Direct
+    // ═══════════════════════════════════════════
+    import {
+      collection as fCollection, doc as fDoc, getDocs as fGetDocs,
+      getDoc as fGetDoc, query as fQuery, where as fWhere, orderBy as fOrderBy,
+      updateDoc as fUpdateDoc, setDoc as fSetDoc, addDoc as fAddDoc, serverTimestamp as fServerTimestamp, onSnapshot
+    } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+
+    let ORDERS_CACHE = [];
+    let DELIVERIES_CACHE = [];
+
+    async function loadEntregas() {
+      $('ordersList').innerHTML = '<p class="a-empty">Carregando pedidos...</p>';
+      try {
+        const ordersSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_orders'), fOrderBy('criado', 'desc')));
+        ORDERS_CACHE = [];
+        ordersSnap.forEach(d => ORDERS_CACHE.push({ id: d.id, ...d.data() }));
+
+        const delSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_deliveries'), fOrderBy('criado', 'desc')));
+        DELIVERIES_CACHE = [];
+        delSnap.forEach(d => DELIVERIES_CACHE.push({ id: d.id, ...d.data() }));
+
+        renderEntregas();
+      } catch (e) {
+        $('ordersList').innerHTML = `<p class="a-empty" style="color:#f87171;">Erro: ${e.message}</p>`;
+      }
+    }
+
+    function renderEntregas() {
+      const g = $('ordersList');
+      $('deliveriesBadge').textContent = ORDERS_CACHE.length + ' pedido(s)';
+
+      if (!ORDERS_CACHE.length) {
+        g.innerHTML = '<p class="a-empty">Nenhum pedido ainda.</p>';
+        return;
+      }
+
+      g.innerHTML = ORDERS_CACHE.map(o => {
+        const delivery = DELIVERIES_CACHE.find(d => d.pedidoId === o.id);
+        const statusColors = {
+          'aguardando_pagamento': '#f59e0b',
+          'pago': '#22c55e',
+          'confirmado': '#3b82f6',
+          'uber_criado': '#8b5cf6',
+          'em_entrega': '#8b5cf6',
+          'entregue': '#22c55e',
+          'cancelado': '#ef4444'
+        };
+        const statusLabels = {
+          'aguardando_pagamento': 'Aguardando Pagamento',
+          'pago': 'Pago',
+          'confirmado': 'Confirmado',
+          'uber_criado': 'Uber Solicitado',
+          'em_entrega': 'Em Entrega',
+          'entregue': 'Entregue',
+          'cancelado': 'Cancelado'
+        };
+        const col = statusColors[o.status] || '#6b7280';
+        const label = statusLabels[o.status] || o.status;
+        const itens = (o.itens || []).map(i => `${i.qty}x ${i.nome}`).join(', ');
+        const total = Number(o.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        const data = o.criado?.toDate ? o.criado.toDate().toLocaleString('pt-BR') : '—';
+        const dStatus = delivery?.status || 'sem_entrega';
+        const dStatusColors = { 'pendente': '#f59e0b', 'aguardando_confirmacao': '#f59e0b', 'ativo': '#22c55e', 'concluido': '#22c55e', 'cancelado': '#ef4444' };
+        const dCol = dStatusColors[dStatus] || '#6b7280';
+
+        return `<div class="order-card glass" onclick="window._openDelDrawer('${o.id}')">
       <div class="order-header">
         <span class="order-id">#${o.id.slice(-6).toUpperCase()}</span>
         <span class="order-status" style="background:${col}22;color:${col};border:1px solid ${col}44">${label}</span>
@@ -731,30 +903,30 @@ function renderEntregas() {
         </div>` : ''}
       </div>
     </div>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-// ── Delivery Drawer ────────────────────────────────────────
-window._openDelDrawer = async (orderId) => {
-  const order = ORDERS_CACHE.find(o => o.id === orderId);
-  if (!order) return;
+    // ── Delivery Drawer ────────────────────────────────────────
+    window._openDelDrawer = async (orderId) => {
+      const order = ORDERS_CACHE.find(o => o.id === orderId);
+      if (!order) return;
 
-  const delivery = DELIVERIES_CACHE.find(d => d.pedidoId === orderId);
-  const content = $('delDrawerContent');
-  const statusColors = {
-    'aguardando_pagamento': '#f59e0b', 'pago': '#22c55e', 'confirmado': '#3b82f6',
-    'uber_criado': '#8b5cf6', 'em_entrega': '#8b5cf6', 'entregue': '#22c55e', 'cancelado': '#ef4444'
-  };
+      const delivery = DELIVERIES_CACHE.find(d => d.pedidoId === orderId);
+      const content = $('delDrawerContent');
+      const statusColors = {
+        'aguardando_pagamento': '#f59e0b', 'pago': '#22c55e', 'confirmado': '#3b82f6',
+        'uber_criado': '#8b5cf6', 'em_entrega': '#8b5cf6', 'entregue': '#22c55e', 'cancelado': '#ef4444'
+      };
 
-  let actionsHtml = '';
-  if (order.status === 'pago' && !delivery) {
-    actionsHtml = `<button class="a-btn a-btn-blue" onclick="confirmarEntrega('${orderId}')" style="margin-top:12px;">✅ CONFIRMAR PEDIDO</button>`;
-  } else if (order.status === 'confirmado') {
-    actionsHtml = `<div style="margin-top:12px;">
+      let actionsHtml = '';
+      if (order.status === 'pago' && !delivery) {
+        actionsHtml = `<button class="a-btn a-btn-blue" onclick="confirmarEntrega('${orderId}')" style="margin-top:12px;">✅ CONFIRMAR PEDIDO</button>`;
+      } else if (order.status === 'confirmado') {
+        actionsHtml = `<div style="margin-top:12px;">
       <button class="a-btn a-btn-blue" onclick="abrirUberPanel('${orderId}')">🚗 SOLICITAR UBER</button>
     </div>`;
-  } else if (delivery?.status === 'ativo') {
-    actionsHtml = `<div style="margin-top:12px;">
+      } else if (delivery?.status === 'ativo') {
+        actionsHtml = `<div style="margin-top:12px;">
       <p style="font-size:12px;color:#22c55e;font-weight:700;margin-bottom:8px;">🚗 Uber em andamento</p>
       ${delivery.trackingUrl ? `<a href="${delivery.trackingUrl}" target="_blank" class="a-btn a-btn-blue" style="display:block;text-decoration:none;text-align:center;margin-bottom:8px;">📍 RASTREAR UBER</a>` : ''}
       <div style="margin-top:8px;">
@@ -766,11 +938,11 @@ window._openDelDrawer = async (orderId) => {
       </div>
       <button class="a-btn a-btn-red" onclick="cancelarUber('${delivery.id}','${orderId}')" style="margin-top:8px;">❌ CANCELAR UBER</button>
     </div>`;
-  }
+      }
 
-  const endereco = order.endereco || {};
-  const itensHtml = (order.itens || []).map(i =>
-    `<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(51,65,85,.3);">
+      const endereco = order.endereco || {};
+      const itensHtml = (order.itens || []).map(i =>
+        `<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(51,65,85,.3);">
       <img src="${i.img || 'https://placehold.co/40x40/111/555'}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;">
       <div style="flex:1;">
         <p style="font-size:12px;font-weight:700;">${i.nome}</p>
@@ -778,9 +950,9 @@ window._openDelDrawer = async (orderId) => {
       </div>
       <span style="font-size:12px;color:#38bdf8;font-weight:700;">R$ ${Number(i.preco).toFixed(2)}</span>
     </div>`
-  ).join('');
+      ).join('');
 
-  content.innerHTML = `
+      content.innerHTML = `
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">PEDIDO #${order.id.slice(-6).toUpperCase()}</span>
@@ -823,100 +995,105 @@ window._openDelDrawer = async (orderId) => {
     </div>` : ''}
 
     ${actionsHtml}
+    <div style="margin-top:12px;">
+      <button class="a-btn" style="background:#0f172a;color:#94a3b8;border:1px solid #334155;font-size:11px;" onclick="toast('⚠️ Emissão retida. Integração NFe requer Cadastro SEFAZ (ex: Bling) e Certificado A1.', 'erro')">
+        📄 EMITIR NOTA FISCAL (NFe)
+      </button>
+    </div>
   `;
 
-  $('delOverlay').classList.add('open');
-  $('delDrawer').classList.add('open');
-  document.body.style.overflow = 'hidden';
-};
+      $('delOverlay').classList.add('open');
+      $('delDrawer').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
 
-window.closeDelDrawer = () => {
-  $('delOverlay').classList.remove('open');
-  $('delDrawer').classList.remove('open');
-  document.body.style.overflow = '';
-};
+    window.closeDelDrawer = () => {
+      $('delOverlay').classList.remove('open');
+      $('delDrawer').classList.remove('open');
+      document.body.style.overflow = '';
+    };
 
-// ── Confirmar entrega ─────────────────────────────────────
-window.confirmarEntrega = async (orderId) => {
-  const order = ORDERS_CACHE.find(o => o.id === orderId);
-  if (!order) return;
-  if (!confirm(`Confirmar pedido de ${order.clienteNome}?`)) return;
+    // ── Confirmar entrega ─────────────────────────────────────
+    window.confirmarEntrega = async (orderId) => {
+      const order = ORDERS_CACHE.find(o => o.id === orderId);
+      if (!order) return;
+      if (!confirm(`Confirmar pedido de ${order.clienteNome}?`)) return;
 
-  try {
-    await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
-      status: 'confirmado',
-      atualizado: fServerTimestamp()
-    });
-    toast('Pedido confirmado! Agora solicite o Uber.', 'ok');
-    closeDelDrawer();
-    await loadEntregas();
-  } catch(e) {
-    toast('Erro: ' + e.message, 'erro');
-  }
-};
-
-// ── Abrir painel Uber com dados pré-preenchidos ───────────
-window.abrirUberPanel = async (orderId) => {
-  const order = ORDERS_CACHE.find(o => o.id === orderId);
-  if (!order) return;
-
-  const endereco = order.endereco || {};
-  const storeName = CONFIGS_DATA.storeName || 'Kazzi Company';
-  const storeAddr = CONFIGS_DATA.storeAddress || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC';
-  const storePhone = CONFIGS_DATA.storePhone || '(47) 98916-4910';
-  const fullDropoff = `${endereco.street || ''}, ${endereco.number || ''}, ${endereco.district || ''}, ${endereco.city || ''} - ${endereco.state || ''}`;
-  const itensStr = (order.itens || []).map(i => `${i.qty}x ${i.nome}`).join('\n');
-
-  const deliveryId = 'kz_' + Date.now();
-
-  // Se tem email/senha do Uber cadastrado, tenta criar automaticamente via API
-  if (CONFIGS_DATA.uberEmail && CONFIGS_DATA.uberSenha) {
-    try {
-      toast('Criando entrega no Uber...', 'info');
-      const result = await fetch('/.netlify/functions/uber', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create_delivery',
-          deliveryId,
-          orderId,
-          uberEmail: CONFIGS_DATA.uberEmail,
-          uberSenha: CONFIGS_DATA.uberSenha,
-          pickup: { address: storeAddr, lat: -26.8597, lng: -49.1028, name: storeName, phone: storePhone },
-          dropoff: { address: fullDropoff, lat: endereco.lat || -26.86, lng: endereco.lng || -49.10, name: order.clienteNome, phone: order.clienteTelefone },
-          items: order.itens || []
-        })
-      });
-      const data = await result.json();
-      if (data.success && data.delivery) {
-        const delRef = await fAddDoc(fCollection(db, 'kazzi_deliveries'), {
-          pedidoId: orderId, deliveryId, clienteNome: order.clienteNome,
-          clienteTelefone: order.clienteTelefone, endereco: order.endereco,
-          itens: order.itens || [], frete: order.frete || 0,
-          status: 'ativo', uberDeliveryId: data.delivery.id || deliveryId,
-          trackingUrl: data.delivery.tracking_url || null,
-          criado: fServerTimestamp(), atualizado: fServerTimestamp()
+      try {
+        await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
+          status: 'confirmado',
+          atualizado: fServerTimestamp()
         });
-        await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), { status: 'uber_criado', atualizado: fServerTimestamp() });
-        toast('Uber criado automaticamente!', 'ok');
+        toast('Pedido confirmado! Agora solicite o Uber.', 'ok');
         closeDelDrawer();
         await loadEntregas();
-        return;
+      } catch (e) {
+        toast('Erro: ' + e.message, 'erro');
       }
-      // Se retornou needsManual, cai para o modo manual
-      if (data.needsManual) {
-        toast('API não configurada. Use o modo manual abaixo.', 'info');
+    };
+
+    // ── Abrir painel Uber com dados pré-preenchidos ───────────
+    window.abrirUberPanel = async (orderId) => {
+      const order = ORDERS_CACHE.find(o => o.id === orderId);
+      if (!order) return;
+
+      const endereco = order.endereco || {};
+      const storeName = CONFIGS_DATA.storeName || 'Kazzi Company';
+      const storeAddr = CONFIGS_DATA.storeAddress || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC';
+      const storePhone = CONFIGS_DATA.storePhone || '(47) 98916-4910';
+      const fullDropoff = `${endereco.street || ''}, ${endereco.number || ''}, ${endereco.district || ''}, ${endereco.city || ''} - ${endereco.state || ''}`;
+      const itensStr = (order.itens || []).map(i => `${i.qty}x ${i.nome}`).join('\n');
+
+      const deliveryId = 'kz_' + Date.now();
+
+      // Se tem email/senha do Uber cadastrado, tenta criar automaticamente via API
+      if (CONFIGS_DATA.uberEmail && CONFIGS_DATA.uberSenha) {
+        try {
+          toast('Criando entrega no Uber...', 'info');
+          const result = await fetch('/.netlify/functions/uber', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'create_delivery',
+              deliveryId,
+              orderId,
+              uberEmail: CONFIGS_DATA.uberEmail,
+              uberSenha: CONFIGS_DATA.uberSenha,
+              pickup: { address: storeAddr, lat: -26.8597, lng: -49.1028, name: storeName, phone: storePhone },
+              dropoff: { address: fullDropoff, lat: endereco.lat || -26.86, lng: endereco.lng || -49.10, name: order.clienteNome, phone: order.clienteTelefone },
+              items: order.itens || []
+            })
+          });
+          const data = await result.json();
+          if (data.success && data.delivery) {
+            const delRef = await fAddDoc(fCollection(db, 'kazzi_deliveries'), {
+              pedidoId: orderId, deliveryId, clienteNome: order.clienteNome,
+              clienteTelefone: order.clienteTelefone, endereco: order.endereco,
+              itens: order.itens || [], frete: order.frete || 0,
+              status: 'ativo', uberDeliveryId: data.delivery.id || deliveryId,
+              trackingUrl: data.delivery.tracking_url || null,
+              criado: fServerTimestamp(), atualizado: fServerTimestamp()
+            });
+            await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), { status: 'uber_criado', atualizado: fServerTimestamp() });
+            toast('Uber criado automaticamente!', 'ok');
+            closeDelDrawer();
+            await loadEntregas();
+            return;
+          }
+          // Se retornou needsManual, cai para o modo manual
+          if (data.needsManual) {
+            toast('API não configurada. Use o modo manual abaixo.', 'info');
+          }
+        } catch (e) {
+          toast('Erro Uber: ' + e.message + ' — Use o modo manual.', 'erro');
+        }
       }
-    } catch(e) {
-      toast('Erro Uber: ' + e.message + ' — Use o modo manual.', 'erro');
-    }
-  }
 
-  // Modo simples: abre Uber e mostra dados para copiar
-  const uberUrl = 'https://www.uber.com/br/deliver/';
+      // Modo simples: abre Uber e mostra dados para copiar
+      const uberUrl = 'https://www.uber.com/br/deliver/';
 
-  const content = $('delDrawerContent');
-  content.innerHTML = `
+      const content = $('delDrawerContent');
+      content.innerHTML = `
     <div style="background:rgba(15,23,42,.8);border:1px solid #1e293b;border-radius:12px;padding:16px;margin-bottom:14px;">
       <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#f1f5f9;margin-bottom:12px;">📍 DADOS PARA O UBER</p>
 
@@ -957,175 +1134,299 @@ window.abrirUberPanel = async (orderId) => {
       </button>
     </div>
   `;
-};
-
-window.copiarDadosUber = (orderId) => {
-  const order = ORDERS_CACHE.find(o => o.id === orderId);
-  if (!order) return;
-  const endereco = order.endereco || {};
-  const storeName = CONFIGS_DATA.storeName || 'Kazzi Company';
-  const storeAddr = CONFIGS_DATA.storeAddress || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC';
-  const storePhone = CONFIGS_DATA.storePhone || '(47) 98916-4910';
-  const fullDropoff = `${endereco.street || ''}, ${endereco.number || ''}, ${endereco.district || ''}, ${endereco.city || ''} - ${endereco.state || ''}`;
-  const itensStr = (order.itens || []).map(i => `${i.qty}x ${i.nome}`).join('\n');
-
-  const texto = `RETIRADA:\n${storeName}\n${storeAddr}\nTel: ${storePhone}\n\nENTREGA:\n${order.clienteNome}\n${fullDropoff}\nTel: ${order.clienteTelefone}\n\nITENS:\n${itensStr}`;
-
-  navigator.clipboard.writeText(texto).then(() => {
-    toast('Dados copiados! Cole no Uber.', 'ok');
-  }).catch(() => {
-    toast('Selecione e copie manualmente', 'info');
-  });
-};
-
-window.criarEntregaComTracking = async (orderId, deliveryId) => {
-  const trackingUrl = $('newTrackingUrl')?.value?.trim();
-  if (!trackingUrl) { toast('Cole o link de rastreamento do Uber', 'erro'); return; }
-
-  const order = ORDERS_CACHE.find(o => o.id === orderId);
-  if (!order) return;
-
-  try {
-    const delRef = await fAddDoc(fCollection(db, 'kazzi_deliveries'), {
-      pedidoId: orderId,
-      deliveryId: deliveryId,
-      clienteNome: order.clienteNome,
-      clienteTelefone: order.clienteTelefone,
-      endereco: order.endereco,
-      itens: order.itens || [],
-      frete: order.frete || 0,
-      status: 'ativo',
-      trackingUrl: trackingUrl,
-      criado: fServerTimestamp(),
-      atualizado: fServerTimestamp()
-    });
-
-    await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
-      status: 'uber_criado',
-      atualizado: fServerTimestamp()
-    });
-
-    toast('Entrega registrada com rastreamento!', 'ok');
-    closeDelDrawer();
-    await loadEntregas();
-  } catch(e) {
-    toast('Erro: ' + e.message, 'erro');
-  }
-};
-
-window.salvarTracking = async (deliveryDocId, orderId) => {
-  const input = $('trackingInput_' + orderId);
-  const url = input?.value?.trim();
-  if (!url) { toast('Cole o link de rastreamento', 'erro'); return; }
-
-  try {
-    await fUpdateDoc(fDoc(db, 'kazzi_deliveries', deliveryDocId), {
-      trackingUrl: url,
-      atualizado: fServerTimestamp()
-    });
-    toast('Rastreamento salvo!', 'ok');
-    closeDelDrawer();
-    await loadEntregas();
-  } catch(e) {
-    toast('Erro: ' + e.message, 'erro');
-  }
-};
-
-window.solicitarUber = window.abrirUberPanel;
-
-window.cancelarUber = async (deliveryDocId, orderId) => {
-  if (!confirm('Cancelar esta entrega Uber?')) return;
-  try {
-    const del = DELIVERIES_CACHE.find(d => d.id === deliveryDocId);
-    if (del?.uberDeliveryId) {
-      await fetch('/.netlify/functions/uber', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'cancel_delivery', deliveryId: del.uberDeliveryId })
-      });
-    }
-
-    await fUpdateDoc(fDoc(db, 'kazzi_deliveries', deliveryDocId), {
-      status: 'cancelado',
-      atualizado: fServerTimestamp()
-    });
-
-    if (orderId) {
-      await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
-        status: 'cancelado',
-        atualizado: fServerTimestamp()
-      });
-    }
-
-    toast('Entrega cancelada', 'info');
-    closeDelDrawer();
-    await loadEntregas();
-  } catch(e) {
-    toast('Erro: ' + e.message, 'erro');
-  }
-};
-
-// ═══════════════════════════════════════════
-// CONFIGURAÇÕES — Uber e Loja
-// ═══════════════════════════════════════════
-let CONFIGS_DATA = {};
-
-async function loadConfigs() {
-  try {
-    const snap = await fGetDoc(fDoc(db, 'kazzi_settings', 'delivery'));
-    if (snap.exists()) {
-      CONFIGS_DATA = snap.data();
-    } else {
-      CONFIGS_DATA = {
-        uberEmail: '',
-        uberSenha: '',
-        storeName: 'Kazzi Company',
-        storePhone: '(47) 98916-4910',
-        storeAddress: 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC'
-      };
-    }
-
-    $('cfgUberEmail').value = CONFIGS_DATA.uberEmail || '';
-    $('cfgUberSenha').value = CONFIGS_DATA.uberSenha || '';
-    $('cfgStoreName').value = CONFIGS_DATA.storeName || 'Kazzi Company';
-    $('cfgStorePhone').value = CONFIGS_DATA.storePhone || '(47) 98916-4910';
-    $('cfgStoreAddr').value = CONFIGS_DATA.storeAddress || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC';
-
-    hideFb($('fbCfg'));
-  } catch(e) {
-    console.error('[KAZZI] Erro carregar configs:', e);
-  }
-}
-
-window.salvarConfigs = async () => {
-  const btn = $('btnSalvarCfg'), fb = $('fbCfg');
-  hideFb(fb);
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin">↻</span> Salvando...';
-
-  try {
-    const dados = {
-      uberEmail: $('cfgUberEmail').value.trim(),
-      uberSenha: $('cfgUberSenha').value.trim(),
-      storeName: $('cfgStoreName').value.trim() || 'Kazzi Company',
-      storePhone: $('cfgStorePhone').value.trim() || '(47) 98916-4910',
-      storeAddress: $('cfgStoreAddr').value.trim() || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC',
-      atualizado: fServerTimestamp()
     };
 
-    await fSetDoc(fDoc(db, 'kazzi_settings', 'delivery'), dados, { merge: true });
+    window.copiarDadosUber = (orderId) => {
+      const order = ORDERS_CACHE.find(o => o.id === orderId);
+      if (!order) return;
+      const endereco = order.endereco || {};
+      const storeName = CONFIGS_DATA.storeName || 'Kazzi Company';
+      const storeAddr = CONFIGS_DATA.storeAddress || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC';
+      const storePhone = CONFIGS_DATA.storePhone || '(47) 98916-4910';
+      const fullDropoff = `${endereco.street || ''}, ${endereco.number || ''}, ${endereco.district || ''}, ${endereco.city || ''} - ${endereco.state || ''}`;
+      const itensStr = (order.itens || []).map(i => `${i.qty}x ${i.nome}`).join('\n');
 
-    CONFIGS_DATA = dados;
-    showFb(fb, '✅ Configurações salvas com sucesso!', 'ok');
-    toast('Configurações salvas!', 'ok');
-  } catch(e) {
-    showFb(fb, '❌ Erro: ' + e.message, 'erro');
-    console.error('[KAZZI] Erro salvar configs:', e);
-  }
+      const texto = `RETIRADA:\n${storeName}\n${storeAddr}\nTel: ${storePhone}\n\nENTREGA:\n${order.clienteNome}\n${fullDropoff}\nTel: ${order.clienteTelefone}\n\nITENS:\n${itensStr}`;
 
-  btn.disabled = false;
-  btn.innerHTML = '💾 SALVAR CONFIGURAÇÕES';
-};
-</script>
+      navigator.clipboard.writeText(texto).then(() => {
+        toast('Dados copiados! Cole no Uber.', 'ok');
+      }).catch(() => {
+        toast('Selecione e copie manualmente', 'info');
+      });
+    };
+
+    window.criarEntregaComTracking = async (orderId, deliveryId) => {
+      const trackingUrl = $('newTrackingUrl')?.value?.trim();
+      if (!trackingUrl) { toast('Cole o link de rastreamento do Uber', 'erro'); return; }
+
+      const order = ORDERS_CACHE.find(o => o.id === orderId);
+      if (!order) return;
+
+      try {
+        const delRef = await fAddDoc(fCollection(db, 'kazzi_deliveries'), {
+          pedidoId: orderId,
+          deliveryId: deliveryId,
+          clienteNome: order.clienteNome,
+          clienteTelefone: order.clienteTelefone,
+          endereco: order.endereco,
+          itens: order.itens || [],
+          frete: order.frete || 0,
+          status: 'ativo',
+          trackingUrl: trackingUrl,
+          criado: fServerTimestamp(),
+          atualizado: fServerTimestamp()
+        });
+
+        await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
+          status: 'uber_criado',
+          atualizado: fServerTimestamp()
+        });
+
+        toast('Entrega registrada com rastreamento!', 'ok');
+        closeDelDrawer();
+        await loadEntregas();
+      } catch (e) {
+        toast('Erro: ' + e.message, 'erro');
+      }
+    };
+
+    window.salvarTracking = async (deliveryDocId, orderId) => {
+      const input = $('trackingInput_' + orderId);
+      const url = input?.value?.trim();
+      if (!url) { toast('Cole o link de rastreamento', 'erro'); return; }
+
+      try {
+        await fUpdateDoc(fDoc(db, 'kazzi_deliveries', deliveryDocId), {
+          trackingUrl: url,
+          atualizado: fServerTimestamp()
+        });
+        toast('Rastreamento salvo!', 'ok');
+        closeDelDrawer();
+        await loadEntregas();
+      } catch (e) {
+        toast('Erro: ' + e.message, 'erro');
+      }
+    };
+
+    window.solicitarUber = window.abrirUberPanel;
+
+    window.cancelarUber = async (deliveryDocId, orderId) => {
+      if (!confirm('Cancelar esta entrega Uber?')) return;
+      try {
+        const del = DELIVERIES_CACHE.find(d => d.id === deliveryDocId);
+        if (del?.uberDeliveryId) {
+          await fetch('/.netlify/functions/uber', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'cancel_delivery', deliveryId: del.uberDeliveryId })
+          });
+        }
+
+        await fUpdateDoc(fDoc(db, 'kazzi_deliveries', deliveryDocId), {
+          status: 'cancelado',
+          atualizado: fServerTimestamp()
+        });
+
+        if (orderId) {
+          await fUpdateDoc(fDoc(db, 'kazzi_orders', orderId), {
+            status: 'cancelado',
+            atualizado: fServerTimestamp()
+          });
+        }
+
+        toast('Entrega cancelada', 'info');
+        closeDelDrawer();
+        await loadEntregas();
+        if ($('tab-caixa').classList.contains('active')) loadCaixa();
+      } catch (e) {
+        toast('Erro: ' + e.message, 'erro');
+      }
+    };
+
+    // ═══════════════════════════════════════════
+    // CAIXA E FINANÇAS
+    // ═══════════════════════════════════════════
+    let CAIXA_EXPENSES = [];
+
+    async function loadCaixa() {
+      if (ORDERS_CACHE.length === 0) {
+         const ordersSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_orders'), fOrderBy('criado', 'desc')));
+         ORDERS_CACHE = [];
+         ordersSnap.forEach(d => ORDERS_CACHE.push({ id: d.id, ...d.data() }));
+      }
+      
+      try {
+        const expSnap = await fGetDocs(fQuery(fCollection(db, 'kazzi_expenses'), fOrderBy('data', 'desc')));
+        CAIXA_EXPENSES = [];
+        expSnap.forEach(d => CAIXA_EXPENSES.push({ id: d.id, ...d.data() }));
+      } catch(e) {} // Falha se a collection não existe ou regras
+
+      calcularCaixa();
+    }
+
+    function isSameDay(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+    }
+    function getWeek(d) {
+      const date = new Date(d.getTime());
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+      const week1 = new Date(date.getFullYear(), 0, 4);
+      return Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+    }
+    function isSameWeek(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() && getWeek(d1) === getWeek(d2);
+    }
+    function isSameMonth(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
+    }
+
+    function calcularCaixa() {
+       const now = new Date();
+       let inDia = 0, inSemana = 0, inMes = 0, inAno = 0;
+       let outMes = 0, outAno = 0;
+
+       const paidOrders = ORDERS_CACHE.filter(o => ['pago','confirmado','uber_criado','em_entrega','entregue'].includes(o.status));
+       const movimentos = [];
+
+       paidOrders.forEach(o => {
+         if (!o.criado || !o.criado.toDate) return;
+         const d = o.criado.toDate();
+         const val = Number(o.total || 0);
+         movimentos.push({ data: d, tipo: 'entrada', valor: val, desc: `Pedido #${o.id.slice(-6).toUpperCase()} - ${o.clienteNome}` });
+
+         if (d.getFullYear() === now.getFullYear()) inAno += val;
+         if (isSameMonth(d, now)) inMes += val;
+         if (isSameWeek(d, now)) inSemana += val;
+         if (isSameDay(d, now)) inDia += val;
+       });
+
+       CAIXA_EXPENSES.forEach(e => {
+         if (!e.data || !e.data.toDate) return;
+         const d = e.data.toDate();
+         const val = Number(e.valor || 0);
+         movimentos.push({ data: d, tipo: 'saida', valor: val, desc: e.desc || 'Despesa' });
+
+         if (d.getFullYear() === now.getFullYear()) outAno += val;
+         if (isSameMonth(d, now)) outMes += val;
+       });
+
+       $('cxDia').textContent = fmtP(inDia);
+       $('cxSemana').textContent = fmtP(inSemana);
+       $('cxMesCtx').textContent = fmtP(inMes);
+       $('cxAno').textContent = fmtP(inAno);
+       
+       const lucroMes = inMes - outMes;
+       $('cxLucroCtx').textContent = fmtP(lucroMes);
+       $('cxLucroCtx').style.color = lucroMes >= 0 ? '#38bdf8' : '#ef4444';
+
+       movimentos.sort((a,b) => b.data - a.data);
+       const table = $('cxTable');
+       
+       if (!movimentos.length) {
+          table.innerHTML = '<p class="a-empty">Sem movimentações ainda.</p>';
+          return;
+       }
+
+       table.innerHTML = movimentos.slice(0, 50).map(m => {
+          const isEntrada = m.tipo === 'entrada';
+          const corVal = isEntrada ? '#22c55e' : '#ef4444';
+          const sinal = isEntrada ? '+' : '-';
+          const dataF = m.data.toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(51,65,85,.3);">
+              <div>
+                <p style="font-size:13px;font-weight:700;color:#f1f5f9;">${m.desc}</p>
+                <p style="font-size:11px;color:#94a3b8;">${dataF}</p>
+              </div>
+              <span style="font-size:14px;font-weight:700;color:${corVal};">${sinal} ${fmtP(m.valor)}</span>
+            </div>
+          `;
+       }).join('');
+    }
+
+    window.addDespesaPrompt = async () => {
+       const desc = prompt('Descrição do Gasto/Despesa (ex: Caixa de Papelão, Marketing):');
+       if (!desc) return;
+       const valorStr = prompt('Valor em R$ (ex: 50.00):');
+       if (!valorStr) return;
+       const valor = parseFloat(valorStr.replace(',','.'));
+       if (isNaN(valor) || valor <= 0) { toast('Valor inválido', 'erro'); return; }
+
+       try {
+         await fAddDoc(fCollection(db, 'kazzi_expenses'), {
+           desc, valor, data: fServerTimestamp()
+         });
+         toast('Despesa registrada no caixa!', 'ok');
+         await loadCaixa();
+       } catch(e) { toast('Erro: ' + e.message, 'erro'); }
+    };
+
+    // ═══════════════════════════════════════════
+    // CONFIGURAÇÕES — Uber e Loja
+    // ═══════════════════════════════════════════
+    let CONFIGS_DATA = {};
+
+    async function loadConfigs() {
+      try {
+        const snap = await fGetDoc(fDoc(db, 'kazzi_settings', 'delivery'));
+        if (snap.exists()) {
+          CONFIGS_DATA = snap.data();
+        } else {
+          CONFIGS_DATA = {
+            uberEmail: '',
+            uberSenha: '',
+            pagseguroEmail: 'suporte@kazzi.com.br',
+            storeName: 'Kazzi Company',
+            storePhone: '(47) 98916-4910',
+            storeAddress: 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC'
+          };
+        }
+
+        $('cfgPagSeguro').value = CONFIGS_DATA.pagseguroEmail || '';
+        $('cfgUberEmail').value = CONFIGS_DATA.uberEmail || '';
+        $('cfgUberSenha').value = CONFIGS_DATA.uberSenha || '';
+        $('cfgStoreName').value = CONFIGS_DATA.storeName || 'Kazzi Company';
+        $('cfgStorePhone').value = CONFIGS_DATA.storePhone || '(47) 98916-4910';
+        $('cfgStoreAddr').value = CONFIGS_DATA.storeAddress || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC';
+
+        hideFb($('fbCfg'));
+      } catch (e) {
+        console.error('[KAZZI] Erro carregar configs:', e);
+      }
+    }
+
+    window.salvarConfigs = async () => {
+      const btn = $('btnSalvarCfg'), fb = $('fbCfg');
+      hideFb(fb);
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin">↻</span> Salvando...';
+
+      try {
+        const dados = {
+          uberEmail: $('cfgUberEmail').value.trim(),
+          uberSenha: $('cfgUberSenha').value.trim(),
+          pagseguroEmail: $('cfgPagSeguro').value.trim() || 'suporte@kazzi.com.br',
+          storeName: $('cfgStoreName').value.trim() || 'Kazzi Company',
+          storePhone: $('cfgStorePhone').value.trim() || '(47) 98916-4910',
+          storeAddress: $('cfgStoreAddr').value.trim() || 'R. Frederico Jensen, 1720, Itoupavazinha, Blumenau - SC',
+          atualizado: fServerTimestamp()
+        };
+
+        await fSetDoc(fDoc(db, 'kazzi_settings', 'delivery'), dados, { merge: true });
+
+        CONFIGS_DATA = dados;
+        showFb(fb, '✅ Configurações salvas com sucesso!', 'ok');
+        toast('Configurações salvas!', 'ok');
+      } catch (e) {
+        showFb(fb, '❌ Erro: ' + e.message, 'erro');
+        console.error('[KAZZI] Erro salvar configs:', e);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '💾 SALVAR CONFIGURAÇÕES';
+    };
+  </script>
 </body>
+
 </html>
