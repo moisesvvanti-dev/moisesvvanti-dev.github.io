@@ -12,8 +12,8 @@
     X-Content-Type-Options      = "nosniff"
     Referrer-Policy             = "strict-origin-when-cross-origin"
     Permissions-Policy          = "geolocation=(), microphone=(), camera=(), payment=()"
-    # CSP: adapte 'connect-src' para seus domínios reais
-    Content-Security-Policy     = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://huqbfmyjnqlrkvwqabec.supabase.co; connect-src 'self' https://huqbfmyjnqlrkvwqabec.supabase.co https://api.pagseguro.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    # CSP: permitindo scripts inline do site e as conexões com Supabase, ViaCEP e PagSeguro
+    Content-Security-Policy     = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://api.pagseguro.com https://viacep.com.br; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
     Strict-Transport-Security   = "max-age=31536000; includeSubDomains; preload"
 
 # ── Cache para assets estáticos ───────────────────────────────
