@@ -150,18 +150,34 @@
 
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModalOverlay">
-  <div class="modal" style="max-width:400px; padding:2rem; text-align:center;">
-    <button class="modal-close" onclick="document.getElementById('authModalOverlay').classList.remove('open');document.body.style.overflow='';">×</button>
-    <h2 style="margin-bottom:1rem; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:2rem; color:white;">ACESSAR CONTA</h2>
-    <input type="email" id="authEmail" placeholder="Seu E-mail" style="width:100%; margin-bottom:1rem; padding:0.8rem; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; font-family:inherit;">
-    <input type="password" id="authSenha" placeholder="Sua Senha" style="width:100%; margin-bottom:1rem; padding:0.8rem; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; font-family:inherit;">
-    <button class="btn-buy" id="btnAcessar" style="width:100%; margin-bottom:0.5rem;">ENTRAR</button>
-    <button class="btn-hero" id="btnRegistrar" style="width:100%; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.2); background:transparent; padding:1rem; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">CRIAR CONTA</button>
+  <div class="modal" style="max-width:350px; width:90%; padding:2.5rem 2rem; display:flex; flex-direction:column; gap:1.2rem; align-items:center; background:#0a0a0a; border:1px solid rgba(255,255,255,0.1); border-radius:12px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.8);">
+    <button class="modal-close" style="top:15px;right:15px;color:rgba(255,255,255,0.5);" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'" onclick="document.getElementById('authModalOverlay').classList.remove('open');document.body.style.overflow='';">×</button>
+    
+    <div style="text-align:center; width: 100%;">
+      <h2 style="font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:2.4rem; color:#fff; margin:0; line-height:1;">ACESSAR CONTA</h2>
+      <p style="color:var(--mut); font-size:0.9rem; margin-top:0.25rem;">Entre ou crie sua conta na Kazzi</p>
+    </div>
+
+    <div style="width:100%; display:flex; flex-direction:column; gap:1rem; margin-top:0.5rem;">
+      <input type="email" id="authEmail" placeholder="Seu E-mail" style="width:100%; padding:0.9rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; font-size:1rem; outline:none; transition:border-color 0.2s; font-family:inherit;" onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+      
+      <input type="password" id="authSenha" placeholder="Sua Senha" style="width:100%; padding:0.9rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; font-size:1rem; outline:none; transition:border-color 0.2s; font-family:inherit;" onfocus="this.style.borderColor='var(--fg)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+    </div>
+
+    <div style="width:100%; display:flex; flex-direction:column; gap:0.8rem; margin-top:0.5rem;">
+      <button class="btn-buy" id="btnAcessar" style="width:100%; margin:0; font-size:1rem; border-radius:8px; padding:0.9rem;">ENTRAR</button>
+      
+      <button class="btn-hero" id="btnRegistrar" style="width:100%; margin:0; padding:0.9rem; background:transparent; border:1px solid rgba(255,255,255,0.15); color:var(--mut); transition:all 0.2s; border-radius:8px; font-weight:600; cursor:pointer;" onmouseover="this.style.color='#fff'; this.style.borderColor='rgba(255,255,255,0.4)'; this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.color='var(--mut)'; this.style.borderColor='rgba(255,255,255,0.15)'; this.style.background='transparent'">CRIAR NOVA CONTA</button>
+    </div>
   </div>
 </div>
 
 <style>
 .grid-msg { grid-column:1/-1; text-align:center; padding:3rem; color:var(--mut); }
+@keyframes skel-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+.skeleton-card { pointer-events:none; border:none; background:transparent; }
+.skeleton-img { width:100%; aspect-ratio:4/5; background:rgba(255,255,255,0.04); animation:skel-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; border-radius:12px; }
+.skeleton-line { height:14px; background:rgba(255,255,255,0.04); border-radius:4px; margin-top:12px; animation:skel-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 </style>
 
 <script type="module">
@@ -175,7 +191,16 @@ let CAT = 'all', BUSCA = '', PRODUTO = null, TAM = null, searchTimer;
 // ── Carrega produtos do Firestore ─────────────────────────
 async function loadProducts() {
   const g = document.getElementById('productGrid');
-  g.innerHTML = '<div class="grid-msg">Carregando...</div>';
+  const skel = `
+    <article class="product-card skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="pc-info" style="padding-top:4px;">
+        <div class="skeleton-line" style="width:80%;"></div>
+        <div class="skeleton-line" style="width:40%;"></div>
+      </div>
+    </article>`;
+  g.innerHTML = skel.repeat(8);
+  
   try {
     const lista = await listarProdutos(CAT, BUSCA);
     if (!lista.length) {
@@ -206,6 +231,19 @@ async function loadProducts() {
   }
 }
 
+window.trocarImagemModal = (url, el) => {
+  const img = document.getElementById('modalImg');
+  const vid = document.getElementById('modalVideo');
+  const isV = /\.(mp4|webm|mov)$/i.test(url);
+  if (isV) {
+    img.style.display = 'none'; vid.style.display = ''; vid.src = url; vid.load(); vid.play();
+  } else {
+    vid.pause(); vid.style.display = 'none'; img.style.display = ''; img.src = url;
+  }
+  document.querySelectorAll('.modal-thumb').forEach(t => { t.classList.remove('active'); t.style.borderColor='transparent'; t.style.opacity='0.6'; });
+  if (el) { el.classList.add('active'); el.style.borderColor='#38bdf8'; el.style.opacity='1'; }
+};
+
 // ── Modal ─────────────────────────────────────────────────
 window._openModal = async (id) => {
   try {
@@ -226,6 +264,21 @@ window._openModal = async (id) => {
       img.style.display = 'none'; vid.style.display = ''; vid.src = p.imagem; vid.load();
     } else {
       vid.pause(); vid.style.display = 'none'; img.style.display = ''; img.src = p.imagem || '';
+    }
+
+    const thumbs = [p.imagem, ...(Array.isArray(p.imagens_extra) ? p.imagens_extra : [])].filter(Boolean);
+    const tm = document.getElementById('modalThumbs');
+    if (thumbs.length > 1) {
+      tm.style.display = 'flex';
+      tm.innerHTML = thumbs.map((u, i) => {
+        const isVid = /\.(mp4|webm|mov)$/i.test(u);
+        const m = isVid ? `<video src="${u}" style="width:100%;height:100%;object-fit:cover;" muted></video>`
+                        : `<img src="${u}" style="width:100%;height:100%;object-fit:cover;">`;
+        return `<div class="modal-thumb ${i===0?'active':''}" style="width:60px;height:60px;flex-shrink:0;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid ${i===0?'#38bdf8':'transparent'};opacity:${i===0?'1':'0.6'};transition:all 0.2s;" onclick="trocarImagemModal('${u}', this)" onmouseover="this.style.opacity='1'" onmouseout="if(!this.classList.contains('active'))this.style.opacity='0.6'">${m}</div>`;
+      }).join('');
+    } else {
+      tm.style.display = 'none';
+      tm.innerHTML = '';
     }
 
     const sizes = getSizes(p);

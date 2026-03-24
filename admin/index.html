@@ -68,68 +68,27 @@
       </div>
 
       <div class="a-card glass" style="margin-bottom:16px;">
-        <p
-          style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:8px;">
-          📁 PRODUTO (GITHUB PAGES)</p>
-        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Escolha o arquivo do produto do seu PC. O nome do
-          arquivo definirá o nome e categoria.</p>
-        <label for="localFileInput" class="a-btn-midia" style="display:inline-block;cursor:pointer;">📷 ESCOLHER
-          IMAGEM/VÍDEO</label>
-        <input type="file" id="localFileInput" class="sr-only" accept="image/*,video/*"
-          onchange="selecionarArquivoUpload(this)">
-      </div>
-
-      <div class="a-card glass" id="cadFormCard" style="display:none;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;">⚡ CADASTRAR
-            PRODUTO</p>
-          <button class="a-btn" style="background:#334155;color:#f1f5f9;padding:6px 12px;font-size:11px;"
-            onclick="limparSelecao()">✕ LIMPAR</button>
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#f1f5f9;margin-bottom:8px;">📁 UPLOAD EM MASSA (DRAG & DROP)</p>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Arraste múltiplos arquivos (imagens ou vídeos) para cadastrá-los automaticamente no seu estoque oculto.</p>
+        
+        <div id="dropZone" style="border:2px dashed #334155; border-radius:12px; padding:40px 20px; text-align:center; cursor:pointer; background:rgba(0,0,0,0.2); transition:all 0.2s;" ondragover="event.preventDefault(); this.style.borderColor='#38bdf8'; this.style.background='rgba(56,189,248,0.1)';" ondragleave="this.style.borderColor='#334155'; this.style.background='rgba(0,0,0,0.2)';" ondrop="event.preventDefault(); this.style.borderColor='#334155'; this.style.background='rgba(0,0,0,0.2)'; window.handleDropFiles(event.dataTransfer.files)">
+          <div style="font-size:32px; margin-bottom:12px;">☁️</div>
+          <p style="font-size:14px; font-weight:700; color:#f1f5f9; margin-bottom:4px;">Arraste fotos e vídeos aqui</p>
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:16px;">ou clique para selecionar múltiplos arquivos</p>
+          <label for="bulkFileInput" class="a-btn" style="background:#334155;color:#fff;padding:8px 16px;border-radius:6px;display:inline-block;cursor:pointer;">SELECIONAR ARQUIVOS</label>
+          <input type="file" id="bulkFileInput" class="sr-only" accept="image/*,video/*" multiple onchange="window.handleDropFiles(this.files)">
         </div>
 
-        <div class="a-preview" id="previewWrap" style="display:flex;">
-          <div class="a-thumb a-thumb-lg" id="previewThumb">📷</div>
-          <div class="a-preview-info">
-            <p class="a-preview-nome" id="previewNome"></p>
-            <p class="a-preview-cat" id="previewCat"></p>
+        <div id="bulkStatusBox" style="display:none; margin-top:16px; background:#0f172a; padding:12px; border-radius:8px; border:1px solid #1e293b;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <p style="font-size:12px; color:#f1f5f9; font-weight:bold;" id="bulkTitle">Enviando arquivos...</p>
+            <p style="font-size:12px; color:#38bdf8; font-weight:bold;" id="bulkCounter">0/0</p>
           </div>
-        </div>
-
-        <div class="a-row2" style="margin-top:16px;">
-          <div class="a-field">
-            <label class="a-label">Preço (R$) *</label>
-            <input id="fPreco" type="number" step="0.01" min="0" placeholder="0,00" class="a-input">
+          <div style="width:100%; height:6px; background:#1e293b; border-radius:3px; overflow:hidden;">
+            <div id="bulkBar" style="width:0%; height:100%; background:#38bdf8; transition:width 0.3s;"></div>
           </div>
-          <div class="a-field">
-            <label class="a-label">Estoque</label>
-            <input id="fEstoque" type="number" min="0" placeholder="0" class="a-input">
-          </div>
+          <p id="bulkLog" style="margin-top:8px; font-size:11px; color:#94a3b8; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></p>
         </div>
-
-        <div class="a-field">
-          <label class="a-label">
-            Descrição
-            <span class="a-badge" id="descBadge">AUTO</span>
-          </label>
-          <textarea id="fDesc" rows="3" class="a-input"
-            placeholder="Gerada automaticamente pelo nome do produto..."></textarea>
-        </div>
-
-        <div class="a-toggle-row">
-          <div>
-            <p class="a-toggle-label">Visível na loja</p>
-            <p class="a-toggle-sub">Ative para aparecer no site</p>
-          </div>
-          <button id="cadToggleBtn" class="toggle-btn" onclick="toggleCadAtivo()" style="background:#334155;">
-            <span id="cadToggleDot" class="toggle-dot" style="transform:translateX(0);"></span>
-          </button>
-        </div>
-
-        <div class="a-fb" id="fbCad" style="display:none;"></div>
-
-        <button class="a-btn a-btn-blue" id="btnCad" onclick="cadastrarLocal()">
-          ⚡ CADASTRAR PRODUTO
-        </button>
       </div>
     </section>
 
@@ -290,12 +249,25 @@
       <button class="drawer-close" onclick="closeDrawer()">×</button>
     </div>
 
-    <div class="a-edit-midia">
-      <div class="a-thumb a-thumb-lg" id="editThumb">📷</div>
-      <div>
-        <label for="editArq" class="a-btn-midia">📷 TROCAR MÍDIA</label>
-        <input type="file" id="editArq" class="sr-only" accept="image/*,video/*" onchange="onEditMidia(this)">
-        <p class="a-midia-status" id="editMidStatus"></p>
+    <div class="a-edit-midia" style="flex-direction:column; align-items:flex-start; margin-top:16px;">
+      <div style="display:flex; width:100%; gap:12px; align-items:center;">
+        <div class="a-thumb a-thumb-lg" id="editThumb">📷</div>
+        <div>
+          <label for="editArq" class="a-btn-midia">📷 TROCAR PRINCIPAL</label>
+          <input type="file" id="editArq" class="sr-only" accept="image/*,video/*" onchange="onEditMidia(this)">
+          <p class="a-midia-status" id="editMidStatus"></p>
+        </div>
+      </div>
+      
+      <div style="margin-top:16px; width:100%; border-top:1px solid rgba(255,255,255,0.1); padding-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <p style="font-size:11px; font-weight:bold; color:var(--mut);">ÂNGULOS EXTRAS</p>
+          <label for="editExtraArq" style="font-size:11px; cursor:pointer; color:#38bdf8;">+ ADICIONAR FOTO/VÍDEO</label>
+          <input type="file" id="editExtraArq" class="sr-only" accept="image/*,video/*" multiple onchange="onEditExtraMidia(this)">
+        </div>
+        <div id="extraImagesList" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; min-height:50px; align-items:center;">
+          <!-- thumbs go here -->
+        </div>
       </div>
     </div>
 
@@ -602,106 +574,98 @@
       btn.textContent = '⬇️ SINCRONIZAR ARQUIVOS DA PASTA /PRODUTOS';
     };
 
-    // ── UPLOAD INDIVIDUAL PRODUTOS ───────────────────────────
-    let _selectedFile = null;
-    let _cadAtivo = false;
+    // ── UPLOAD EM MASSA PRODUTOS ───────────────────────────
+    window.handleDropFiles = async (files) => {
+      if (!files || files.length === 0) return;
+      const fileArray = Array.from(files).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+      if (fileArray.length === 0) { toast('Nenhum arquivo válido suportado.', 'warning'); return; }
 
-    window.selecionarArquivoUpload = (input) => {
-      const f = input.files[0];
-      if (!f) return;
-      _selectedFile = f;
-
-      const nomeCompleto = f.name;
-      const i = nomeCompleto.lastIndexOf('.');
-      const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
-
-      const isV = f.type.startsWith('video/');
-      const url = URL.createObjectURL(f);
-
-      $('previewThumb').innerHTML = isV
-        ? `<video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
-        : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onload="URL.revokeObjectURL(this.src)">`;
-
-      $('previewNome').textContent = nome;
-      $('previewCat').textContent = detectarCat(nome);
-      $('fDesc').value = descAuto(nome, detectarCat(nome));
-      window.setBadge('descBadge', 'AUTO', '#1e40af', '#93c5fd');
-      hideFb($('fbCad'));
-
-      $('cadFormCard').style.display = 'block';
-      $('cadFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    window.limparSelecao = () => {
-      _selectedFile = null;
-      const input = $('localFileInput');
-      if (input) input.value = '';
-      $('cadFormCard').style.display = 'none';
-      $('fPreco').value = '';
-      $('fEstoque').value = '';
-      $('fDesc').value = '';
-    };
-
-    window.toggleCadAtivo = () => {
-      _cadAtivo = !_cadAtivo;
-      $('cadToggleBtn').style.background = _cadAtivo ? '#2563eb' : '#334155';
-      $('cadToggleDot').style.transform = _cadAtivo ? 'translateX(21px)' : 'translateX(0)';
-    };
-
-    window.cadastrarLocal = async () => {
-      if (!_selectedFile) { showFb($('fbCad'), '⚠️ Selecione uma imagem primeiro.', 'erro'); return; }
-      const preco = parseFloat($('fPreco').value);
-      if (!preco || preco <= 0) { showFb($('fbCad'), '⚠️ Informe um preço válido.', 'erro'); return; }
-
-      const est = parseInt($('fEstoque').value) || 0;
-      const desc = $('fDesc').value.trim();
-      const nomeCompleto = _selectedFile.name;
-      const i = nomeCompleto.lastIndexOf('.');
-      const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
-      const cat = detectarCat(nome);
-      const btn = $('btnCad'), fb = $('fbCad');
-      hideFb(fb);
-
-      btn.disabled = true;
-      btn.textContent = 'Enviando (1/2)...';
-
-      try {
-        const urlObj = await uploadMidia(_selectedFile, (pct) => {
-          btn.textContent = `Enviando Arquivo (${Math.round(pct)}%)...`;
-        });
-
-        await criarProduto({
-          nome,
-          categoria: cat,
-          preco,
-          estoque: est,
-          descricao: desc || descAuto(nome, cat),
-          imagem: urlObj.url,
-          storage_path: urlObj.path,
-          ativo: _cadAtivo
-        });
-
-        showFb(fb, `✅ "${nome}" cadastrado com sucesso e enviado p/ o Supabase!`, 'ok');
-        limparSelecao();
-        btn.disabled = false;
-        btn.textContent = '⚡ CADASTRAR PRODUTO';
-        await loadEstoque();
-      } catch (e) {
-        console.error('[KAZZI] Erro ao criar:', e);
-        showFb(fb, traduzErro(e), 'erro');
-        btn.disabled = false;
-        btn.textContent = '⚡ CADASTRAR PRODUTO';
+      $('bulkStatusBox').style.display = 'block';
+      let count = 0;
+      let total = fileArray.length;
+      
+      for (const f of fileArray) {
+        count++;
+        $('bulkCounter').textContent = `${count}/${total}`;
+        const nomeCompleto = f.name;
+        const i = nomeCompleto.lastIndexOf('.');
+        const nome = i > 0 ? nomeCompleto.substring(0, i) : nomeCompleto;
+        const cat = detectarCat(nome);
+        
+        $('bulkLog').textContent = `Enviando ${nomeCompleto}...`;
+        $('bulkBar').style.width = Math.round((count - 1) / total * 100) + '%';
+        
+        try {
+          // Faz upload do arquivo
+          const urlObj = await uploadMidia(f, (pct) => {
+            $('bulkLog').textContent = `Enviando ${nomeCompleto} (${Math.round(pct)}%)`;
+          });
+          
+          await criarProduto({
+            nome,
+            categoria: cat,
+            preco: 0,
+            estoque: 0,
+            descricao: descAuto(nome, cat),
+            imagem: urlObj.url,
+            storage_path: urlObj.path,
+            ativo: false // Vai direto pro Oculto
+          });
+          
+        } catch(e) {
+          console.error(e);
+          toast(`Erro ao enviar ${nomeCompleto}: ` + traduzErro(e), 'erro');
+        }
+        
+        $('bulkBar').style.width = Math.round(count / total * 100) + '%';
       }
+      
+      $('bulkLog').textContent = `Concluído! ${count} produtos enviados para a área de Ocultos.`;
+      toast('Upload concluído com sucesso!', 'ok');
+      await loadEstoque();
     };
 
 
 
     // ── EDITOR ────────────────────────────────────────────────
-    let _editId = null, _editAtivo = true, _editFile = null;
+    let _editId = null, _editAtivo = true, _editFile = null, _extraFiles = [], _existingExtras = [];
+
+    function renderExtraImages() {
+      const list = $('extraImagesList');
+      if (!list) return;
+      let html = '';
+      _existingExtras.forEach((url, idx) => {
+        const isV = /\.(mp4|webm|mov)$/i.test(url);
+        const m = isV ? `<video src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" muted></video>`
+                      : `<img src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">`;
+        html += `<div style="position:relative;flex-shrink:0;"><div style="width:40px;height:40px;border-radius:4px;overflow:hidden">${m}</div><button onclick="rmExtra(${idx})" style="position:absolute;top:-5px;right:-5px;background:red;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:1;border:none;cursor:pointer;padding:0;">×</button></div>`;
+      });
+      _extraFiles.forEach((f, idx) => {
+        const url = URL.createObjectURL(f);
+        const isV = f.type.startsWith('video/');
+        const m = isV ? `<video src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" muted></video>`
+                      : `<img src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" onload="URL.revokeObjectURL(this.src)">`;
+        html += `<div style="position:relative;flex-shrink:0;"><div style="width:40px;height:40px;border-radius:4px;overflow:hidden;border:2px solid #38bdf8;">${m}</div><button onclick="rmExtraNew(${idx})" style="position:absolute;top:-5px;right:-5px;background:red;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:1;border:none;cursor:pointer;padding:0;">×</button></div>`;
+      });
+      if (!_existingExtras.length && !_extraFiles.length) html = '<p class="a-empty" style="font-size:11px;margin:0;">Nenhuma foto extra</p>';
+      list.innerHTML = html;
+    }
+
+    window.rmExtra = (idx) => { _existingExtras.splice(idx, 1); renderExtraImages(); };
+    window.rmExtraNew = (idx) => { _extraFiles.splice(idx, 1); renderExtraImages(); };
+    
+    window.onEditExtraMidia = (input) => {
+      if(input.files && input.files.length > 0){
+        Array.from(input.files).forEach(f => _extraFiles.push(f));
+        renderExtraImages();
+      }
+      input.value = '';
+    };
 
     window._openEditor = id => {
       const p = CACHE.find(x => x.id === id); if (!p) return;
       _editId = id; _editAtivo = p.ativo !== false; _editFile = null;
+      _extraFiles = []; _existingExtras = Array.isArray(p.imagens_extra) ? [...p.imagens_extra] : [];
 
       $('editNome').value = p.nome || '';
       $('editPreco').value = p.preco || '';
@@ -718,6 +682,7 @@
           ? `<video src="${img}" style="width:100%;height:100%;object-fit:cover;" muted preload="metadata"></video>`
           : `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
 
+      renderExtraImages();
       updToggle();
       $('dOverlay').classList.add('open');
       $('drawer').classList.add('open');
@@ -768,16 +733,22 @@
       btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> Salvando...';
       showFb(fb, 'Salvando...', 'info');
 
-      const p = CACHE.find(x => x.id === _editId);
-
       try {
         let updateData = { nome, preco, estoque: est, descricao: desc, ativo: _editAtivo };
         
         if (_editFile) {
-          const urlObj = await uploadMidia(_editFile, (pct) => { btn.textContent = `Enviando Arquivo (${Math.round(pct)}%)...`; });
+          const urlObj = await uploadMidia(_editFile, (pct) => { btn.textContent = `Principal (${Math.round(pct)}%)...`; });
           updateData.imagem = urlObj.url;
           updateData.storage_path = urlObj.path;
         }
+
+        if (_extraFiles.length > 0) {
+          for(let f of _extraFiles) {
+            const urlObj = await uploadMidia(f, (pct) => { btn.textContent = `Extra (${Math.round(pct)}%)...`; });
+            _existingExtras.push(urlObj.url);
+          }
+        }
+        updateData.imagens_extra = _existingExtras;
 
         await editarProduto(_editId, updateData);
         showFb(fb, '✅ Produto salvo com sucesso!', 'ok');
