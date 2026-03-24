@@ -1,34 +1,38 @@
 // ═══════════════════════════════════════
-// PagSeguro — Netlify Function
+// PagSeguro — Netlify Function (MODERN API v4/v5)
 // ═══════════════════════════════════════
-const PG_BASE = 'https://ws.pagseguro.uol.com.br';
+const PG_WS = 'https://ws.pagseguro.uol.com.br';
+const PG_API = 'https://api.pagseguro.com';
 
-async function pgFetch(endpoint, body) {
-  const token = process.env.PAGSEGURO_TOKEN;
+async function pgFetch(endpoint, body, method = 'POST', isModern = true, customToken = null) {
+  const token = customToken || process.env.PAGSEGURO_TOKEN;
   const email = process.env.PAGSEGURO_EMAIL;
 
-  if (endpoint.includes('/checkout')) {
+  if (!isModern) {
     const params = new URLSearchParams();
     params.append('email', email);
     params.append('token', token);
-    Object.entries(body).forEach(([k, v]) => params.append(k, v));
+    if (body) Object.entries(body).forEach(([k, v]) => params.append(k, v));
 
-    const res = await fetch(`${PG_BASE}${endpoint}?${params.toString()}`, {
-      method: 'POST',
+    const res = await fetch(`${PG_WS}${endpoint}?${params.toString()}`, {
+      method: method,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'Accept': 'application/json' }
     });
     const text = await res.text();
     try { return JSON.parse(text); } catch { return { code: text.match(/<code>([^<]+)<\/code>/)?.[1] || '', raw: text }; }
+  } else {
+    // Modern API v4/v5
+    const res = await fetch(`${PG_API}${endpoint}`, {
+      method: method,
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    return await res.json();
   }
-
-  const separator = endpoint.includes('?') ? '&' : '?';
-  const res = await fetch(`${PG_BASE}${endpoint}${separator}email=${encodeURIComponent(email)}&token=${token}`, {
-    method: endpoint.includes('/cancelling') || endpoint.includes('/refunding') ? 'POST' : 'GET',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: endpoint.includes('/cancelling') || endpoint.includes('/refunding') ? JSON.stringify(body) : undefined
-  });
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { raw: text }; }
 }
 
 exports.handler = async (event) => {
@@ -112,52 +116,72 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: JSON.stringify({ success: false, error: result.errors?.[0]?.message || 'Erro PagSeguro', raw: result }) };
       }
 
-      case 'create_boleto': {
+      case 'create_checkout': {
+        // params: items: [], orderId, customer: {name, email, phone}, shipping: {cost, address}
         const pgBody = {
-          'reference': params.orderId,
-          'senderName': params.customerName,
-          'senderAreaCode': params.phone?.substring(0, 2) || '47',
-          'senderPhone': params.phone?.substring(2) || '',
-          'senderEmail': params.customerEmail || 'cliente@email.com',
-          'senderCPF': params.customerCPF || '',
-          'shippingAddressRequired': 'false',
-          'currency': 'BRL',
-          'redirectURL': params.redirectURL || 'https://kazzi.com.br/',
-          'notificationURL': params.notificationURL || 'https://kazzi.com.br/.netlify/functions/pagseguro?action=notification',
-          'paymentMethod': 'boleto',
+          reference_id: params.orderId,
+          customer: {
+            name: params.customer?.name || 'Cliente Kazzi',
+            email: params.customer?.email || 'cliente@email.com',
+            tax_id: params.customer?.cpf?.replace(/\D/g, '') || '00000000000',
+            phones: [{
+              country: '55',
+              area: params.customer?.phone?.replace(/\D/g, '').substring(0, 2) || '47',
+              number: params.customer?.phone?.replace(/\D/g, '').substring(2) || '999999999',
+              type: 'MOBILE'
+            }]
+          },
+          items: (params.items || []).map(it => ({
+            reference_id: it.id || 'prod',
+            name: it.nome,
+            quantity: it.qty,
+            unit_amount: Math.round(Number(it.preco) * 100)
+          })),
+          redirect_url: 'https://moisesvvanti-dev.github.io/carrinho.html?step=confirm',
+          notification_urls: ['https://moisesvvanti-dev.github.io/.netlify/functions/pagseguro?action=notification']
         };
 
-        (params.items || []).forEach((item, i) => {
-          const idx = i + 1;
-          pgBody[`itemId${idx}`] = item.id || `item${idx}`;
-          pgBody[`itemDescription${idx}`] = item.nome;
-          pgBody[`itemAmount${idx}`] = Number(item.preco).toFixed(2);
-          pgBody[`itemQuantity${idx}`] = item.qty;
-        });
-
-        if (params.shippingCost > 0) {
-          const idx = (params.items?.length || 0) + 1;
-          pgBody[`itemId${idx}`] = 'frete';
-          pgBody[`itemDescription${idx}`] = 'Frete';
-          pgBody[`itemAmount${idx}`] = Number(params.shippingCost).toFixed(2);
-          pgBody[`itemQuantity${idx}`] = '1';
+        if (params.shipping?.cost > 0) {
+          pgBody.shipping = {
+             address: {
+               street: params.shipping.address?.street || '',
+               number: params.shipping.address?.number || '',
+               complement: params.shipping.address?.complement || '',
+               locality: params.shipping.address?.district || '',
+               city: params.shipping.address?.city || '',
+               region_code: params.shipping.address?.state || '',
+               country: 'BRA',
+               postal_code: params.shipping.address?.zip?.replace(/\D/g, '') || ''
+             }
+          };
+          // Shipping cost is added as an item or fee in some APIs, 
+          // but in PagBank Checkouts it might be better as a separate field if available, 
+          // or just an item.
+          pgBody.items.push({
+            reference_id: 'FRETE',
+            name: 'Frete (Especial)',
+            quantity: 1,
+            unit_amount: Math.round(Number(params.shipping.cost) * 100)
+          });
         }
 
-        const result = await pgFetch('/v2/transactions', pgBody);
-
-        if (result.code) {
+        const result = await pgFetch('/checkouts', pgBody, 'POST', true, params.token);
+        
+        if (result.links) {
+          const payLink = result.links.find(l => l.rel === 'PAY')?.href;
           return {
             statusCode: 200, headers,
-            body: JSON.stringify({
-              success: true,
-              transactionId: result.code,
-              status: result.status,
-              paymentLink: result.paymentLink?.paymentLink || null
-            })
+            body: JSON.stringify({ success: true, paymentLink: payLink, raw: result })
           };
         }
+        return { statusCode: 200, headers, body: JSON.stringify({ success: false, error: result.error_messages?.[0]?.description || 'Erro na API PagBank' }) };
+      }
 
-        return { statusCode: 200, headers, body: JSON.stringify({ success: false, error: result.errors?.[0]?.message || 'Erro PagSeguro' }) };
+      case 'create_pix': {
+        // Manteve compatibilidade básica com v2 se necessário, ou migramos tudo. 
+        // Para simplificar, vou deixar como estava mas usando isModern=false se o usuário ainda usa Token v2 legacy.
+        const result = await pgFetch('/v2/transactions', params, 'POST', false);
+        return { statusCode: 200, headers, body: JSON.stringify(result) };
       }
 
       case 'get_status': {

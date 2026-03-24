@@ -373,42 +373,53 @@ window.processPayment = async () => {
     saveOrderLocal(orderLocal);
 
     if (PAY_METHOD === 'pagseguro') {
-      let psEmail = 'suporte@kazzi.com.br';
       try {
-        const { data: snap } = await supabase.from('kazzi_settings').select('pagseguro_email').eq('id', 'delivery').single();
-        if (snap && snap.pagseguro_email) psEmail = snap.pagseguro_email;
-      } catch(e) {}
-      
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://pagseguro.uol.com.br/v2/checkout/payment.html';
+        // 1. Pegar o Token do Admin (Supabase)
+        const { data: snap } = await supabase.from('kazzi_settings').select('pagseguro_token').eq('id', 'delivery').single();
+        const token = snap?.pagseguro_token;
 
-      const addInput = (n,v) => { const i=document.createElement('input'); i.type='hidden'; i.name=n; i.value=v; form.appendChild(i); };
+        if (!token) {
+          toast('Erro: Token do PagSeguro não configurado no Admin.', 'erro');
+          btn.disabled = false; btn.textContent = 'FINALIZAR COMPRA ✅';
+          return;
+        }
 
-      addInput('receiverEmail', psEmail);
-      addInput('currency', 'BRL');
-      addInput('reference', pedidoId);
+        // 2. Chamar a nossa Função Netlify (Ponte segura para o PagBank)
+        const response = await fetch('/.netlify/functions/pagseguro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create_checkout',
+            orderId: pedidoId,
+            token: token,
+            customer: {
+              name: addr.name,
+              email: addr.email,
+              phone: addr.phone
+            },
+            items: cart,
+            shipping: {
+              cost: frete,
+              address: addr
+            }
+          })
+        });
 
-      cart.forEach((item, idx) => {
-         const i = idx + 1;
-         addInput(`itemId${i}`, item.id || i);
-         addInput(`itemDescription${i}`, `${item.nome} (${item.tam || 'Único'})`);
-         addInput(`itemAmount${i}`, Number(item.preco).toFixed(2));
-         addInput(`itemQuantity${i}`, item.qty);
-      });
+        const resData = await response.json();
 
-      if (frete > 0) {
-         addInput('shippingType', '3'); // Fixo/Não especificado
-         addInput('shippingCost', Number(frete).toFixed(2));
+        if (resData.success && resData.paymentLink) {
+          Cart.clear();
+          window.location.href = resData.paymentLink; // Redireciona para o checkout profissional
+          return;
+        } else {
+          throw new Error(resData.error || 'Erro ao gerar link de pagamento');
+        }
+      } catch (err) {
+        console.error('[KAZZI] Falha Checkout PagBank:', err);
+        toast('Erro ao iniciar PagSeguro: ' + err.message, 'erro');
+        btn.disabled = false; btn.textContent = 'FINALIZAR COMPRA ✅';
+        return;
       }
-
-      addInput('senderName', addr.name);
-      addInput('senderEmail', addr.email);
-
-      document.body.appendChild(form);
-      Cart.clear();
-      form.submit();
-      return;
     }
 
     Cart.clear();
