@@ -1,7 +1,8 @@
 function load_script(src, remote = true, transfer = []) {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = src;
+    // Add cache busting
+    script.src = src + (src.includes("?") ? "&" : "?") + "v=" + Date.now();
     script.onload = resolve;
     script.onerror = reject;
     document.head.appendChild(script);
