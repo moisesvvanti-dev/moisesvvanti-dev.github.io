@@ -1,0 +1,9 @@
+﻿@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+pup_extracted/
+PS4UPDATE.PUP
+bin/
+PFU-PupFileUnpacker/

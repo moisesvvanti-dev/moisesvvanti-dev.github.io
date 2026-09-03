@@ -1,0 +1,697 @@
+/* ============================================
+   PS4 WebKit Exploit - Modern Dark Theme
+   Designed for PS4 Browser (WebKit-based)
+   ============================================ */
+
+/* --- CSS Variables (PS4 Color Palette) --- */
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #1a1a2e;
+  --bg-card-hover: #22223a;
+  --bg-input: #16162a;
+  --border-color: #2a2a4a;
+  --border-glow: #3a3a6a;
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888aa;
+  --text-muted: #55557a;
+  --accent-blue: #0066cc;
+  --accent-blue-hover: #0077ee;
+  --accent-green: #00cc66;
+  --accent-green-dim: #008844;
+  --accent-red: #cc3344;
+  --accent-yellow: #ccaa22;
+  --console-bg: #0a0a0f;
+  --console-text: #00ff88;
+  --console-prompt: #00cc66;
+  --console-cmd: #66aaff;
+  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(0, 102, 204, 0.15);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* --- PS4 Container --- */
+.ps4-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- Header --- */
+.ps4-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.header-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ps4-logo {
+  width: 32px;
+  height: 32px;
+  color: var(--accent-blue);
+  filter: drop-shadow(0 0 8px rgba(0, 102, 204, 0.4));
+}
+
+.header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, #88bbff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fw-version {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-green-dim);
+  transition: var(--transition);
+}
+
+.status-dot.active {
+  background: var(--accent-green);
+  box-shadow: 0 0 12px rgba(0, 204, 102, 0.5);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- Main Layout --- */
+.ps4-main {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+}
+
+.panel-left {
+  width: 340px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-right {
+  flex: 1;
+  display: flex;
+}
+
+/* --- Cards --- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.card-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-blue);
+}
+
+.card-body {
+  padding: 18px;
+}
+
+/* --- Kernel Form --- */
+.kernel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.radio-group:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-card-hover);
+}
+
+.radio-group input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 2px solid var(--text-muted);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.radio-group input[type="radio"]:checked {
+  border-color: var(--accent-green);
+  background: var(--accent-green);
+  box-shadow: 0 0 8px rgba(0, 204, 102, 0.3);
+}
+
+.radio-group input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+.radio-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radio-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.radio-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* --- Divider --- */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+  margin: 14px 0;
+}
+
+/* --- Auto JB Toggle --- */
+.auto-jb-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 42px;
+  height: 24px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  position: relative;
+  transition: var(--transition);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent-green-dim);
+  border-color: var(--accent-green);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  left: 20px;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px rgba(0, 204, 102, 0.4);
+}
+
+.toggle-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* --- Jailbreak Button --- */
+.btn-jailbreak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #0044aa 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-jailbreak::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: 0.5s;
+}
+
+.btn-jailbreak:hover::before {
+  left: 100%;
+}
+
+.btn-jailbreak:hover {
+  background: linear-gradient(135deg, var(--accent-blue-hover) 0%, #0055cc 100%);
+  box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-jailbreak:active {
+  transform: translateY(0);
+}
+
+.btn-jailbreak:disabled {
+  background: #1a1a3a;
+  color: #444466;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-jailbreak:disabled::before {
+  display: none;
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Info Card --- */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.info-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.info-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+/* --- Console Card --- */
+.console-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #0d0d15;
+  border-bottom: 1px solid #1a1a2a;
+}
+
+.console-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.console-title {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #55557a;
+  text-transform: none;
+}
+
+.console-clear {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.console-clear:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.05);
+}
+
+.console-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+}
+
+#console {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  background: var(--console-bg);
+  color: var(--console-text);
+  padding: 16px;
+  margin: 0;
+  width: 100%;
+  min-height: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border: none;
+  outline: none;
+  resize: none;
+  tab-size: 4;
+}
+
+#console .prompt {
+  color: var(--console-prompt);
+  font-weight: bold;
+}
+
+#console .cmd {
+  color: var(--console-cmd);
+}
+
+#console .output {
+  color: var(--console-text);
+  opacity: 0.9;
+}
+
+#console .error {
+  color: var(--accent-red);
+}
+
+#console .warn {
+  color: var(--accent-yellow);
+}
+
+#console .info {
+  color: var(--accent-blue);
+}
+
+#console .success {
+  color: var(--accent-green);
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* --- Scrollbar Styling --- */
+#console::-webkit-scrollbar {
+  width: 6px;
+}
+
+#console::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#console::-webkit-scrollbar-thumb {
+  background: #1a1a3a;
+  border-radius: 3px;
+}
+
+#console::-webkit-scrollbar-thumb:hover {
+  background: #2a2a4a;
+}
+
+/* --- Footer --- */
+.ps4-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+}
+
+.footer-sep {
+  opacity: 0.3;
+}
+
+.footer-dynamic {
+  color: var(--accent-green-dim);
+}
+
+/* --- Responsive --- */
+@media (max-width: 800px) {
+  .ps4-main {
+    flex-direction: column;
+  }
+  
+  .panel-left {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .header-title {
+    font-size: 1rem;
+  }
+  
+  .ps4-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ps4-container {
+    padding: 8px;
+  }
+  
+  .card-body {
+    padding: 12px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  #console {
+    font-size: 0.75rem;
+    padding: 10px;
+    min-height: 200px;
+  }
+}
+
+/* --- PS4 Browser Specific Fixes --- */
+@supports (-webkit-overflow-scrolling: touch) {
+  #console {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .btn-jailbreak {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* --- Loading Animation --- */
+.loading-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--bg-input);
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: var(--accent-blue);
+  animation: loading 2s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% { left: -50%; }
+  100% { left: 100%; }
+}
+
+/* --- Status Badge --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background: rgba(0, 204, 102, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 204, 102, 0.3);
+}
+
+.badge-error {
+  background: rgba(204, 51, 68, 0.15);
+  color: var(--accent-red);
+  border: 1px solid rgba(204, 51, 68, 0.3);
+}
+
+.badge-warning {
+  background: rgba(204, 170, 34, 0.15);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(204, 170, 34, 0.3);
+}

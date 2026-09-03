@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CSSFontFace Exploit - PS4 WebKit</title>
+  <link rel="stylesheet" href="includes/style.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600;700&display=swap');
+  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💥</text></svg>">
+</head>
+<body>
+  <div class="ps4-container">
+    <!-- Header -->
+    <header class="ps4-header">
+      <div class="header-badge">
+        <svg class="ps4-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-title">PS4 WebKit Exploit</span>
+      </div>
+      <div class="header-status">
+        <span class="fw-version" id="UA">Firmware: --</span>
+        <span class="status-dot" id="statusDot"></span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="ps4-main">
+      <!-- Left Panel -->
+      <div class="panel-left">
+        <div class="card exploit-card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+            </svg>
+            <span>Exploit Settings</span>
+          </div>
+          <div class="card-body">
+            <form id="kernel-options" class="kernel-form">
+              <label class="radio-group">
+                <input type="radio" name="kernel" id="netctrl-exploit" value="netctrl">
+                <span class="radio-label">
+                  <span class="radio-title">NetCtrl</span>
+                  <span class="radio-desc">UAF + kqueue (recommended)</span>
+                </span>
+              </label>
+              <label class="radio-group">
+                <input type="radio" name="kernel" id="lapse-exploit" value="lapse">
+                <span class="radio-label">
+                  <span class="radio-title">Lapse</span>
+                  <span class="radio-desc">Double-free variant</span>
+                </span>
+              </label>
+            </form>
+
+            <div class="divider"></div>
+
+            <div class="auto-jb-section">
+              <label class="toggle-switch">
+                <input type="checkbox" id="autoJbInput">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label" id="autoJbLabel">Auto Jailbreak</span>
+              </label>
+            </div>
+
+            <button id="jeilbrek" class="btn-jailbreak">
+              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span>EXECUTE JAILBREAK</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card info-card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <span>Firmware Info</span>
+          </div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Console</span>
+                <span class="info-value" id="consoleType">PS4</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Firmware</span>
+                <span class="info-value" id="fwVersion">--</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">WebKit</span>
+                <span class="info-value" id="webkitVersion">--</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Kernel</span>
+                <span class="info-value" id="kernelExploit">Auto</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel - Console -->
+      <div class="panel-right">
+        <div class="card console-card">
+          <div class="card-header console-header">
+            <div class="console-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="console-title">Terminal Output</span>
+            <span class="console-clear" id="clearConsole">Clear</span>
+          </div>
+          <div class="card-body console-body">
+            <pre id="console">
+              <span class="prompt">$</span> <span class="cmd">system.boot</span>
+              <span class="output">[OK] PS4 WebKit Exploit initialized</span>
+              <span class="prompt">$</span> <span class="cmd">awaiting.user</span>
+              <span class="output cursor-blink">_</span>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="ps4-footer">
+      <span>CSSFontFace UAF Exploit</span>
+      <span class="footer-sep">|</span>
+      <span>Runtime Scanner v1.0</span>
+      <span class="footer-sep">|</span>
+      <span class="footer-dynamic">Dynamic Offsets</span>
+    </footer>
+  </div>
+
+  <script src="src/main.js"></script>
+  <script src="includes/script.js"></script>
+</body>
+</html>
