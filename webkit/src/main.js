@@ -34,7 +34,17 @@ async function doJb() {
 
     let rw = undefined;
     if (arw.master === undefined) {
-      rw = await init_rw();
+      try {
+        rw = await init_rw();
+      } catch (e) {
+        logger.error("init_rw failed: " + e.message);
+        throw e;
+      }
+    }
+
+    // Check if UAF succeeded
+    if (!rw || !rw.uaf_ab) {
+      throw new Error("UAF failed - unable to get initial read/write primitive");
     }
 
     // Stage 1: Scan CSSFontFace struct offsets (needed by init_arw)
