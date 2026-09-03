@@ -466,4 +466,4 @@ scanner.scan_all = function(webkit_base, css_offsets) {
   return results;
 };
 
-export default scanner;
+// scanner is global
