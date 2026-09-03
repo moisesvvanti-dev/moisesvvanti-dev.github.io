@@ -11,6 +11,9 @@ function load_script(src, remote = true, transfer = []) {
 async function doJb() {
   await load_script("src/misc.js");
 
+    // Load constants (firmware-specific offsets)
+    await load_script("src/ps4/constants.js");
+
   try {
     version.init();
     switch (version.console) {
